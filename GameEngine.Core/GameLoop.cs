@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GameEngine.Core.Systems;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -8,18 +9,27 @@ using System.Threading.Tasks;
 
 namespace GameEngine.Core
 {
-    public class GameLoop : IDisposable
+    public class GameLoop(Game game) : IDisposable
     {
 
-        private Game _game;
-        private SpriteBatch _spriteBatch;
+        private Game _game = game;
+        private List<EngineSystem> _systems = new List<EngineSystem>();
+        private SpriteBatch? _spriteBatch;
 
         private TimeSpan _accumulator = TimeSpan.Zero;
         private TimeSpan _fixedUpdateStep = TimeSpan.FromSeconds(1.0 / 60.0);
 
-        public GameLoop(Game game)
+        public void RegisterSystem(EngineSystem system)
         {
-            _game = game;
+            if (!_systems.Contains(system))
+            {
+                _systems.Add(system);
+            }
+        }
+
+        public void UnregiserSystem(EngineSystem system)
+        {
+            _systems.Remove(system);
         }
 
         /// <summary>
@@ -27,7 +37,10 @@ namespace GameEngine.Core
         /// </summary>
         public void Initialize()
         {
-
+            foreach (EngineSystem system in _systems)
+            {
+                  system.Initialize();
+            }
         }
 
         /// <summary>
@@ -37,6 +50,10 @@ namespace GameEngine.Core
         public void LoadContent(SpriteBatch spriteBatch)
         {
             _spriteBatch = spriteBatch;
+            foreach (EngineSystem system in _systems)
+            {
+                system.LoadContent();
+            }
         }
 
         /// <summary>
@@ -49,6 +66,10 @@ namespace GameEngine.Core
             while (_accumulator >= _fixedUpdateStep)
             {
                 _accumulator -= _fixedUpdateStep;
+                foreach (EngineSystem system in _systems)
+                {
+                    system.Update(gameTime);
+                }
             }
         }
 
@@ -61,7 +82,10 @@ namespace GameEngine.Core
             _game.GraphicsDevice.Clear(Color.White);
             if (_spriteBatch != null)
             {
-
+                foreach (EngineSystem system in _systems)
+                {
+                    system.Draw(_spriteBatch);
+                }
             }
         }
 
@@ -71,7 +95,11 @@ namespace GameEngine.Core
         /// <exception cref="NotImplementedException"></exception>
         public void Dispose()
         {
-            throw new NotImplementedException();
+            foreach (EngineSystem system in _systems)
+            {
+                system.Dispose();
+            }
+            _systems.Clear();
         }
     }
 }
