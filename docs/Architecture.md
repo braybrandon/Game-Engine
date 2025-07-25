@@ -7,86 +7,81 @@ This document outlines the architecture for your ECS-based MonoGame engine, cove
 ## 1. Core Engine & Game Loop Hierarchy
 
 This diagram illustrates the flow of control and updates during your game's runtime.
+```mermaid
+graph TD
+    A[ MonoGame Main Game Loop<br>MyGame.cs] --> B("MyGame.Run() <br>Called by MonoGame Framework, runs continuously")
 
-[1. MonoGame Main Game Loop] - MyGame.cs (Your class inheriting from Microsoft.Xna.Framework.Game)
-    ├── MyGame.Run() (Called by MonoGame Framework)
-    │   ├──> MyGame.Update(gameTime)  <-- Your game's per-frame logic update
-    │   │      │
-    │   │      ├── 1. Global Service Updates (Order is CRITICAL here for fresh data)
-    │   │      │   ├──> ServiceLocator.Get<ITimeManager>().Update(gameTime)
-    │   │      │   │     (Updates internal elapsed/total time for the frame)
-    │   │      │   └──> ((MonoGameInputService)ServiceLocator.Get<IInputService>()).Update()
-    │   │      │         (Polls Keyboard, Mouse, GamePad states ONCE for the frame)
-    │   │      │
-    │   │      ├── 2. Game State Orchestration
-    │   │      │   └──> ServiceLocator.Get<IGameStateManager>().Update(gameTime)
-    │   │      │          │
-    │   │      │          └──> Active IScene (e.g., MainMenuScene, LevelOneScene).Update(gameTime)
-    │   │      │                 (The currently active "game state" object)
-    │   │      │                 │
-    │   │      │                 └──> Scene's Owned GameLoop.Update(gameTime)
-    │   │      │                        (YOUR custom GameLoop instance, orchestrates ECS Systems for this scene)
-    │   │      │                        │
-    │   │      │                        ├── (Internal: Handles Fixed-Time Step Accumulation)
-    │   │      │                        │    (Ensures systems get a consistent delta time for physics, AI, etc.)
-    │   │      │                        └── For each EngineSystem in GameLoop's registered list:
-    │   │      │                            ├──> EngineSystem.Update(fixedDeltaTime)
-    │   │      │                            │      (Performs specific game logic based on entity components)
-    │   │      │                            │      ├── Reads/Writes: ComponentManager
-    │   │      │                            │      │   (To get/set Components for entities it's interested in)
-    │   │      │                            │      ├── Reads: ServiceLocator.Get<IInputService>()
-    │   │      │                            │      │   (To get player input, NOT to poll raw state)
-    │   │      │                            │      ├── Reads: ServiceLocator.Get<ITimeManager>()
-    │   │      │                            │      │   (If it needs variable time for non-fixed updates or calculations)
-    │   │      │                            │      └── Reads/Writes: Other Services (e.g., IPhysicsService, IAudioService, IUIService)
-    │   │      │                            │          (For specific functions or data from other engine utilities)
-    │   │      │                            │
-    │   │      │                            └── Next EngineSystem.Update(...)
-    │   │      │
-    │   │      └── MyGame.base.Update(gameTime) (MonoGame's internal updates)
-    │   │
-    │   └──> MyGame.Draw(gameTime)  <-- Your game's per-frame rendering
-    │          │
-    │          ├── 1. Global Rendering Setup
-    │          │   └──> ServiceLocator.Get<IRenderer>().Clear(Color.CornflowerBlue)
-    │          │          (Clears the graphics device)
-    │          │
-    │          ├── 2. Game State Rendering Delegation
-    │          │   └──> ServiceLocator.Get<IGameStateManager>().Draw(gameTime)
-    │          │          │
-    │          │          └──> Active IScene.Draw(gameTime)
-    │          │                 (The current game state's rendering logic)
-    │          │                 │
-    │          │                 └──> Scene's Owned GameLoop.Draw(gameTime)
-    │          │                        (YOUR custom GameLoop, orchestrates rendering systems)
-    │          │                        │
-    │          │                        ├── (Internal: Renderer.BeginSpriteBatch() or similar global render setup)
-    │          │                        └── For each EngineSystem in GameLoop's registered list (specifically rendering systems):
-    │          │                            ├──> EngineSystem.Draw(renderer/spriteBatch)
-    │          │                            │      (Renders relevant components like SpriteComponent, TransformComponent)
-    │          │                            │      ├── Reads: ComponentManager (for rendering data)
-    │          │                            │      └── Uses: ServiceLocator.Get<IRenderer>() (or directly SpriteBatch) to draw
-    │          │                            │
-    │          │                            └── Next EngineSystem.Draw(...)
-    │          │                        
-    │          │                        └── (Internal: Renderer.EndSpriteBatch() or similar global render cleanup)
-    │          │
-    │          └── MyGame.base.Draw(gameTime) (MonoGame's internal drawing)
-    │
-    └── (Continuous loop until game exits)
+    B --> C("MyGame.Update(gameTime) <br>Your game's per-frame logic update")
+    B --> D("MyGame.Draw(gameTime) <br>Your game's per-frame rendering")
 
-[2. Static Global Access] - ServiceLocator.cs
-    ├── Register<TService>(instance)
-    └── Get<TService>()
-        (Provides global, easy access to single instances of Services)
+    subgraph Update Flow
+        C --> C1[ Global Service Updates<br>Order is CRITICAL for fresh data]
+        C1 --> C1a("ServiceLocator.Get<ITimeManager>().Update(gameTime)<br>Updates internal elapsed/total time")
+        C1 --> C1b("(MonoGameInputService)ServiceLocator.Get<IInputService>()).Update()<br>Polls Keyboard, Mouse, GamePad states ONCE for the frame")
 
-[3. ECS Data Storage] - ComponentManager.cs (Likely a Service itself, accessed via ServiceLocator)
-    ├── CreateEntity()
-    ├── AddComponent(entityId, component)
-    ├── GetComponent<T>(entityId)
-    ├── GetEntitiesWith<T1, T2, ...>()
-    └── (Note: ComponentManager is a data store; it does NOT have its own Update/Draw method)
+        C --> C2[ Game State Orchestration]
+        C2 --> C2a("ServiceLocator.Get<IGameStateManager>().Update(gameTime)")
+        C2a --> C2b("Active IScene.Update(gameTime)<br>The currently active 'game state' object")
 
+        C2b --> C2c("Scene's Owned GameLoop.Update(gameTime)<br>YOUR custom GameLoop, orchestrates ECS Systems for this scene")
+
+        subgraph Scene GameLoop Update Details
+            C2c --> C2c_internal_1("Internal: Handles Fixed-Time Step Accumulation<br>Ensures systems get consistent delta time")
+            C2c_internal_1 --> C2c_systems("For each EngineSystem in GameLoop's registered list:")
+
+            C2c_systems --> S1("EngineSystem.Update(fixedDeltaTime)<br>Performs specific game logic based on entity components")
+            S1 --> S1_a[Reads/Writes: ComponentManager<br>To get/set Components]
+            S1 --> S1_b[Reads: InputService <br>To get player input, NOT to poll raw state]
+            S1 --> S1_c[Reads: ServiceLocator.Get<ITimeManager><br>If it needs variable time for non-fixed updates]
+            S1 --> S1_d[Reads/Writes: Other Services<br>e.g., IPhysicsService, IAudioService, IUIService]
+            S1 --> S1_next("Next EngineSystem.Update(...)")
+        end
+        C --> MyGameBaseUpdate("MyGame.base.Update(gameTime)<br>MonoGame's internal updates")
+    end
+
+    subgraph Draw Flow
+        D --> D1[ Global Rendering Setup]
+        D1 --> D1a("ServiceLocator.Get<IRenderer>().Clear(Color.CornflowerBlue)<br>Clears the graphics device")
+
+        D --> D2[2. Game State Rendering Delegation]
+        D2 --> D2a("ServiceLocator.Get<IGameStateManager>().Draw(gameTime)")
+        D2a --> D2b("Active IScene.Draw(gameTime)<br>The current game state's rendering logic")
+
+        D2b --> D2c("Scene's Owned GameLoop.Draw(gameTime)<br>YOUR custom GameLoop, orchestrates rendering systems")
+
+        subgraph Scene GameLoop Draw Details
+            D2c --> D2c_internal_1("Internal: Renderer.BeginSpriteBatch() or similar global render setup")
+            D2c_internal_1 --> D2c_systems("For each EngineSystem in GameLoop's registered list<br>(specifically rendering systems):")
+
+            D2c_systems --> DR1("EngineSystem.Draw(renderer/spriteBatch)<br>Renders relevant components like SpriteComponent, TransformComponent")
+            DR1 --> DR1_a[Reads: ComponentManager<br>for rendering data]
+            DR1 --> DR1_b[Uses: ServiceLocator.Get<IRenderer><br>or directly SpriteBatch to draw]
+            DR1 --> DR1_next("Next EngineSystem.Draw(...)")
+            D2c_systems --> D2c_internal_2("Internal: Renderer.EndSpriteBatch() or similar global render cleanup")
+        end
+        D --> MyGameBaseDraw("MyGame.base.Draw(gameTime)<br>MonoGame's internal drawing")
+    end
+
+    E[ Static Global Access<br>ServiceLocator.cs]
+    E --> Ea("Register<TService>(instance)")
+    E --> Eb("Get<TService>()")
+    Eb --- NotesE(Provides global, easy access to single instances of Services)
+
+    F[ ECS Data Storage<br>ComponentManager.cs]
+    F --> Fa("CreateEntity()")
+    F --> Fb("AddComponent(entityId, component)")
+    F --> Fc("GetComponent<T>(entityId)")
+    F --> Fd("GetEntitiesWith<T1, T2, ...>()")
+    Fd --- NotesF(Note: ComponentManager is a data store;<br>it does NOT have its own Update/Draw method)
+
+   style A fill:#502A50,stroke:#E0BBE4,stroke-width:2px,color:#FFFFFF
+    style E fill:#502A50,stroke:#E0BBE4,stroke-width:2px,color:#FFFFFF
+    style F fill:#502A50,stroke:#E0BBE4,stroke-width:2px,color:#FFFFFF
+    style S1 fill:#2A3A4A,stroke:#BBCCDD,stroke-width:2px,color:#FFFFFF
+    style DR1 fill:#2A3A4A,stroke:#BBCCDD,stroke-width:2px,color:#FFFFFF
+    style C2c fill:#1F2E3E,stroke:#AABBCC,stroke-width:2px,color:#FFFFFF
+    style D2c fill:#1F2E3E,stroke:#AABBCC,stroke-width:2px,color:#FFFFFF
+```
 
 ---
 
