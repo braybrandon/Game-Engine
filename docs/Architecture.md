@@ -26,7 +26,6 @@ graph TD
         C2b --> C2c("Scene's Owned GameLoop.Update(gameTime)<br>YOUR custom GameLoop, orchestrates ECS Systems for this scene")
 
         subgraph Scene GameLoop Update Details
-            direction TD
             C2c --> C2c_internal_1("Internal: Handles Fixed-Time Step Accumulation<br>Ensures systems get consistent delta time")
             C2c_internal_1 --> C2c_systems("For each EngineSystem in GameLoop's registered list:")
 
@@ -51,7 +50,6 @@ graph TD
         D2b --> D2c("Scene's Owned GameLoop.Draw(gameTime)<br>YOUR custom GameLoop, orchestrates rendering systems")
 
         subgraph Scene GameLoop Draw Details
-            direction TD
             D2c --> D2c_internal_1("Internal: Renderer.BeginSpriteBatch() or similar global render setup")
             D2c_internal_1 --> D2c_systems("For each EngineSystem in GameLoop's registered list<br>(specifically rendering systems):")
 
