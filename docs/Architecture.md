@@ -9,71 +9,71 @@ This document outlines the architecture for your ECS-based MonoGame engine, cove
 This diagram illustrates the flow of control and updates during your game's runtime.
 ```mermaid
 graph TD
-    A[1. MonoGame Main Game Loop<br>MyGame.cs] --> B(MyGame.Run() <br>Called by MonoGame Framework, runs continuously)
+    A[1. MonoGame Main Game Loop<br>MyGame.cs] --> B("MyGame.Run() <br>Called by MonoGame Framework, runs continuously")
 
-    B --> C(MyGame.Update(gameTime) <br>Your game's per-frame logic update)
-    B --> D(MyGame.Draw(gameTime) <br>Your game's per-frame rendering)
+    B --> C("MyGame.Update(gameTime) <br>Your game's per-frame logic update")
+    B --> D("MyGame.Draw(gameTime) <br>Your game's per-frame rendering")
 
     subgraph Update Flow
         C --> C1[1. Global Service Updates<br>Order is CRITICAL for fresh data]
-        C1 --> C1a(ServiceLocator.Get<ITimeManager>().Update(gameTime)<br>Updates internal elapsed/total time)
-        C1 --> C1b((MonoGameInputService)ServiceLocator.Get<IInputService>()).Update()<br>Polls Keyboard, Mouse, GamePad states ONCE for the frame))
+        C1 --> C1a("ServiceLocator.Get<ITimeManager>().Update(gameTime)<br>Updates internal elapsed/total time")
+        C1 --> C1b("(MonoGameInputService)ServiceLocator.Get<IInputService>()).Update()<br>Polls Keyboard, Mouse, GamePad states ONCE for the frame")
 
         C --> C2[2. Game State Orchestration]
-        C2 --> C2a(ServiceLocator.Get<IGameStateManager>().Update(gameTime))
-        C2a --> C2b(Active IScene.Update(gameTime)<br>The currently active "game state" object)
+        C2 --> C2a("ServiceLocator.Get<IGameStateManager>().Update(gameTime)")
+        C2a --> C2b("Active IScene.Update(gameTime)<br>The currently active 'game state' object")
 
-        C2b --> C2c(Scene's Owned GameLoop.Update(gameTime)<br>YOUR custom GameLoop, orchestrates ECS Systems for this scene)
+        C2b --> C2c("Scene's Owned GameLoop.Update(gameTime)<br>YOUR custom GameLoop, orchestrates ECS Systems for this scene")
 
         subgraph Scene GameLoop Update Details
             direction TD
-            C2c --> C2c_internal_1(Internal: Handles Fixed-Time Step Accumulation<br>Ensures systems get consistent delta time)
-            C2c_internal_1 --> C2c_systems(For each EngineSystem in GameLoop's registered list:)
+            C2c --> C2c_internal_1("Internal: Handles Fixed-Time Step Accumulation<br>Ensures systems get consistent delta time")
+            C2c_internal_1 --> C2c_systems("For each EngineSystem in GameLoop's registered list:")
 
-            C2c_systems --> S1(EngineSystem.Update(fixedDeltaTime)<br>Performs specific game logic based on entity components)
+            C2c_systems --> S1("EngineSystem.Update(fixedDeltaTime)<br>Performs specific game logic based on entity components")
             S1 --> S1_a[Reads/Writes: ComponentManager<br>To get/set Components]
             S1 --> S1_b[Reads: ServiceLocator.Get<IInputService>()<br>To get player input, NOT to poll raw state]
             S1 --> S1_c[Reads: ServiceLocator.Get<ITimeManager>()<br>If it needs variable time for non-fixed updates]
             S1 --> S1_d[Reads/Writes: Other Services<br>e.g., IPhysicsService, IAudioService, IUIService]
-            S1 --> S1_next(Next EngineSystem.Update(...))
+            S1 --> S1_next("Next EngineSystem.Update(...)")
         end
-        C --> MyGameBaseUpdate(MyGame.base.Update(gameTime)<br>MonoGame's internal updates)
+        C --> MyGameBaseUpdate("MyGame.base.Update(gameTime)<br>MonoGame's internal updates")
     end
 
     subgraph Draw Flow
         D --> D1[1. Global Rendering Setup]
-        D1 --> D1a(ServiceLocator.Get<IRenderer>().Clear(Color.CornflowerBlue)<br>Clears the graphics device)
+        D1 --> D1a("ServiceLocator.Get<IRenderer>().Clear(Color.CornflowerBlue)<br>Clears the graphics device")
 
         D --> D2[2. Game State Rendering Delegation]
-        D2 --> D2a(ServiceLocator.Get<IGameStateManager>().Draw(gameTime))
-        D2a --> D2b(Active IScene.Draw(gameTime)<br>The current game state's rendering logic)
+        D2 --> D2a("ServiceLocator.Get<IGameStateManager>().Draw(gameTime)")
+        D2a --> D2b("Active IScene.Draw(gameTime)<br>The current game state's rendering logic")
 
-        D2b --> D2c(Scene's Owned GameLoop.Draw(gameTime)<br>YOUR custom GameLoop, orchestrates rendering systems)
+        D2b --> D2c("Scene's Owned GameLoop.Draw(gameTime)<br>YOUR custom GameLoop, orchestrates rendering systems")
 
         subgraph Scene GameLoop Draw Details
             direction TD
-            D2c --> D2c_internal_1(Internal: Renderer.BeginSpriteBatch() or similar global render setup)
-            D2c_internal_1 --> D2c_systems(For each EngineSystem in GameLoop's registered list<br>(specifically rendering systems):)
+            D2c --> D2c_internal_1("Internal: Renderer.BeginSpriteBatch() or similar global render setup")
+            D2c_internal_1 --> D2c_systems("For each EngineSystem in GameLoop's registered list<br>(specifically rendering systems):")
 
-            D2c_systems --> DR1(EngineSystem.Draw(renderer/spriteBatch)<br>Renders relevant components like SpriteComponent, TransformComponent)
+            D2c_systems --> DR1("EngineSystem.Draw(renderer/spriteBatch)<br>Renders relevant components like SpriteComponent, TransformComponent")
             DR1 --> DR1_a[Reads: ComponentManager<br>for rendering data]
             DR1 --> DR1_b[Uses: ServiceLocator.Get<IRenderer>()<br>or directly SpriteBatch to draw]
-            DR1 --> DR1_next(Next EngineSystem.Draw(...))
-            D2c_systems --> D2c_internal_2(Internal: Renderer.EndSpriteBatch() or similar global render cleanup)
+            DR1 --> DR1_next("Next EngineSystem.Draw(...)")
+            D2c_systems --> D2c_internal_2("Internal: Renderer.EndSpriteBatch() or similar global render cleanup")
         end
-        D --> MyGameBaseDraw(MyGame.base.Draw(gameTime)<br>MonoGame's internal drawing)
+        D --> MyGameBaseDraw("MyGame.base.Draw(gameTime)<br>MonoGame's internal drawing")
     end
 
     E[2. Static Global Access<br>ServiceLocator.cs]
-    E --> Ea(Register<TService>(instance))
-    E --> Eb(Get<TService>())
+    E --> Ea("Register<TService>(instance)")
+    E --> Eb("Get<TService>()")
     Eb --- NotesE(Provides global, easy access to single instances of Services)
 
     F[3. ECS Data Storage<br>ComponentManager.cs]
-    F --> Fa(CreateEntity())
-    F --> Fb(AddComponent(entityId, component))
-    F --> Fc(GetComponent<T>(entityId))
-    F --> Fd(GetEntitiesWith<T1, T2, ...>())
+    F --> Fa("CreateEntity()")
+    F --> Fb("AddComponent(entityId, component)")
+    F --> Fc("GetComponent<T>(entityId)")
+    F --> Fd("GetEntitiesWith<T1, T2, ...>()")
     Fd --- NotesF(Note: ComponentManager is a data store;<br>it does NOT have its own Update/Draw method)
 
     style A fill:#f9f,stroke:#333,stroke-width:2px
