@@ -9,17 +9,17 @@ This document outlines the architecture for your ECS-based MonoGame engine, cove
 This diagram illustrates the flow of control and updates during your game's runtime.
 ```mermaid
 graph TD
-    A[1. MonoGame Main Game Loop<br>MyGame.cs] --> B("MyGame.Run() <br>Called by MonoGame Framework, runs continuously")
+    A[ MonoGame Main Game Loop<br>MyGame.cs] --> B("MyGame.Run() <br>Called by MonoGame Framework, runs continuously")
 
     B --> C("MyGame.Update(gameTime) <br>Your game's per-frame logic update")
     B --> D("MyGame.Draw(gameTime) <br>Your game's per-frame rendering")
 
     subgraph Update Flow
-        C --> C1[1. Global Service Updates<br>Order is CRITICAL for fresh data]
+        C --> C1[ Global Service Updates<br>Order is CRITICAL for fresh data]
         C1 --> C1a("ServiceLocator.Get<ITimeManager>().Update(gameTime)<br>Updates internal elapsed/total time")
         C1 --> C1b("(MonoGameInputService)ServiceLocator.Get<IInputService>()).Update()<br>Polls Keyboard, Mouse, GamePad states ONCE for the frame")
 
-        C --> C2[2. Game State Orchestration]
+        C --> C2[ Game State Orchestration]
         C2 --> C2a("ServiceLocator.Get<IGameStateManager>().Update(gameTime)")
         C2a --> C2b("Active IScene.Update(gameTime)<br>The currently active 'game state' object")
 
@@ -40,7 +40,7 @@ graph TD
     end
 
     subgraph Draw Flow
-        D --> D1[1. Global Rendering Setup]
+        D --> D1[ Global Rendering Setup]
         D1 --> D1a("ServiceLocator.Get<IRenderer>().Clear(Color.CornflowerBlue)<br>Clears the graphics device")
 
         D --> D2[2. Game State Rendering Delegation]
@@ -62,12 +62,12 @@ graph TD
         D --> MyGameBaseDraw("MyGame.base.Draw(gameTime)<br>MonoGame's internal drawing")
     end
 
-    E[2. Static Global Access<br>ServiceLocator.cs]
+    E[ Static Global Access<br>ServiceLocator.cs]
     E --> Ea("Register<TService>(instance)")
     E --> Eb("Get<TService>()")
     Eb --- NotesE(Provides global, easy access to single instances of Services)
 
-    F[3. ECS Data Storage<br>ComponentManager.cs]
+    F[ ECS Data Storage<br>ComponentManager.cs]
     F --> Fa("CreateEntity()")
     F --> Fb("AddComponent(entityId, component)")
     F --> Fc("GetComponent<T>(entityId)")
