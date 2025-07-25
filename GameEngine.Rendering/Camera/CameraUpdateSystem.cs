@@ -3,7 +3,6 @@ using GameEngine.Core.Entities;
 using GameEngine.Core.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using System.Windows.Markup;
 
 namespace GameEngine.Rendering.Camera
 {
@@ -42,7 +41,7 @@ namespace GameEngine.Rendering.Camera
                 {
                     
                     cameraComponent.Zoom += scrollDelta * 0.001f;
-                    cameraComponent.Zoom = MathHelper.Clamp(cameraComponent.Zoom, 0.1f, 5.0f); // Example limits
+                    cameraComponent.Zoom = MathHelper.Clamp(cameraComponent.Zoom, 0.1f, 5.0f);
                 }
 
                 // Middle Mouse Button panning Logic
