@@ -31,8 +31,8 @@ graph TD
 
             C2c_systems --> S1("EngineSystem.Update(fixedDeltaTime)<br>Performs specific game logic based on entity components")
             S1 --> S1_a[Reads/Writes: ComponentManager<br>To get/set Components]
-            S1 --> S1_b[Reads: ServiceLocator.Get<IInputService>()<br>To get player input, NOT to poll raw state]
-            S1 --> S1_c[Reads: ServiceLocator.Get<ITimeManager>()<br>If it needs variable time for non-fixed updates]
+            S1 --> S1_b[Reads: InputService <br>To get player input, NOT to poll raw state]
+            S1 --> S1_c[Reads: ServiceLocator.Get<ITimeManager><br>If it needs variable time for non-fixed updates]
             S1 --> S1_d[Reads/Writes: Other Services<br>e.g., IPhysicsService, IAudioService, IUIService]
             S1 --> S1_next("Next EngineSystem.Update(...)")
         end
@@ -55,7 +55,7 @@ graph TD
 
             D2c_systems --> DR1("EngineSystem.Draw(renderer/spriteBatch)<br>Renders relevant components like SpriteComponent, TransformComponent")
             DR1 --> DR1_a[Reads: ComponentManager<br>for rendering data]
-            DR1 --> DR1_b[Uses: ServiceLocator.Get<IRenderer>()<br>or directly SpriteBatch to draw]
+            DR1 --> DR1_b[Uses: ServiceLocator.Get<IRenderer><br>or directly SpriteBatch to draw]
             DR1 --> DR1_next("Next EngineSystem.Draw(...)")
             D2c_systems --> D2c_internal_2("Internal: Renderer.EndSpriteBatch() or similar global render cleanup")
         end
