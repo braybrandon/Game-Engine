@@ -1,10 +1,14 @@
-﻿using GameEngine.Core;
+﻿using GameEngine.Animation;
+using GameEngine.Core;
 using GameEngine.Core.Components;
 using GameEngine.Core.Entities;
+using GameEngine.Input;
+using GameEngine.Physics;
 using GameEngine.Rendering;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 
 namespace GameEnginePlayground
 {
@@ -19,6 +23,12 @@ namespace GameEnginePlayground
 
         // Textures
         private Texture2D _playerTexture;
+        private Texture2D _playerWalkUpTexture;
+        private Texture2D _playerWalkDownTexture;
+        private Texture2D _playerWalkLeftTexture;
+        private Texture2D _playerWalkRightTexture;
+
+        private const int SPRITE_SIZE = 96;
 
         public Game1()
         {
@@ -38,6 +48,13 @@ namespace GameEnginePlayground
             ComponentManager.AddComponent(_playerEntity, new HealthComponent { CurrentHealth = 100, MaxHealth = 100 });
             ComponentManager.AddComponent(_playerEntity, new PlayerInputComponent { IsPlayerControlled = true });
             ComponentManager.AddComponent(_playerEntity, new ColliderComponent { Bounds = new Rectangle(0, 0, 96, 96), IsTrigger = false, IsStatic = false });
+            ComponentManager.AddComponent(_playerEntity, new AnimationComponent { Clips = new Dictionary<string, AnimationClip>(), CurrentClipName = "Idle" });
+
+            // 3. Register EngineSystems with the GameLoop
+            // Order matters for systems that depend on each other's output!
+            _gameLoop.RegisterSystem(new PlayerInputSystem(this));
+            _gameLoop.RegisterSystem(new MovementSystem(this));
+            _gameLoop.RegisterSystem(new AnimationSystem(this));
 
             _gameLoop.Initialize();
             base.Initialize();
@@ -50,6 +67,10 @@ namespace GameEnginePlayground
             // TODO: use this.Content to load your game content here
 
             _playerTexture = Content.Load<Texture2D>("player");
+            _playerWalkUpTexture = Content.Load<Texture2D>("walkUp");
+            _playerWalkDownTexture = Content.Load<Texture2D>("walkDown");
+            _playerWalkLeftTexture = Content.Load<Texture2D>("walkLeft");
+            _playerWalkRightTexture = Content.Load<Texture2D>("walkRight");
 
             if (ComponentManager.HasComponent<PositionComponent>(_playerEntity))
             {
@@ -65,6 +86,93 @@ namespace GameEnginePlayground
                     LayerDepth = 0f
                 });
             }
+
+            // --- Define Player Animations ---
+            var playerAnimationComponent = ComponentManager.GetComponent<AnimationComponent>(_playerEntity);
+            var playerSpriteComponent = ComponentManager.GetComponent<SpriteComponent>(_playerEntity);
+
+            // Player Idle Animation (using first frame of walk_down as idle for simplicity)
+            playerAnimationComponent.Clips["Idle"] = new AnimationClip
+            {
+                Name = "Idle",
+                Texture = _playerWalkDownTexture, // Idle uses the down-facing sheet
+                Frames = new List<Rectangle> { new Rectangle(0, 0, SPRITE_SIZE, SPRITE_SIZE) },
+                FrameDuration = 0.2f,
+                IsLooping = true
+            };
+
+            // Player Walk Up Animation (e.g., 4 frames, 96x96 each)
+            playerAnimationComponent.Clips["WalkUp"] = new AnimationClip
+            {
+                Name = "WalkUp",
+                Texture = _playerWalkUpTexture,
+                Frames = new List<Rectangle>
+            {
+                new Rectangle(0 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE),
+                new Rectangle(1 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE),
+                new Rectangle(2 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE),
+                new Rectangle(3 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE)
+            },
+                FrameDuration = 0.1f,
+                IsLooping = true
+            };
+
+            // Player Walk Down Animation (e.g., 4 frames, 96x96 each)
+            playerAnimationComponent.Clips["WalkDown"] = new AnimationClip
+            {
+                Name = "WalkDown",
+                Texture = _playerWalkDownTexture,
+                Frames = new List<Rectangle>
+            {
+                new Rectangle(0 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE),
+                new Rectangle(1 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE),
+                new Rectangle(2 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE),
+                new Rectangle(3 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE)
+            },
+                FrameDuration = 0.1f,
+                IsLooping = true
+            };
+
+            // Player Walk Left Animation (e.g., 4 frames, 96x96 each)
+            playerAnimationComponent.Clips["WalkLeft"] = new AnimationClip
+            {
+                Name = "WalkLeft",
+                Texture = _playerWalkLeftTexture,
+                Frames = new List<Rectangle>
+            {
+                new Rectangle(0 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE),
+                new Rectangle(1 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE),
+                new Rectangle(2 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE),
+                new Rectangle(3 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE)
+            },
+                FrameDuration = 0.1f,
+                IsLooping = true
+            };
+
+            // Player Walk Right Animation (e.g., 4 frames, 96x96 each)
+            playerAnimationComponent.Clips["WalkRight"] = new AnimationClip
+            {
+                Name = "WalkRight",
+                Texture = _playerWalkRightTexture,
+                Frames = new List<Rectangle>
+            {
+                new Rectangle(0 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE),
+                new Rectangle(1 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE),
+                new Rectangle(2 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE),
+                new Rectangle(3 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE)
+            },
+                FrameDuration = 0.1f,
+                IsLooping = true
+            };
+
+            playerSpriteComponent.Texture = playerAnimationComponent.CurrentClip.Texture; // Set to texture of initial clip
+            playerSpriteComponent.SourceRectangle = playerAnimationComponent.CurrentClip.Frames[0]; // Set to first frame of Idle
+            playerSpriteComponent.Origin = new Vector2(SPRITE_SIZE / 2, SPRITE_SIZE / 2); // Center origin for 96x96 sprite
+
+            ComponentManager.AddComponent(_playerEntity, playerAnimationComponent);
+            ComponentManager.AddComponent(_playerEntity, playerSpriteComponent);
+
+
 
             _gameLoop.RegisterSystem(new SpriteRenderSystem(this));
             _gameLoop.LoadContent(_spriteBatch);
