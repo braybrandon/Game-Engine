@@ -18,6 +18,7 @@ This repository hosts a MonoGame-based project, featuring a modular game engine 
 ---
 
 ## 📦 Project Structure
+```
 C:.
 ├── .gitattributes
 ├── .gitignore
@@ -39,7 +40,7 @@ C:.
 ├── GameEngine.UI/
 ├── GameEnginePlayground/
 └── rpg/
-
+```
 ---
 
 ### Key Folders & Files:
