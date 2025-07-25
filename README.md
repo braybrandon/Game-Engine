@@ -189,11 +189,11 @@ We welcome contributions to this project! If you find a bug, have an idea for a 
 
 ## 📄 License
 
-This project is licensed under the [Choose a License, e.g., MIT License](LICENSE) - see the `LICENSE` file for details. *(Make sure you actually have a `LICENSE` file in your root directory!)*
+This project is licensed under the [MIT License](LICENSE). - see the `LICENSE` file for details.
 
 ---
 
 ## ✉️ Contact
 
-* Your Name/Alias - [Your Email Address or preferred contact]
+* Brandon Bray - braybrandon59@outlook.com
 * Project Link: (https://github.com/braybrandon/Game-Engine)
