@@ -7,7 +7,7 @@ This document outlines the architecture for your ECS-based MonoGame engine, cove
 ## 1. Core Engine & Game Loop Hierarchy
 
 This diagram illustrates the flow of control and updates during your game's runtime.
-
+```mermaid
 graph TD
     A[1. MonoGame Main Game Loop<br>MyGame.cs] --> B(MyGame.Run() <br>Called by MonoGame Framework, runs continuously)
 
@@ -83,6 +83,7 @@ graph TD
     style DR1 fill:#ccf,stroke:#666,stroke-width:2px
     style C2c fill:#bbf,stroke:#666,stroke-width:2px
     style D2c fill:#bbf,stroke:#666,stroke-width:2px
+```
 
 ---
 
