@@ -74,13 +74,13 @@ graph TD
     F --> Fd("GetEntitiesWith<T1, T2, ...>()")
     Fd --- NotesF(Note: ComponentManager is a data store;<br>it does NOT have its own Update/Draw method)
 
-    style A fill:#f9f,stroke:#333,stroke-width:2px
-    style E fill:#f9f,stroke:#333,stroke-width:2px
-    style F fill:#f9f,stroke:#333,stroke-width:2px
-    style S1 fill:#ccf,stroke:#666,stroke-width:2px
-    style DR1 fill:#ccf,stroke:#666,stroke-width:2px
-    style C2c fill:#bbf,stroke:#666,stroke-width:2px
-    style D2c fill:#bbf,stroke:#666,stroke-width:2px
+   style A fill:#502A50,stroke:#E0BBE4,stroke-width:2px,color:#FFFFFF
+    style E fill:#502A50,stroke:#E0BBE4,stroke-width:2px,color:#FFFFFF
+    style F fill:#502A50,stroke:#E0BBE4,stroke-width:2px,color:#FFFFFF
+    style S1 fill:#2A3A4A,stroke:#BBCCDD,stroke-width:2px,color:#FFFFFF
+    style DR1 fill:#2A3A4A,stroke:#BBCCDD,stroke-width:2px,color:#FFFFFF
+    style C2c fill:#1F2E3E,stroke:#AABBCC,stroke-width:2px,color:#FFFFFF
+    style D2c fill:#1F2E3E,stroke:#AABBCC,stroke-width:2px,color:#FFFFFF
 ```
 
 ---
