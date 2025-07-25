@@ -9,25 +9,84 @@ This document outlines the architecture for your ECS-based MonoGame engine, cove
 This diagram illustrates the flow of control and updates during your game's runtime.
 
 [1. MonoGame Main Game Loop] - MyGame.cs (Your class inheriting from Microsoft.Xna.Framework.Game)
-├── MyGame.Run() (Called by MonoGame Framework, runs continuously)
-│   ├──> MyGame.Update(gameTime)  <-- Your game's per-frame logic update
-│   │      │
-│   │      ├── 1. Global Service Updates (Order is CRITICAL here for fresh data)
-│   │      │   ├──> ServiceLocator.Get
-
-│          │                        └── (Internal: Renderer.EndSpriteBatch() or similar global render cleanup)
-│          │
-│          └── MyGame.base.Draw(gameTime) (MonoGame's internal drawing)
-│
-└── (Continuous loop until game exits)
+    ├── MyGame.Run() (Called by MonoGame Framework)
+    │   ├──> MyGame.Update(gameTime)  <-- Your game's per-frame logic update
+    │   │      │
+    │   │      ├── 1. Global Service Updates (Order is CRITICAL here for fresh data)
+    │   │      │   ├──> ServiceLocator.Get<ITimeManager>().Update(gameTime)
+    │   │      │   │     (Updates internal elapsed/total time for the frame)
+    │   │      │   └──> ((MonoGameInputService)ServiceLocator.Get<IInputService>()).Update()
+    │   │      │         (Polls Keyboard, Mouse, GamePad states ONCE for the frame)
+    │   │      │
+    │   │      ├── 2. Game State Orchestration
+    │   │      │   └──> ServiceLocator.Get<IGameStateManager>().Update(gameTime)
+    │   │      │          │
+    │   │      │          └──> Active IScene (e.g., MainMenuScene, LevelOneScene).Update(gameTime)
+    │   │      │                 (The currently active "game state" object)
+    │   │      │                 │
+    │   │      │                 └──> Scene's Owned GameLoop.Update(gameTime)
+    │   │      │                        (YOUR custom GameLoop instance, orchestrates ECS Systems for this scene)
+    │   │      │                        │
+    │   │      │                        ├── (Internal: Handles Fixed-Time Step Accumulation)
+    │   │      │                        │    (Ensures systems get a consistent delta time for physics, AI, etc.)
+    │   │      │                        └── For each EngineSystem in GameLoop's registered list:
+    │   │      │                            ├──> EngineSystem.Update(fixedDeltaTime)
+    │   │      │                            │      (Performs specific game logic based on entity components)
+    │   │      │                            │      ├── Reads/Writes: ComponentManager
+    │   │      │                            │      │   (To get/set Components for entities it's interested in)
+    │   │      │                            │      ├── Reads: ServiceLocator.Get<IInputService>()
+    │   │      │                            │      │   (To get player input, NOT to poll raw state)
+    │   │      │                            │      ├── Reads: ServiceLocator.Get<ITimeManager>()
+    │   │      │                            │      │   (If it needs variable time for non-fixed updates or calculations)
+    │   │      │                            │      └── Reads/Writes: Other Services (e.g., IPhysicsService, IAudioService, IUIService)
+    │   │      │                            │          (For specific functions or data from other engine utilities)
+    │   │      │                            │
+    │   │      │                            └── Next EngineSystem.Update(...)
+    │   │      │
+    │   │      └── MyGame.base.Update(gameTime) (MonoGame's internal updates)
+    │   │
+    │   └──> MyGame.Draw(gameTime)  <-- Your game's per-frame rendering
+    │          │
+    │          ├── 1. Global Rendering Setup
+    │          │   └──> ServiceLocator.Get<IRenderer>().Clear(Color.CornflowerBlue)
+    │          │          (Clears the graphics device)
+    │          │
+    │          ├── 2. Game State Rendering Delegation
+    │          │   └──> ServiceLocator.Get<IGameStateManager>().Draw(gameTime)
+    │          │          │
+    │          │          └──> Active IScene.Draw(gameTime)
+    │          │                 (The current game state's rendering logic)
+    │          │                 │
+    │          │                 └──> Scene's Owned GameLoop.Draw(gameTime)
+    │          │                        (YOUR custom GameLoop, orchestrates rendering systems)
+    │          │                        │
+    │          │                        ├── (Internal: Renderer.BeginSpriteBatch() or similar global render setup)
+    │          │                        └── For each EngineSystem in GameLoop's registered list (specifically rendering systems):
+    │          │                            ├──> EngineSystem.Draw(renderer/spriteBatch)
+    │          │                            │      (Renders relevant components like SpriteComponent, TransformComponent)
+    │          │                            │      ├── Reads: ComponentManager (for rendering data)
+    │          │                            │      └── Uses: ServiceLocator.Get<IRenderer>() (or directly SpriteBatch) to draw
+    │          │                            │
+    │          │                            └── Next EngineSystem.Draw(...)
+    │          │                        
+    │          │                        └── (Internal: Renderer.EndSpriteBatch() or similar global render cleanup)
+    │          │
+    │          └── MyGame.base.Draw(gameTime) (MonoGame's internal drawing)
+    │
+    └── (Continuous loop until game exits)
 
 [2. Static Global Access] - ServiceLocator.cs
-├── Register
+    ├── Register<TService>(instance)
+    └── Get<TService>()
+        (Provides global, easy access to single instances of Services)
 
 [3. ECS Data Storage] - ComponentManager.cs (Likely a Service itself, accessed via ServiceLocator)
-├── CreateEntity()
-├── AddComponent(entityId, component)
-├── GetComponent
+    ├── CreateEntity()
+    ├── AddComponent(entityId, component)
+    ├── GetComponent<T>(entityId)
+    ├── GetEntitiesWith<T1, T2, ...>()
+    └── (Note: ComponentManager is a data store; it does NOT have its own Update/Draw method)
+
 
 ---
 
