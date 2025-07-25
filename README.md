@@ -1,4 +1,4 @@
-# My MonoGame Game Engine & RPG Project
+# MonoGame Game Engine & RPG Project
 
 ![Project Screenshot/GIF (Optional - Add a compelling image here!)](path/to/screenshot.png)
 
