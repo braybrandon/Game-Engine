@@ -5,6 +5,7 @@ using GameEngine.Core.Entities;
 using GameEngine.Input;
 using GameEngine.Physics;
 using GameEngine.Rendering;
+using GameEngine.Rendering.Camera;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -20,6 +21,7 @@ namespace GameEnginePlayground
 
         // Entities
         private Entity _playerEntity;
+        private Entity _cameraEntity;
 
         // Textures
         private Texture2D _playerTexture;
@@ -43,23 +45,30 @@ namespace GameEnginePlayground
             _gameLoop = new GameLoop(this);
 
             _playerEntity = Entity.Create();
-            ComponentManager.AddComponent(_playerEntity, new PositionComponent { Position = new Vector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2) });
+            ComponentManager.AddComponent(_playerEntity, new TransformComponent { Position = new Vector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2), Rotation = 0f, Scale = Vector2.One });
             ComponentManager.AddComponent(_playerEntity, new VelocityComponent { Value = Vector2.Zero });
             ComponentManager.AddComponent(_playerEntity, new HealthComponent { CurrentHealth = 100, MaxHealth = 100 });
             ComponentManager.AddComponent(_playerEntity, new PlayerInputComponent { IsPlayerControlled = true });
             ComponentManager.AddComponent(_playerEntity, new ColliderComponent { Bounds = new Rectangle(0, 0, 96, 96), IsTrigger = false, IsStatic = false });
-            ComponentManager.AddComponent(_playerEntity, new AnimationComponent { Clips = new Dictionary<string, AnimationClip>(), CurrentClipName = "Idle" });
+            ComponentManager.AddComponent(_playerEntity, new AnimationComponent { Clips = new Dictionary<AnimationType, AnimationClip>(), CurrentClipName = AnimationType.Idle });
+
+            _cameraEntity = Entity.Create();
+            ComponentManager.AddComponent(_cameraEntity, new TransformComponent { Position = new Vector2(400, 240), Rotation = 0f, Scale = Vector2.One });
+            ComponentManager.AddComponent(_cameraEntity, new CameraComponent(GraphicsDevice.Viewport) { Zoom = 1f});
 
             // 3. Register EngineSystems with the GameLoop
             // Order matters for systems that depend on each other's output!
             _gameLoop.RegisterSystem(new PlayerInputSystem(this));
+            _gameLoop.RegisterSystem(new CalculateVelocitySystem(this));
             _gameLoop.RegisterSystem(new MovementSystem(this));
+            _gameLoop.RegisterSystem(new AnimationStateSystem(this));
             _gameLoop.RegisterSystem(new AnimationSystem(this));
+            _gameLoop.RegisterSystem(new CameraUpdateSystem(this, _playerEntity));
 
             _gameLoop.Initialize();
             base.Initialize();
         }
-
+        
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -72,7 +81,7 @@ namespace GameEnginePlayground
             _playerWalkLeftTexture = Content.Load<Texture2D>("walkLeft");
             _playerWalkRightTexture = Content.Load<Texture2D>("walkRight");
 
-            if (ComponentManager.HasComponent<PositionComponent>(_playerEntity))
+            if (ComponentManager.HasComponent<TransformComponent>(_playerEntity))
             {
                 ComponentManager.AddComponent(_playerEntity, new SpriteComponent
                 {
@@ -92,7 +101,7 @@ namespace GameEnginePlayground
             var playerSpriteComponent = ComponentManager.GetComponent<SpriteComponent>(_playerEntity);
 
             // Player Idle Animation (using first frame of walk_down as idle for simplicity)
-            playerAnimationComponent.Clips["Idle"] = new AnimationClip
+            playerAnimationComponent.Clips[AnimationType.Idle] = new AnimationClip
             {
                 Name = "Idle",
                 Texture = _playerWalkDownTexture, // Idle uses the down-facing sheet
@@ -102,7 +111,7 @@ namespace GameEnginePlayground
             };
 
             // Player Walk Up Animation (e.g., 4 frames, 96x96 each)
-            playerAnimationComponent.Clips["WalkUp"] = new AnimationClip
+            playerAnimationComponent.Clips[AnimationType.WalkUp] = new AnimationClip
             {
                 Name = "WalkUp",
                 Texture = _playerWalkUpTexture,
@@ -118,7 +127,7 @@ namespace GameEnginePlayground
             };
 
             // Player Walk Down Animation (e.g., 4 frames, 96x96 each)
-            playerAnimationComponent.Clips["WalkDown"] = new AnimationClip
+            playerAnimationComponent.Clips[AnimationType.WalkDown] = new AnimationClip
             {
                 Name = "WalkDown",
                 Texture = _playerWalkDownTexture,
@@ -134,7 +143,7 @@ namespace GameEnginePlayground
             };
 
             // Player Walk Left Animation (e.g., 4 frames, 96x96 each)
-            playerAnimationComponent.Clips["WalkLeft"] = new AnimationClip
+            playerAnimationComponent.Clips[AnimationType.WalkLeft] = new AnimationClip
             {
                 Name = "WalkLeft",
                 Texture = _playerWalkLeftTexture,
@@ -150,7 +159,7 @@ namespace GameEnginePlayground
             };
 
             // Player Walk Right Animation (e.g., 4 frames, 96x96 each)
-            playerAnimationComponent.Clips["WalkRight"] = new AnimationClip
+            playerAnimationComponent.Clips[AnimationType.WalkRight] = new AnimationClip
             {
                 Name = "WalkRight",
                 Texture = _playerWalkRightTexture,
@@ -165,9 +174,9 @@ namespace GameEnginePlayground
                 IsLooping = true
             };
 
-            playerSpriteComponent.Texture = playerAnimationComponent.CurrentClip.Texture; // Set to texture of initial clip
-            playerSpriteComponent.SourceRectangle = playerAnimationComponent.CurrentClip.Frames[0]; // Set to first frame of Idle
-            playerSpriteComponent.Origin = new Vector2(SPRITE_SIZE / 2, SPRITE_SIZE / 2); // Center origin for 96x96 sprite
+            playerSpriteComponent.Texture = playerAnimationComponent.CurrentClip.Texture;
+            playerSpriteComponent.SourceRectangle = playerAnimationComponent.CurrentClip.Frames[0]; 
+            playerSpriteComponent.Origin = new Vector2(SPRITE_SIZE / 2, SPRITE_SIZE / 2); 
 
             ComponentManager.AddComponent(_playerEntity, playerAnimationComponent);
             ComponentManager.AddComponent(_playerEntity, playerSpriteComponent);

@@ -19,16 +19,16 @@ namespace GameEngine.Physics
         {
             float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            foreach (var entity in ComponentManager.GetEntitiesWith<PositionComponent, VelocityComponent>())
+            foreach (var entity in ComponentManager.GetEntitiesWith<TransformComponent, VelocityComponent>())
             {
                 // Get copies of the components
-                var position = ComponentManager.GetComponent<PositionComponent>(entity);
                 var velocity = ComponentManager.GetComponent<VelocityComponent>(entity);
+                var transform = ComponentManager.GetComponent<TransformComponent>(entity);  
 
-                position.Position += velocity.Value * dt;
+                transform.Position += velocity.Value * dt;
 
                 // Add the modified position component back to update it
-                ComponentManager.AddComponent(entity, position);
+                ComponentManager.AddComponent(entity, transform);
             }
         }
     }

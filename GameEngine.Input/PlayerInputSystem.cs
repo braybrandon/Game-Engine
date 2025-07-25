@@ -8,6 +8,7 @@ namespace GameEngine.Input
     public class PlayerInputSystem : EngineSystem
     {
         private float _playerSpeed = 300f;
+        private MouseState _previousMouseState;
 
         public PlayerInputSystem(Game game) : base(game)
         {
@@ -15,60 +16,15 @@ namespace GameEngine.Input
 
         public override void Update(GameTime gameTime)
         {
-            KeyboardState keyboardState = Keyboard.GetState();
-            foreach(var entity in ComponentManager.GetEntitiesWith<PlayerInputComponent, PositionComponent, VelocityComponent>())
+
+            foreach (var entity in ComponentManager.GetEntitiesWith<PlayerInputComponent>())
             {
-                var velocity = ComponentManager.GetComponent<VelocityComponent>(entity);
-                velocity.Value = Vector2.Zero;
-                Vector2 movement = Vector2.Zero;
-
-                if (keyboardState.IsKeyDown(Keys.W)) movement.Y -= 1;
-                if (keyboardState.IsKeyDown(Keys.S)) movement.Y += 1;
-                if (keyboardState.IsKeyDown(Keys.A)) movement.X -= 1;
-                if (keyboardState.IsKeyDown(Keys.D)) movement.X += 1;
-
-                if (movement != Vector2.Zero)
-                {
-                    movement.Normalize();
-                    velocity.Value = movement * _playerSpeed;
-                }
-
-                if (ComponentManager.HasComponent<AnimationComponent>(entity))
-                {
-                    var animation = ComponentManager.GetComponent<AnimationComponent>(entity); // Get copy
-                    string newClipName = animation.CurrentClipName; // Default to current
-
-                    if (movement.Y < 0) // Moving Up
-                    {
-                        newClipName = "WalkUp";
-                    }
-                    else if (movement.Y > 0) // Moving Down
-                    {
-                        newClipName = "WalkDown";
-                    }
-                    else if (movement.X < 0) // Moving Left
-                    {
-                        newClipName = "WalkLeft";
-                    }
-                    else if (movement.X > 0) // Moving Right
-                    {
-                        newClipName = "WalkRight";
-                    }
-                    else // Not moving
-                    {
-                        newClipName = "Idle";
-                    }
-
-                    // Only play if clip name changes (or if it's an attack/non-looping animation)
-                    // We'll let the AttackSystem manage the "Attack" animation directly.
-                    if (newClipName != animation.CurrentClipName && newClipName != "Attack")
-                    {
-                        animation.Play(newClipName);
-                        ComponentManager.AddComponent(entity, animation); // Update animation component
-                    }
-                }
-
-                ComponentManager.AddComponent(entity, velocity);
+                PlayerInputComponent inputComponent = ComponentManager.GetComponent<PlayerInputComponent>(entity);
+                inputComponent.PreviousMouseState = inputComponent.CurrentMouseState;
+                inputComponent.PreviousKeyboardState = inputComponent.CurrentKeyboardState;
+                inputComponent.CurrentKeyboardState = Keyboard.GetState();
+                inputComponent.CurrentMouseState = Mouse.GetState();
+                ComponentManager.AddComponent(entity, inputComponent);
             }
         }
     }

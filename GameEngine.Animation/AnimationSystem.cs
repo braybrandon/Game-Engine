@@ -11,6 +11,7 @@ namespace GameEngine.Animation
 {
     public class AnimationSystem : EngineSystem
     {
+        private const int SPRITE_SIZE = 96;
         public AnimationSystem(Game game) : base(game) { }
 
         public override void Update(GameTime gameTime)
@@ -24,7 +25,7 @@ namespace GameEngine.Animation
                 var sprite = ComponentManager.GetComponent<SpriteComponent>(entity); // Get copy
                 var animation = ComponentManager.GetComponent<AnimationComponent>(entity); // Get copy
 
-                if (animation.Clips.Count == 0 || string.IsNullOrEmpty(animation.CurrentClipName))
+                if (animation.Clips.Count == 0 )
                 {
                     continue; // No animations defined or no current clip set
                 }
@@ -71,6 +72,7 @@ namespace GameEngine.Animation
                 // Update the SpriteComponent's Texture and SourceRectangle to the current animation frame
                 sprite.Texture = currentClip.Texture; // IMPORTANT: Update the texture based on the current clip
                 sprite.SourceRectangle = currentClip.Frames[animation.CurrentFrameIndex];
+                sprite.Origin = new Vector2(SPRITE_SIZE / 2f, SPRITE_SIZE / 2f);
 
                 // Add back the modified components
                 ComponentManager.AddComponent(entity, sprite);
