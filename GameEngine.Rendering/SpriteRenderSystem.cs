@@ -1,5 +1,6 @@
 ﻿using GameEngine.Core.Components;
 using GameEngine.Core.Systems;
+using GameEngine.Rendering.Camera;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -13,21 +14,31 @@ namespace GameEngine.Rendering
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
+            Matrix cameraViewMatrix = Matrix.Identity;
 
-            foreach (var entity in ComponentManager.GetEntitiesWith<PositionComponent, SpriteComponent>())
+            var cameraEntities = ComponentManager.GetEntitiesWith<CameraComponent, TransformComponent>();
+            foreach(var entity in cameraEntities)
             {
-                var position = ComponentManager.GetComponent<PositionComponent>(entity);
+                CameraComponent camera = ComponentManager.GetComponent<CameraComponent>(entity);
+                cameraViewMatrix = camera.ViewMatrix;
+                break;
+            }
+
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, cameraViewMatrix);
+
+            foreach (var entity in ComponentManager.GetEntitiesWith<TransformComponent, SpriteComponent>())
+            {
+                var transform = ComponentManager.GetComponent<TransformComponent>(entity);
                 var sprite = ComponentManager.GetComponent<SpriteComponent>(entity);
 
                 spriteBatch.Draw(
                     sprite.Texture,
-                    position.Position,
+                    transform.Position,
                     sprite.SourceRectangle,
                     sprite.Color,
-                    sprite.Rotation,
+                    transform.Rotation,
                     sprite.Origin,
-                    sprite.Scale,
+                    transform.Scale,
                     sprite.Effects,
                     sprite.LayerDepth
                 );

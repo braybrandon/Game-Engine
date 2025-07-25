@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,11 +9,6 @@ using System.Threading.Tasks;
 
 namespace GameEngine.Core.Components
 {
-    public struct PositionComponent
-    {
-        public Vector2 Position;
-    }
-
     public struct VelocityComponent
     {
         public Vector2 Value; 
@@ -38,7 +34,11 @@ namespace GameEngine.Core.Components
 
     public struct PlayerInputComponent
     {
-        public bool IsPlayerControlled; 
+        public bool IsPlayerControlled;
+        public KeyboardState CurrentKeyboardState;
+        public KeyboardState PreviousKeyboardState;
+        public MouseState CurrentMouseState;
+        public MouseState PreviousMouseState;
     }
 
     public struct ColliderComponent
@@ -60,19 +60,28 @@ namespace GameEngine.Core.Components
         public bool IsLooping;
     }
 
+    public enum AnimationType
+    {
+        Idle,
+        WalkUp,
+        WalkDown,
+        WalkLeft,
+        WalkRight
+    }
+
     /// <summary>
     /// Component holding animation data and current state for an entity.
     /// </summary>
     public struct AnimationComponent
     {
-        public Dictionary<string, AnimationClip> Clips; // All animation clips by name
-        public string CurrentClipName; // Key of the currently playing clip
+        public Dictionary<AnimationType, AnimationClip> Clips; // All animation clips by name
+        public AnimationType CurrentClipName; // Key of the currently playing clip
         public float TimeInClip; // Time elapsed since current clip started
         public int CurrentFrameIndex; // Current frame being displayed
 
         public AnimationClip CurrentClip => Clips.ContainsKey(CurrentClipName) ? Clips[CurrentClipName] : default(AnimationClip);
 
-        public void Play(string clipName)
+        public void Play(AnimationType clipName)
         {
             if (Clips.ContainsKey(clipName) && CurrentClipName != clipName)
             {
@@ -80,6 +89,20 @@ namespace GameEngine.Core.Components
                 TimeInClip = 0f;
                 CurrentFrameIndex = 0;
             }
+        }
+    }
+
+    public struct TransformComponent
+    {
+        public Vector2 Position;
+        public float Rotation;
+        public Vector2 Scale;
+
+        public Matrix GetWorldMatrix()
+        {
+            return Matrix.CreateScale(Scale.X, Scale.Y, 1f) *
+                Matrix.CreateRotationZ(Rotation) *
+                Matrix.CreateTranslation(Position.X, Position.Y, 0f);
         }
     }
 }
