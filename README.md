@@ -195,5 +195,5 @@ This project is licensed under the [MIT License](LICENSE). - see the `LICENSE` f
 
 ## ✉️ Contact
 
-* Your Name/Alias - [Your Email Address or preferred contact]
+* Brandon Bray - braybrandon59@outlook.com
 * Project Link: (https://github.com/braybrandon/Game-Engine)
