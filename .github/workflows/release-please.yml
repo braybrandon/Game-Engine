@@ -24,7 +24,6 @@ jobs:
         uses: googleapis/release-please-action@v4.2.0
         id: release
         with:
-          release-type: simple
-          path: CHANGELOG.md
-          manifest-file: Directory.Build.props # Point to your Directory.Build.props
-          # NO 'release-as' here, as it's not a valid input.
+          # --- CRITICAL CHANGE HERE ---
+          # Use the config-file. Remove 'release-type', 'path', 'manifest-file' from here.
+          config-file: ./.release-please-config.json # <--- Point to your new config file
