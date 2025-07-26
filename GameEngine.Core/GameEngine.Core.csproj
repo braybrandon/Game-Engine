@@ -1,54 +1,16 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<!-- GameEngine.Core/GameEngine.Core.csproj -->
+<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<IsPackable>false</IsPackable>
+	</PropertyGroup>
 
-    <!-- REQUIRED FOR YOUR MAIN PACKAGE -->
-    <PackageId>BrayBrandon.GameEngine</PackageId> <!-- Your desired unique package ID -->
-    <IsPackable>true</IsPackable> <!-- Explicitly set to true -->
-    <Authors>Bray Brandon</Authors>
-    <Company>BrayTec</Company>
-    <Description>A bundled game engine for C# and MonoGame.</Description>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/braybrandon/Game-Engine</PackageProjectUrl>
-    <PackageTags>game-engine;monogame;ecs;bundle</PackageTags>
-    <PackageOutputPath>./nupkg</PackageOutputPath>
-    <RepositoryUrl>https://github.com/braybrandon/Game-Engine</RepositoryUrl>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+	<ItemGroup>
+		<PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.4" />
+	</ItemGroup>
 
-    <!-- Version is handled by Directory.Build.props, so no <Version> here -->
-  </PropertyGroup> <!-- This PropertyGroup is correctly closed here -->
-
-  <ItemGroup>
-    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.4" />
-
-    <!--  Costura.Fody for bundling  -->
-    <PackageReference Include="Costura.Fody" Version="5.7.0" PrivateAssets="all" />
-    <PackageReference Include="Fody" Version="6.8.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <!--  Project References to ALL other libraries you want to bundle  -->
-    <ProjectReference Include="../GameEngine.Animation/GameEngine.Animation.csproj" />
-    <ProjectReference Include="../GameEngine.Audio/GameEngine.Audio.csproj" />
-    <ProjectReference Include="../GameEngine.Input/GameEngine.Input.csproj" />
-    <ProjectReference Include="../GameEngine.Physics/GameEngine.Physics.csproj" />
-    <ProjectReference Include="../GameEngine.Rendering/GameEngine.Rendering.csproj" />
-    <ProjectReference Include="../GameEngine.Scene/GameEngine.Scene.csproj" />
-    <ProjectReference Include="../GameEngine.State/GameEngine.State.csproj" />
-    <ProjectReference Include="../GameEngine.Tiles/GameEngine.Tiles.csproj" />
-    <ProjectReference Include="../GameEngine.UI/GameEngine.UI.csproj" />
-    <ProjectReference Include="../GameEngine.Assets/GameEngine.Assets.csproj" />
-    <ProjectReference Include="../GameEngine.AI/GameEngine.AI.csproj" />
-    <ProjectReference Include="../GameEngine.SaveLoad/GameEngine.SaveLoad.csproj" />
-    <ProjectReference Include="../GameEngine.Particles/GameEngine.Particles.csproj" />
-    <!-- Add any other library projects you want to bundle -->
-  </ItemGroup>
-  <!-- REMOVE THE EXTRA </PropertyGroup> HERE -->
 </Project>
+

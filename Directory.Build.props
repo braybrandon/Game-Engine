@@ -4,7 +4,6 @@
   <!-- ... existing properties like TargetFramework, Version ... -->
   <Version>0.0.1</Version>
   <!-- Essential NuGet Package Metadata -->
-  <PackageId>BrayBrandon.GameEngine.Core</PackageId> <!-- REQUIRED: e.g., GameEngine.Core -->
   <Authors>Brandon Bray</Authors>
   <Company>Bray Software</Company>
   <Description>A brief description of what your game engine package provides.</Description>

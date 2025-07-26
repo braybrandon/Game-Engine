@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameEngine.Tiles", "GameEng
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameEnginePlayground", "GameEnginePlayground\GameEnginePlayground.csproj", "{1B434E5E-12CC-48DF-B0A1-99A06D46FB43}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameEngine.Engine", "GameEngine.Engine\GameEngine.Engine.csproj", "{036C8B59-6FED-47FD-9BC9-96CA11EB322F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -99,6 +101,10 @@ Global
 		{1B434E5E-12CC-48DF-B0A1-99A06D46FB43}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1B434E5E-12CC-48DF-B0A1-99A06D46FB43}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1B434E5E-12CC-48DF-B0A1-99A06D46FB43}.Release|Any CPU.Build.0 = Release|Any CPU
+		{036C8B59-6FED-47FD-9BC9-96CA11EB322F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{036C8B59-6FED-47FD-9BC9-96CA11EB322F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{036C8B59-6FED-47FD-9BC9-96CA11EB322F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{036C8B59-6FED-47FD-9BC9-96CA11EB322F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

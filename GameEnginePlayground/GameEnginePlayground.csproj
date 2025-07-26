@@ -23,8 +23,8 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.*" />
-    <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.*" />
+    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.4" />
+    <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.4" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GameEngine.AI\GameEngine.AI.csproj" />
@@ -32,6 +32,7 @@
     <ProjectReference Include="..\GameEngine.Assets\GameEngine.Assets.csproj" />
     <ProjectReference Include="..\GameEngine.Audio\GameEngine.Audio.csproj" />
     <ProjectReference Include="..\GameEngine.Core\GameEngine.Core.csproj" />
+    <ProjectReference Include="..\GameEngine.Engine\GameEngine.Engine.csproj" />
     <ProjectReference Include="..\GameEngine.Input\GameEngine.Input.csproj" />
     <ProjectReference Include="..\GameEngine.Particles\GameEngine.Particles.csproj" />
     <ProjectReference Include="..\GameEngine.Physics\GameEngine.Physics.csproj" />

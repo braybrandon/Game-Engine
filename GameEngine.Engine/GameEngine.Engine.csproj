@@ -1,0 +1,54 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+
+		<!-- REQUIRED FOR YOUR FAT PACKAGE -->
+		<PackageId>BrayBrandon.GameEngine</PackageId>
+		<!-- Your desired unique package ID for the bundled engine -->
+		<IsPackable>true</IsPackable>
+		<!-- This project IS packable -->
+		<Authors>Bray Brandon</Authors>
+		<Company>BrayTec</Company>
+		<Description>A bundled game engine for C# and MonoGame, including all modules.</Description>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageProjectUrl>https://github.com/braybrandon/Game-Engine</PackageProjectUrl>
+		<PackageTags>game-engine;monogame;ecs;bundle;all-in-one</PackageTags>
+		<PackageOutputPath>./nupkg</PackageOutputPath>
+		<!-- Output path for the .nupkg -->
+		<RepositoryUrl>https://github.com/braybrandon/Game-Engine</RepositoryUrl>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+
+		<!-- Version is handled by Directory.Build.props, so no <Version> here -->
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- Costura.Fody for bundling -->
+		<PackageReference Include="Costura.Fody" Version="5.7.0" PrivateAssets="all" />
+		<PackageReference Include="Fody" Version="6.8.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GameEngine.AI\GameEngine.AI.csproj" />
+    <ProjectReference Include="..\GameEngine.Animation\GameEngine.Animation.csproj" />
+    <ProjectReference Include="..\GameEngine.Assets\GameEngine.Assets.csproj" />
+    <ProjectReference Include="..\GameEngine.Audio\GameEngine.Audio.csproj" />
+    <ProjectReference Include="..\GameEngine.Core\GameEngine.Core.csproj" />
+    <ProjectReference Include="..\GameEngine.Input\GameEngine.Input.csproj" />
+    <ProjectReference Include="..\GameEngine.Particles\GameEngine.Particles.csproj" />
+    <ProjectReference Include="..\GameEngine.Physics\GameEngine.Physics.csproj" />
+    <ProjectReference Include="..\GameEngine.Rendering\GameEngine.Rendering.csproj" />
+    <ProjectReference Include="..\GameEngine.SaveLoad\GameEngine.SaveLoad.csproj" />
+    <ProjectReference Include="..\GameEngine.Scene\GameEngine.Scene.csproj" />
+    <ProjectReference Include="..\GameEngine.State\GameEngine.State.csproj" />
+    <ProjectReference Include="..\GameEngine.Tiles\GameEngine.Tiles.csproj" />
+    <ProjectReference Include="..\GameEngine.UI\GameEngine.UI.csproj" />
+  </ItemGroup>
+
+</Project>
