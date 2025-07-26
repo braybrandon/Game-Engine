@@ -42,6 +42,8 @@ jobs:
           # Authenticate with the GITHUB_TOKEN
           # This token is automatically provided by GitHub Actions for the current repository
           # and usually has 'packages: write' permission if configured in 'permissions' block.
+          
+        env:
           nuget-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Restore dependencies
