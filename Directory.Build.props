@@ -3,17 +3,5 @@
   <PropertyGroup>
     <!-- This is the version that release-please will update -->
     <Version>0.0.1</Version>
-    <PackageVersion>$(Version)</PackageVersion> <!-- Optional, for NuGet packages -->
-
-    <!-- Optional: Common package metadata for all projects -->
-    <Authors>Brandon Bray</Authors>
-    <Company>Bray Software</Company>
-    <Product>Bray Software Game Engine</Product>
-    <Description>A modular game engine for C# and MonoGame.</Description>
-    <RepositoryUrl>https://github.com/braybrandon/Game-Engine</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/braybrandon/Game-Engine</PackageProjectUrl>
-    <PackageTags>game-engine;monogame;ecs</PackageTags>
   </PropertyGroup>
 </Project>
