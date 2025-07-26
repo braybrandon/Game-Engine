@@ -24,13 +24,13 @@ jobs:
 
       - name: Run Release Please
         uses: googleapis/release-please-action@v4.2.0
-        id: release
+        id: release # <--- This ID is crucial
         with:
-          config-file: .release-please-config.json
-          manifest-file: .release-please-manifest.json
+          config-file: ./.release-please-config.json
+          manifest-file: ./.release-please-manifest.json
 
       - name: Setup .NET SDK
-        if: ${{ steps.release.outputs.release_created }}
+        if: ${{ steps.release.outputs.release_created }} # Correctly referencing 'release' ID
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
@@ -39,20 +39,20 @@ jobs:
           NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Restore dependencies
-        if: ${{ steps.release.outputs.release_created }}
+        if: ${{ steps.release.outputs.release_created }} # Correctly referencing 'release' ID
         run: dotnet restore GameEngine.sln
 
       - name: Build Solution
-        if: ${{ steps.release.outputs.release_created }}
+        if: ${{ steps.release.outputs.release_created }} # Correctly referencing 'release' ID
         run: dotnet build GameEngine.sln --configuration Release --no-restore
 
       - name: Pack All NuGet packages with Release Version
-        if: ${{ steps.release.outputs.release_created }}
+        if: ${{ steps.release.outputs.release_created }} # Correctly referencing 'release' ID
         run: |
           RELEASE_VERSION="${{ steps.release.outputs.version }}"
           echo "Packing NuGet packages with version: $RELEASE_VERSION"
           dotnet pack GameEngine.sln --configuration Release --output .nupkg /p:Version=$RELEASE_VERSION --no-build
 
       - name: Push All NuGet packages to GitHub Packages
-        if: ${{ steps.outputs.release_created }} # Use outputs from release step
+        if: ${{ steps.release.outputs.release_created }} # <--- CRITICAL FIX: Changed from steps.outputs to steps.release.outputs
         run: dotnet nuget push .nupkg/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json --skip-duplicate
