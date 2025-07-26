@@ -20,6 +20,7 @@
       "release-as": "0.1.0",  
       "extra-files": [
         "Directory.Build.props" 
+      ]
     }
   }
 }
