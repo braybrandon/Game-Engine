@@ -57,7 +57,7 @@ namespace GameEnginePlayground
             _playerEntity = _world.CreateEntity();
             _playerEntity.AddComponent(new TransformComponent { Position = new Vector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2), Rotation = 0f, Scale = Vector2.One });
             _playerEntity.AddComponent(new VelocityComponent { Value = Vector2.Zero });
-            _playerEntity.AddComponent(new HealthComponent { CurrentHealth = 100, MaxHealth = 100 });
+            _playerEntity.AddComponent(new HealthComponent { CurrentHealth = 130, MaxHealth = 100 });
             _playerEntity.AddComponent(new PlayerInputComponent { IsPlayerControlled = true });
             _playerEntity.AddComponent(new ColliderComponent { Bounds = new Rectangle(0, 0, 96, 96), IsTrigger = false, IsStatic = false });
             _playerEntity.AddComponent(new AnimationComponent { Clips = new Dictionary<AnimationType, AnimationClip>(), CurrentClipName = AnimationType.Idle });
