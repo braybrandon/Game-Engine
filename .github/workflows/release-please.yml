@@ -10,6 +10,7 @@ permissions:
   contents: write
   pull-requests: write
   issues: write
+  packages: write # <--- CRITICAL: ADD THIS LINE FOR GITHUB PACKAGES
 
 jobs:
   release-please:
@@ -25,37 +26,35 @@ jobs:
         uses: googleapis/release-please-action@v4.2.0
         id: release
         with:
-          # --- CRITICAL CHANGE HERE ---
-          # Use the config-file. Remove 'release-type', 'path', 'manifest-file' from here.
-          config-file: .release-please-config.json # <--- Point to your new config file
-          manifest-file: .release-please-manifest.json
+          config-file: ./.release-please-config.json # <--- Ensure the dot is there if file is in root
+          manifest-file: ./.release-please-manifest.json # <--- Ensure the dot is there if file is in root
 
-           # --- GitHub Packages Publishing Steps (Conditional) ---
+      # --- GitHub Packages Publishing Steps (Conditional) ---
       - name: Setup .NET SDK
-        # This step only runs if a new release was created by release-please
         if: ${{ steps.release.outputs.release_created }}
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x' # Specify your .NET SDK version (e.g., '6.0.x', '7.0.x', '8.0.x')
+          dotnet-version: '8.0.x' # Specify your .NET SDK version
           # Configure GitHub Packages as a NuGet source
           source-url: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
-          # Authenticate with the GITHUB_TOKEN
-          # This token is automatically provided by GitHub Actions for the current repository
-          # and usually has 'packages: write' permission if configured in 'permissions' block.    
+          # The 'nuget-token' input is not used in v4. We provide the token via env.
         env:
-          NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # <--- CORRECTED ENV VARIABLE NAME
 
       - name: Restore dependencies
         if: ${{ steps.release.outputs.release_created }}
-        run: dotnet restore
+        run: dotnet restore GameEngine.Engine/GameEngine.Engine.csproj # <--- TARGET THE NEW BUNDLE PROJECT
 
-      - name: Pack NuGet package
+      - name: Build Main Project (to trigger Fody weaving)
         if: ${{ steps.release.outputs.release_created }}
-        run: dotnet pack --configuration Release --output .nupkg # Output to a temporary folder
-        # Adjust 'YourProjectName.csproj' if you need to pack a specific project
-        # run: dotnet pack YourProjectName/YourProjectName.csproj --configuration Release --output .nupkg
+        run: dotnet build GameEngine.Engine/GameEngine.Engine.csproj --configuration Release --no-restore
+        # CRITICAL: TARGET THE NEW BUNDLE PROJECT HERE
+
+      - name: Pack Main NuGet package
+        if: ${{ steps.release.outputs.release_created }}
+        run: dotnet pack GameEngine.Engine/GameEngine.Engine.csproj --configuration Release --output .nupkg --no-build
+        # CRITICAL: TARGET THE NEW BUNDLE PROJECT HERE.
 
       - name: Push NuGet package to GitHub Packages
         if: ${{ steps.release.outputs.release_created }}
         run: dotnet nuget push .nupkg/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json --skip-duplicate
-        # --skip-duplicate is often useful to avoid errors if a version is re-pushed
