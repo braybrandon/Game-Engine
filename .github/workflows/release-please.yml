@@ -41,10 +41,9 @@ jobs:
           source-url: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
           # Authenticate with the GITHUB_TOKEN
           # This token is automatically provided by GitHub Actions for the current repository
-          # and usually has 'packages: write' permission if configured in 'permissions' block.
-          
+          # and usually has 'packages: write' permission if configured in 'permissions' block.    
         env:
-          nuget-token: ${{ secrets.GITHUB_TOKEN }}
+          NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
       - name: Restore dependencies
         if: ${{ steps.release.outputs.release_created }}
