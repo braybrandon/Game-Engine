@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.3-alpha.1](https://github.com/braybrandon/Game-Engine/compare/v0.1.2-alpha.1...v0.1.3-alpha.1) (2025-07-26)
+
+
+### Bug Fixes
+
+* Deploy all packages ([186bff8](https://github.com/braybrandon/Game-Engine/commit/186bff84620d5dec08d44e9e8f3c4186f4fbbfbe))
+
 ## [0.1.2-alpha.1](https://github.com/braybrandon/Game-Engine/compare/v0.1.1-alpha.1...v0.1.2-alpha.1) (2025-07-26)
 
 
