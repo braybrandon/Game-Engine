@@ -1,0 +1,40 @@
+# .github/workflows/release-please.yml
+name: Release Please
+
+# This workflow runs whenever code is pushed to your main branch.
+# It analyzes commit messages to determine if a new release is needed.
+on:
+  push:
+    branches:
+      - master # IMPORTANT: Change this to 'master' if your default branch is named 'master'
+
+# Permissions required for release-please to create pull requests, releases, and tags.
+permissions:
+  contents: write # Allows the action to create/update files (like CHANGELOG.md) and create releases/tags.
+  pull-requests: write # Allows the action to create pull requests (the "Release PR").
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest # The type of virtual machine to run the job on.
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4 # Action to check out your repository code.
+        with:
+          fetch-depth: 0 # Crucial: Fetches all history needed by release-please to analyze commits.
+
+      - name: Run Release Please
+        uses: google-github-actions/release-please@v9 # The official release-please action.
+        id: release # Assign an ID to this step to access its outputs.
+        with:
+          # Specifies the type of release. 'simple' is suitable for most general repositories.
+          release-type: simple
+          # The path to your CHANGELOG.md file. This file will be created/updated automatically.
+          changelog-path: CHANGELOG.md
+          # Optional: If you have a specific file where your version is stored (e.g., package.json, .csproj)
+          # and want release-please to update it automatically, specify it here.
+          # For .NET projects, this might be your solution file or a specific .csproj.
+          # Example for a .NET solution: manifest-file: YourGameEngine.sln
+          # For now, we'll omit this to keep it simple, and you'll manage versions manually or in Stage 2.
+          # manifest-file: .
+          # default-branch: main # Explicitly set your default branch if it's not 'main'
