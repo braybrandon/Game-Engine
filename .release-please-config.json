@@ -16,6 +16,7 @@
         {"type": "fix", "section": "Bug Fixes"},
         {"type": "chore", "section": "Other Changes", "hidden": true}
       ],
+      "prerelease": true,
       "extra-files": [
         "Directory.Build.props" 
       ]
