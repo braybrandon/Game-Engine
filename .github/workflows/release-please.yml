@@ -1,33 +1,31 @@
 # .github/workflows/release-please.yml
 name: Release Please
 
-# This workflow runs whenever code is pushed to your main branch.
-# It analyzes commit messages to determine if a new release is needed.
 on:
   push:
     branches:
-      - master # IMPORTANT: Change this to 'master' if your default branch is named 'master'
+      - master
 
-# Permissions required for release-please to create pull requests, releases, and tags.
 permissions:
-  contents: write # Allows the action to create/update files (like CHANGELOG.md) and create releases/tags.
-  pull-requests: write # Allows the action to create pull requests (the "Release PR").
+  contents: write
+  pull-requests: write
 
 jobs:
   release-please:
-    runs-on: ubuntu-latest # The type of virtual machine to run the job on.
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4 # Action to check out your repository code.
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Crucial: Fetches all history needed by release-please to analyze commits.
+          fetch-depth: 0
 
       - name: Run Release Please
-        uses: google-github-actions/release-please@v9 # The official release-please action.
-        id: release # Assign an ID to this step to access its outputs.
+        # --- CRITICAL CHANGE HERE ---
+        # Use the explicit latest tag shown in the image
+        uses: googleapis/release-please-action@v4.2.0 # Changed to v4.2.0
+        id: release
         with:
-          # Specifies the type of release. 'simple' is suitable for most general repositories.
           release-type: simple
           path: CHANGELOG.md
           manifest-file: GameEngine.sln # Ensure this path is correct
