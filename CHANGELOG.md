@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.9-alpha.1](https://github.com/braybrandon/Game-Engine/compare/v0.1.8-alpha.1...v0.1.9-alpha.1) (2025-07-26)
+
+
+### Bug Fixes
+
+* remove nupkg from asset file ([7062776](https://github.com/braybrandon/Game-Engine/commit/706277648312f1b0600ce5d2b8e904e4de6000a1))
+
 ## [0.1.8-alpha.1](https://github.com/braybrandon/Game-Engine/compare/v0.1.7-alpha.1...v0.1.8-alpha.1) (2025-07-26)
 
 
