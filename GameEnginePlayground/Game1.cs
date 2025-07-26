@@ -63,7 +63,7 @@ namespace GameEnginePlayground
             _playerEntity.AddComponent(new AnimationComponent { Clips = new Dictionary<AnimationType, AnimationClip>(), CurrentClipName = AnimationType.Idle });
 
             _cameraEntity = _world.CreateEntity();
-            _cameraEntity.AddComponent(new TransformComponent { Position = new Vector2(300, 240), Rotation = 0f, Scale = Vector2.One });
+            _cameraEntity.AddComponent(new TransformComponent { Position = new Vector2(400, 240), Rotation = 0f, Scale = Vector2.One });
             _cameraEntity.AddComponent(new CameraComponent(GraphicsDevice.Viewport) { Zoom = 1f});
 
             // 3. Register EngineSystems with the GameLoop
