@@ -28,4 +28,5 @@ jobs:
         with:
           release-type: simple
           path: CHANGELOG.md
-          manifest-file: Directory.Build.props # Ensure this path is correct
+          # manifest-file: Directory.Build.props # Ensure this path is correct
+          release-as: 0.1.0
