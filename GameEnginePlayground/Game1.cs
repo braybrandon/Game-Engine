@@ -2,6 +2,7 @@
 using GameEngine.Core;
 using GameEngine.Core.Components;
 using GameEngine.Core.Entities;
+using GameEngine.Core.Services;
 using GameEngine.Input;
 using GameEngine.Physics;
 using GameEngine.Rendering;
@@ -17,7 +18,10 @@ namespace GameEnginePlayground
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-        private GameLoop _gameLoop;
+        private Engine _gameLoop;
+
+        private World _world;
+        private TimeManager _timeManager;
 
         // Entities
         private Entity _playerEntity;
@@ -41,29 +45,35 @@ namespace GameEnginePlayground
 
         protected override void Initialize()
         {
+            _timeManager = new TimeManager();
+            ServiceLocator.Register<ITimeManager>(_timeManager);
+
             // TODO: Add your initialization logic here
-            _gameLoop = new GameLoop(this);
+            _gameLoop = new Engine(this);
+            
 
-            _playerEntity = Entity.Create();
-            ComponentManager.AddComponent(_playerEntity, new TransformComponent { Position = new Vector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2), Rotation = 0f, Scale = Vector2.One });
-            ComponentManager.AddComponent(_playerEntity, new VelocityComponent { Value = Vector2.Zero });
-            ComponentManager.AddComponent(_playerEntity, new HealthComponent { CurrentHealth = 100, MaxHealth = 100 });
-            ComponentManager.AddComponent(_playerEntity, new PlayerInputComponent { IsPlayerControlled = true });
-            ComponentManager.AddComponent(_playerEntity, new ColliderComponent { Bounds = new Rectangle(0, 0, 96, 96), IsTrigger = false, IsStatic = false });
-            ComponentManager.AddComponent(_playerEntity, new AnimationComponent { Clips = new Dictionary<AnimationType, AnimationClip>(), CurrentClipName = AnimationType.Idle });
+            _world = new World();
 
-            _cameraEntity = Entity.Create();
-            ComponentManager.AddComponent(_cameraEntity, new TransformComponent { Position = new Vector2(400, 240), Rotation = 0f, Scale = Vector2.One });
-            ComponentManager.AddComponent(_cameraEntity, new CameraComponent(GraphicsDevice.Viewport) { Zoom = 1f});
+            _playerEntity = _world.CreateEntity();
+            _playerEntity.AddComponent(new TransformComponent { Position = new Vector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2), Rotation = 0f, Scale = Vector2.One });
+            _playerEntity.AddComponent(new VelocityComponent { Value = Vector2.Zero });
+            _playerEntity.AddComponent(new HealthComponent { CurrentHealth = 100, MaxHealth = 100 });
+            _playerEntity.AddComponent(new PlayerInputComponent { IsPlayerControlled = true });
+            _playerEntity.AddComponent(new ColliderComponent { Bounds = new Rectangle(0, 0, 96, 96), IsTrigger = false, IsStatic = false });
+            _playerEntity.AddComponent(new AnimationComponent { Clips = new Dictionary<AnimationType, AnimationClip>(), CurrentClipName = AnimationType.Idle });
+
+            _cameraEntity = _world.CreateEntity();
+            _cameraEntity.AddComponent(new TransformComponent { Position = new Vector2(400, 240), Rotation = 0f, Scale = Vector2.One });
+            _cameraEntity.AddComponent(new CameraComponent(GraphicsDevice.Viewport) { Zoom = 1f});
 
             // 3. Register EngineSystems with the GameLoop
             // Order matters for systems that depend on each other's output!
-            _gameLoop.RegisterSystem(new PlayerInputSystem(this));
-            _gameLoop.RegisterSystem(new CalculateVelocitySystem(this));
-            _gameLoop.RegisterSystem(new MovementSystem(this));
-            _gameLoop.RegisterSystem(new AnimationStateSystem(this));
-            _gameLoop.RegisterSystem(new AnimationSystem(this));
-            _gameLoop.RegisterSystem(new CameraUpdateSystem(this, _playerEntity));
+            _gameLoop.RegisterSystem(new PlayerInputSystem());
+            _gameLoop.RegisterSystem(new CalculateVelocitySystem());
+            _gameLoop.RegisterSystem(new MovementSystem());
+            _gameLoop.RegisterSystem(new AnimationStateSystem());
+            _gameLoop.RegisterSystem(new AnimationSystem());
+            _gameLoop.RegisterSystem(new CameraUpdateSystem(_playerEntity));
 
             _gameLoop.Initialize();
             base.Initialize();
@@ -81,9 +91,9 @@ namespace GameEnginePlayground
             _playerWalkLeftTexture = Content.Load<Texture2D>("walkLeft");
             _playerWalkRightTexture = Content.Load<Texture2D>("walkRight");
 
-            if (ComponentManager.HasComponent<TransformComponent>(_playerEntity))
+            if (_playerEntity.HasComponent<TransformComponent>())
             {
-                ComponentManager.AddComponent(_playerEntity, new SpriteComponent
+                _playerEntity.AddComponent(new SpriteComponent
                 {
                     Texture = _playerTexture,
                     SourceRectangle = _playerTexture.Bounds,
@@ -97,8 +107,8 @@ namespace GameEnginePlayground
             }
 
             // --- Define Player Animations ---
-            var playerAnimationComponent = ComponentManager.GetComponent<AnimationComponent>(_playerEntity);
-            var playerSpriteComponent = ComponentManager.GetComponent<SpriteComponent>(_playerEntity);
+            ref var playerAnimationComponent = ref _playerEntity.GetComponent<AnimationComponent>();
+            ref var playerSpriteComponent = ref _playerEntity.GetComponent<SpriteComponent>();
 
             // Player Idle Animation (using first frame of walk_down as idle for simplicity)
             playerAnimationComponent.Clips[AnimationType.Idle] = new AnimationClip
@@ -178,22 +188,23 @@ namespace GameEnginePlayground
             playerSpriteComponent.SourceRectangle = playerAnimationComponent.CurrentClip.Frames[0]; 
             playerSpriteComponent.Origin = new Vector2(SPRITE_SIZE / 2, SPRITE_SIZE / 2); 
 
-            ComponentManager.AddComponent(_playerEntity, playerAnimationComponent);
-            ComponentManager.AddComponent(_playerEntity, playerSpriteComponent);
+            _playerEntity.AddComponent(playerAnimationComponent);
+            _playerEntity.AddComponent(playerSpriteComponent);
 
 
 
-            _gameLoop.RegisterSystem(new SpriteRenderSystem(this));
+            _gameLoop.RegisterSystem(new SpriteRenderSystem());
             _gameLoop.LoadContent(_spriteBatch);
         }
 
         protected override void Update(GameTime gameTime)
         {
+            _timeManager.Update(gameTime);
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
             // TODO: Add your update logic here
-            _gameLoop.Update(gameTime);
+            _gameLoop.Update(_world);
 
             base.Update(gameTime);
         }
@@ -203,7 +214,7 @@ namespace GameEnginePlayground
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             // TODO: Add your drawing code here
-            _gameLoop.Draw(gameTime);
+            _gameLoop.Draw(gameTime, _world);
             base.Draw(gameTime);
         }
 

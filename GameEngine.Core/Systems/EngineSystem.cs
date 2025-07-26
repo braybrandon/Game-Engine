@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GameEngine.Core.Components;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace GameEngine.Core.Systems
@@ -10,12 +11,6 @@ namespace GameEngine.Core.Systems
     /// </summary>
     public abstract class EngineSystem : IDisposable
     {
-        protected Game GameInstance { get; set; }
-
-        public EngineSystem(Game game)
-        {
-            GameInstance = game;
-        }
 
         /// <summary>
         /// Initializes the system.
@@ -29,12 +24,12 @@ namespace GameEngine.Core.Systems
         /// Called every fixed game update. Use for game logic, physics, AI, etc.
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
-        public virtual void Update(GameTime gameTime) { }
+        public virtual void Update(World world) { }
         /// <summary>
         /// Called every frame for drawing operations.
         /// </summary>
         /// <param name="spriteBatch">The SpriteBatch instance for drawing 2D sprites.</param>
-        public virtual void Draw(SpriteBatch spriteBatch) { }
+        public virtual void Draw(SpriteBatch spriteBatch, World world) { }
         /// <summary>
         /// Called when the system is disposed. Use for cleaning up resources.
         /// </summary>

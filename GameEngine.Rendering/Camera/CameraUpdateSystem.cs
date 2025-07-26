@@ -1,5 +1,6 @@
 ﻿using GameEngine.Core.Components;
 using GameEngine.Core.Entities;
+using GameEngine.Core.Services;
 using GameEngine.Core.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -11,29 +12,28 @@ namespace GameEngine.Rendering.Camera
         private Entity _playerEntity;
         private Vector2 _previousPlayerPosition = Vector2.Zero;
 
-        public CameraUpdateSystem(Game game, Entity playerEntity) : base(game)
+        public CameraUpdateSystem(Entity playerEntity)
         {
             _playerEntity = playerEntity;
         }
 
-        public override void Update(GameTime gameTime)
+        public override void Update(World world)
         {
-            float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            if (!ComponentManager.HasComponent<TransformComponent>(_playerEntity)) {
+            if (!_playerEntity.HasComponent<TransformComponent>()) {
                 return;
             }
-            if (!ComponentManager.HasComponent<PlayerInputComponent>(_playerEntity))
+            if (!_playerEntity.HasComponent<PlayerInputComponent>())
             {
                 return;
             }
 
-            TransformComponent playerTransformComponent = ComponentManager.GetComponent<TransformComponent>(_playerEntity);
-            PlayerInputComponent playerInputComponent = ComponentManager.GetComponent<PlayerInputComponent>(_playerEntity);
+            ref TransformComponent playerTransformComponent = ref _playerEntity.GetComponent<TransformComponent>();
+            ref PlayerInputComponent playerInputComponent = ref _playerEntity.GetComponent<PlayerInputComponent>();
 
-            foreach (var cameraEntity in ComponentManager.GetEntitiesWith<TransformComponent, CameraComponent>()) {
-                TransformComponent cameraTransformComponent = ComponentManager.GetComponent<TransformComponent>(cameraEntity);
-                CameraComponent cameraComponent = ComponentManager.GetComponent<CameraComponent>(cameraEntity);
+            foreach (var cameraEntity in world.GetEntitiesWith<TransformComponent, CameraComponent>()) {
+                ref TransformComponent cameraTransformComponent = ref cameraEntity.GetComponent<TransformComponent>();
+                ref CameraComponent cameraComponent = ref cameraEntity.GetComponent<CameraComponent>();
 
                 // Scroll wheel Zoom logic
                 float scrollDelta = playerInputComponent.CurrentMouseState.ScrollWheelValue - playerInputComponent.PreviousMouseState.ScrollWheelValue;
@@ -62,8 +62,6 @@ namespace GameEngine.Rendering.Camera
                 _previousPlayerPosition = playerTransformComponent.Position;
 
                 cameraComponent.ViewMatrix = cameraComponent.CalculateViewMatrix(cameraTransformComponent.Position, cameraTransformComponent.Rotation, cameraTransformComponent.Scale);
-                ComponentManager.AddComponent(cameraEntity, cameraTransformComponent);
-                ComponentManager.AddComponent(cameraEntity, cameraComponent);
                 break;
             }
         
