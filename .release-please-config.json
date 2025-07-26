@@ -16,7 +16,6 @@
         {"type": "fix", "section": "Bug Fixes"},
         {"type": "chore", "section": "Other Changes", "hidden": true}
       ],
-      "release-as": "0.1.0", 
       "extra-files": [
         "Directory.Build.props" 
       ]
