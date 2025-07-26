@@ -10,21 +10,16 @@ namespace GameEngine.Input
         private float _playerSpeed = 300f;
         private MouseState _previousMouseState;
 
-        public PlayerInputSystem(Game game) : base(game)
-        {
-        }
-
-        public override void Update(GameTime gameTime)
+        public override void Update(World world)
         {
 
-            foreach (var entity in ComponentManager.GetEntitiesWith<PlayerInputComponent>())
+            foreach (var entity in world.GetEntitiesWith<PlayerInputComponent>())
             {
-                PlayerInputComponent inputComponent = ComponentManager.GetComponent<PlayerInputComponent>(entity);
+                ref PlayerInputComponent inputComponent = ref entity.GetComponent<PlayerInputComponent>();
                 inputComponent.PreviousMouseState = inputComponent.CurrentMouseState;
                 inputComponent.PreviousKeyboardState = inputComponent.CurrentKeyboardState;
                 inputComponent.CurrentKeyboardState = Keyboard.GetState();
                 inputComponent.CurrentMouseState = Mouse.GetState();
-                ComponentManager.AddComponent(entity, inputComponent);
             }
         }
     }

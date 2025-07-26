@@ -12,17 +12,14 @@ namespace GameEngine.Animation
 {
     public class AnimationStateSystem : EngineSystem
     {
-        public AnimationStateSystem(Game game) : base(game)
-        {
-        }
 
-        public override void Update(GameTime gameTime)
+        public override void Update(World world)
         {
             // Player Walk Animations
-            foreach (var entity in ComponentManager.GetEntitiesWith<PlayerInputComponent, AnimationComponent>())
+            foreach (var entity in world.GetEntitiesWith<PlayerInputComponent, AnimationComponent>())
             {
-                var input = ComponentManager.GetComponent<PlayerInputComponent>(entity);
-                var animation = ComponentManager.GetComponent<AnimationComponent>(entity);
+                ref var input = ref entity.GetComponent<PlayerInputComponent>();
+                ref var animation = ref entity.GetComponent<AnimationComponent>();
                 AnimationType newClipName = animation.CurrentClipName;
 
                 if (input.CurrentKeyboardState.IsKeyDown(Keys.W)) newClipName = AnimationType.WalkUp;
@@ -32,7 +29,6 @@ namespace GameEngine.Animation
                 else { newClipName = AnimationType.Idle;
                 }
                 animation.Play(newClipName);
-                ComponentManager.AddComponent(entity, animation);
             }
         }
     }

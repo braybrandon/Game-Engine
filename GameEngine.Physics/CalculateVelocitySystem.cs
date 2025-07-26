@@ -8,16 +8,13 @@ namespace GameEngine.Physics
     public class CalculateVelocitySystem : EngineSystem
     {
         private float _playerSpeed = 300f;
-        public CalculateVelocitySystem(Game game) : base(game)
-        {
-        }
 
-        public override void Update(GameTime gameTime)
+        public override void Update(World world)
         {
-            foreach (var entity in ComponentManager.GetEntitiesWith<PlayerInputComponent, VelocityComponent>())
+            foreach (var entity in world.GetEntitiesWith<PlayerInputComponent, VelocityComponent>())
             {
-                VelocityComponent velocity = ComponentManager.GetComponent<VelocityComponent>(entity);
-                PlayerInputComponent input = ComponentManager.GetComponent<PlayerInputComponent>(entity);
+                ref VelocityComponent velocity = ref entity.GetComponent<VelocityComponent>();
+                ref PlayerInputComponent input = ref entity.GetComponent<PlayerInputComponent>();
                 // Player Movement Logic
                 velocity.Value = Vector2.Zero;
                 Vector2 movement = Vector2.Zero;
@@ -32,8 +29,6 @@ namespace GameEngine.Physics
                     movement.Normalize();
                     velocity.Value = movement * _playerSpeed;
                 }
-
-                ComponentManager.AddComponent(entity, velocity);
             }
         }
     }

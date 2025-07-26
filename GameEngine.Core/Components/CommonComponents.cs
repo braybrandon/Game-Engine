@@ -1,26 +1,23 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+using GameEngine.Core.Entities;
 namespace GameEngine.Core.Components
 {
-    public struct VelocityComponent
+    public struct VelocityComponent : IComponent
     {
         public Vector2 Value; 
     }
 
-    public struct HealthComponent
+    public struct HealthComponent : IComponent
+    
     {
         public int CurrentHealth;
         public int MaxHealth;
     }
 
-    public struct SpriteComponent
+    public struct SpriteComponent : IComponent
+    
     {
         public Texture2D Texture;
         public Rectangle SourceRectangle; 
@@ -32,7 +29,8 @@ namespace GameEngine.Core.Components
         public float LayerDepth;
     }
 
-    public struct PlayerInputComponent
+    public struct PlayerInputComponent : IComponent
+    
     {
         public bool IsPlayerControlled;
         public KeyboardState CurrentKeyboardState;
@@ -41,7 +39,7 @@ namespace GameEngine.Core.Components
         public MouseState PreviousMouseState;
     }
 
-    public struct ColliderComponent
+    public struct ColliderComponent : IComponent
     {
         public Rectangle Bounds; 
         public bool IsTrigger;
@@ -51,7 +49,7 @@ namespace GameEngine.Core.Components
     /// <summary>
     /// Represents a single animation clip.
     /// </summary>
-    public struct AnimationClip
+    public struct AnimationClip : IComponent
     {
         public string Name;
         public Texture2D Texture; // The specific texture sheet for this animation clip
@@ -72,7 +70,7 @@ namespace GameEngine.Core.Components
     /// <summary>
     /// Component holding animation data and current state for an entity.
     /// </summary>
-    public struct AnimationComponent
+    public struct AnimationComponent : IComponent
     {
         public Dictionary<AnimationType, AnimationClip> Clips; // All animation clips by name
         public AnimationType CurrentClipName; // Key of the currently playing clip
@@ -92,7 +90,7 @@ namespace GameEngine.Core.Components
         }
     }
 
-    public struct TransformComponent
+    public struct TransformComponent : IComponent
     {
         public Vector2 Position;
         public float Rotation;
@@ -105,4 +103,5 @@ namespace GameEngine.Core.Components
                 Matrix.CreateTranslation(Position.X, Position.Y, 0f);
         }
     }
+    
 }

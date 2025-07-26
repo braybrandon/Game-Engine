@@ -1,15 +1,12 @@
-﻿using GameEngine.Core.Systems;
+﻿using GameEngine.Core.Components;
+using GameEngine.Core.Services;
+using GameEngine.Core.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GameEngine.Core
 {
-    public class GameLoop(Game game) : IDisposable
+    public class Engine(Game game) : IDisposable
     {
 
         private Game _game = game;
@@ -60,15 +57,16 @@ namespace GameEngine.Core
         /// Updates the game state. Handles fixed-time step logic
         /// </summary>
         /// <param name="gameTime"></param>
-        public void Update(GameTime gameTime)
+        public void Update(World currentWorld)
         {
-            _accumulator += gameTime.ElapsedGameTime;
-            while (_accumulator >= _fixedUpdateStep)
+            ITimeManager timeManager = ServiceLocator.GetService<ITimeManager>();
+            _accumulator += timeManager.UnscaledElapsed;
+            while (_accumulator >= timeManager.FixedStep)
             {
-                _accumulator -= _fixedUpdateStep;
+                _accumulator -= timeManager.FixedStep;
                 foreach (EngineSystem system in _systems)
                 {
-                    system.Update(gameTime);
+                    system.Update(currentWorld);
                 }
             }
         }
@@ -77,14 +75,14 @@ namespace GameEngine.Core
         /// Draws the game.
         /// </summary>
         /// <param name="gameTime"></param>
-        public void Draw(GameTime gameTime)
+        public void Draw(GameTime gameTime, World world)
         {
             _game.GraphicsDevice.Clear(Color.White);
             if (_spriteBatch != null)
             {
                 foreach (EngineSystem system in _systems)
                 {
-                    system.Draw(_spriteBatch);
+                    system.Draw(_spriteBatch, world);
                 }
             }
         }
