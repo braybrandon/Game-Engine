@@ -1,7 +1,3 @@
 {
-  ".": {
-    "release-type": "simple",
-    "version": "0.0.1",
-    "changelog-path": "CHANGELOG.md"
-  }
+  ".": "0.0.1"
 }
