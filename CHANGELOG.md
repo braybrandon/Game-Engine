@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.2-alpha.1](https://github.com/braybrandon/Game-Engine/compare/v0.0.1-alpha.1...v0.0.2-alpha.1) (2025-07-26)
+
+
+### Bug Fixes
+
+* Setup .NET SDK ([55e5c3a](https://github.com/braybrandon/Game-Engine/commit/55e5c3a4ea67138ada31650fe9bdb2f9421beeaf))
+
 ## [0.0.1-alpha.1](https://github.com/braybrandon/Game-Engine/compare/v0.0.1...v0.0.1-alpha.1) (2025-07-26)
 
 
