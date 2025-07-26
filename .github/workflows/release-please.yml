@@ -29,12 +29,5 @@ jobs:
         with:
           # Specifies the type of release. 'simple' is suitable for most general repositories.
           release-type: simple
-          # The path to your CHANGELOG.md file. This file will be created/updated automatically.
-          changelog-path: CHANGELOG.md
-          # Optional: If you have a specific file where your version is stored (e.g., package.json, .csproj)
-          # and want release-please to update it automatically, specify it here.
-          # For .NET projects, this might be your solution file or a specific .csproj.
-          # Example for a .NET solution: manifest-file: YourGameEngine.sln
-          # For now, we'll omit this to keep it simple, and you'll manage versions manually or in Stage 2.
-          # manifest-file: .
-          # default-branch: main # Explicitly set your default branch if it's not 'main'
+          path: CHANGELOG.md
+          manifest-file: GameEngine.sln # Ensure this path is correct
