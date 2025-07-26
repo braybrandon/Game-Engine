@@ -11,6 +11,7 @@ permissions:
   pull-requests: write
   issues: write
   packages: write
+  # Corrected indentation for 'release: write'
   release: write # <--- CRITICAL: This is needed for uploading assets
 
 jobs:
