@@ -5,7 +5,17 @@
 		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<IsPackable>false</IsPackable>
+		<IsPackable>true</IsPackable>
+		<Authors>Bray Brandon</Authors>
+		<Company>BrayTec</Company>
+		<Description>Core module for the GameEngine.</Description>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageProjectUrl>https://github.com/braybrandon/Game-Engine</PackageProjectUrl>
+		<PackageTags>game-engine;core;monogame</PackageTags>
+		<PackageOutputPath>./nupkg</PackageOutputPath>
+		<RepositoryUrl>https://github.com/braybrandon/Game-Engine</RepositoryUrl>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 	</PropertyGroup>
 
 	<ItemGroup>
