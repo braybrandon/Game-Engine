@@ -61,15 +61,35 @@ jobs:
         if: ${{ steps.release.outputs.release_created }}
         run: dotnet nuget push .nupkg/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json --skip-duplicate
 
+       # --- Corrected Upload Individual NuGet Packages to GitHub Release ---
       - name: Upload Individual NuGet Packages to GitHub Release
         if: ${{ steps.release.outputs.release_created }}
         run: |
+          # Ensure the .nupkg directory exists and contains files
+          ls -l ./.nupkg/
+          
+          # Get the upload URL from release-please output
+          UPLOAD_URL="${{ steps.release.outputs.upload_url }}"
+          
+          # Loop through each .nupkg file and upload it
           for file in ./.nupkg/*.nupkg; do
-            ASSET_NAME=$(basename $file)
-            curl -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Content-Type: application/zip" \
-            --data-binary "@$file" \
-            "${{ steps.release.outputs.upload_url }}?name=$ASSET_NAME"
+            if [ -f "$file" ]; then # Check if the file actually exists
+              ASSET_NAME=$(basename "$file")
+              echo "Uploading $ASSET_NAME to release assets..."
+              
+              curl -X POST \
+              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Content-Type: application/octet-stream" \
+              --data-binary "@$file" \
+              "${{ steps.release.outputs.upload_url }}?name=$ASSET_NAME"
+              
+              # Add -v for verbose output to debug if it fails again
+              # curl -v -X POST ...
+              
+              echo "Finished uploading $ASSET_NAME."
+            else
+              echo "Warning: No .nupkg files found in ./.nupkg/"
+            fi
           done
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Ensure token is available for curl
