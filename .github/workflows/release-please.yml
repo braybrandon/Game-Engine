@@ -24,10 +24,10 @@ jobs:
 
       - name: Run Release Please
         uses: googleapis/release-please-action@v4.2.0
-        id: release
+        id: release # <--- Keep this ID, we'll use its outputs
         with:
-          config-file: .release-please-config.json
-          manifest-file: .release-please-manifest.json
+          config-file: .release-please-config.json # <--- Ensure the dot is there if file is in root
+          manifest-file: .release-please-manifest.json # <--- Ensure the dot is there if file is in root
 
       # --- GitHub Packages Publishing Steps (Conditional) ---
       - name: Setup .NET SDK
@@ -37,25 +37,26 @@ jobs:
           dotnet-version: '8.0.x' # Specify your .NET SDK version
           source-url: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
         env:
-          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Corrected env var name
 
       - name: Restore dependencies
         if: ${{ steps.release.outputs.release_created }}
-        # Restore the entire solution
-        run: dotnet restore GameEngine.sln
+        run: dotnet restore GameEngine.sln # Restore the entire solution
 
       - name: Build Solution
         if: ${{ steps.release.outputs.release_created }}
-        # Build the entire solution to ensure all projects are compiled
         run: dotnet build GameEngine.sln --configuration Release --no-restore
 
-      - name: Pack All NuGet packages
+      - name: Pack All NuGet packages with Release Version # <--- NAME CHANGED FOR CLARITY
         if: ${{ steps.release.outputs.release_created }}
-        # Pack all packable projects in the solution
-        run: dotnet pack GameEngine.sln --configuration Release --output .nupkg --no-build
+        run: |
+          # Get the version from release-please output
+          RELEASE_VERSION="${{ steps.release.outputs.version }}"
+          echo "Packing NuGet packages with version: $RELEASE_VERSION"
+          # Pack all packable projects in the solution, overriding the version
+          dotnet pack GameEngine.sln --configuration Release --output .nupkg /p:Version=$RELEASE_VERSION --no-build # <--- CRITICAL CHANGE HERE
         # This will create a .nupkg file for each project with IsPackable=true
 
       - name: Push All NuGet packages to GitHub Packages
         if: ${{ steps.release.outputs.release_created }}
-        # Push all .nupkg files found in the output directory
         run: dotnet nuget push .nupkg/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json --skip-duplicate
