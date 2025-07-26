@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.1-alpha.1](https://github.com/braybrandon/Game-Engine/compare/v0.1.0-alpha.1...v0.1.1-alpha.1) (2025-07-26)
+
+
+### Bug Fixes
+
+* csproj ([ea30ce5](https://github.com/braybrandon/Game-Engine/commit/ea30ce5dce078232c8c4f4492dfb8b8124a8149c))
+
 ## [0.1.0-alpha.1](https://github.com/braybrandon/Game-Engine/compare/v0.0.3-alpha.1...v0.1.0-alpha.1) (2025-07-26)
 
 
