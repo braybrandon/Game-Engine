@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.3-alpha.1](https://github.com/braybrandon/Game-Engine/compare/v0.0.2-alpha.1...v0.0.3-alpha.1) (2025-07-26)
+
+
+### Bug Fixes
+
+* Nuget auth token ([269c531](https://github.com/braybrandon/Game-Engine/commit/269c531e52dacf3060ed80e491d7c56edb6bca52))
+
 ## [0.0.2-alpha.1](https://github.com/braybrandon/Game-Engine/compare/v0.0.1-alpha.1...v0.0.2-alpha.1) (2025-07-26)
 
 
