@@ -77,7 +77,6 @@ namespace GameEngine.Core
         /// <param name="gameTime"></param>
         public void Draw(GameTime gameTime, World world)
         {
-            _game.GraphicsDevice.Clear(Color.White);
             if (_spriteBatch != null)
             {
                 foreach (EngineSystem system in _systems)
