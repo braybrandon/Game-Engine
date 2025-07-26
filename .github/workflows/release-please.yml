@@ -29,3 +29,32 @@ jobs:
           # Use the config-file. Remove 'release-type', 'path', 'manifest-file' from here.
           config-file: .release-please-config.json # <--- Point to your new config file
           manifest-file: .release-please-manifest.json
+
+           # --- GitHub Packages Publishing Steps (Conditional) ---
+      - name: Setup .NET SDK
+        # This step only runs if a new release was created by release-please
+        if: ${{ steps.release.outputs.release_created }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x' # Specify your .NET SDK version (e.g., '6.0.x', '7.0.x', '8.0.x')
+          # Configure GitHub Packages as a NuGet source
+          source-url: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+          # Authenticate with the GITHUB_TOKEN
+          # This token is automatically provided by GitHub Actions for the current repository
+          # and usually has 'packages: write' permission if configured in 'permissions' block.
+          nuget-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Restore dependencies
+        if: ${{ steps.release.outputs.release_created }}
+        run: dotnet restore
+
+      - name: Pack NuGet package
+        if: ${{ steps.release.outputs.release_created }}
+        run: dotnet pack --configuration Release --output .nupkg # Output to a temporary folder
+        # Adjust 'YourProjectName.csproj' if you need to pack a specific project
+        # run: dotnet pack YourProjectName/YourProjectName.csproj --configuration Release --output .nupkg
+
+      - name: Push NuGet package to GitHub Packages
+        if: ${{ steps.release.outputs.release_created }}
+        run: dotnet nuget push .nupkg/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json --skip-duplicate
+        # --skip-duplicate is often useful to avoid errors if a version is re-pushed
