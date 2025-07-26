@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.10-alpha.1](https://github.com/braybrandon/Game-Engine/compare/v0.1.9-alpha.1...v0.1.10-alpha.1) (2025-07-26)
+
+
+### Bug Fixes
+
+* Build errors ([79ef0b8](https://github.com/braybrandon/Game-Engine/commit/79ef0b8e36e8cc44f129ed9b15d1ac729e97e114))
+* typo ([b4ab228](https://github.com/braybrandon/Game-Engine/commit/b4ab2284f8694756f9b3ea9847bf7aaca1901dbd))
+
 ## [0.1.9-alpha.1](https://github.com/braybrandon/Game-Engine/compare/v0.1.8-alpha.1...v0.1.9-alpha.1) (2025-07-26)
 
 
