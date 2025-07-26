@@ -1,0 +1,25 @@
+
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please-action/main/schemas/config.json",
+  "release-type": "simple",
+  "changelog-path": "CHANGELOG.md",
+  "changelog-sections": [
+    {"type": "feat", "section": "Features"},
+    {"type": "fix", "section": "Bug Fixes"},
+    {"type": "chore", "section": "Other Changes", "hidden": true}
+  ],
+  "packages": {
+    ".": {
+      "release-type": "simple",
+      "changelog-path": "CHANGELOG.md",
+      "changelog-sections": [
+        {"type": "feat", "section": "Features"},
+        {"type": "fix", "section": "Bug Fixes"},
+        {"type": "chore", "section": "Other Changes", "hidden": true}
+      ],
+      "release-as": "0.1.0",  
+      "extra-files": [
+        "Directory.Build.props" 
+    }
+  }
+}

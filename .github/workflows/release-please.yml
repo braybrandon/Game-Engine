@@ -21,10 +21,13 @@ jobs:
           fetch-depth: 0
 
       - name: Run Release Please
-        uses: googleapis/release-please-action@v4.2.0 # Confirmed correct version
+        uses: googleapis/release-please-action@v4.2.0
         id: release
         with:
-          release-type: simple
-          path: CHANGELOG.md
-          # Use Directory.Build.props as the manifest file
-          manifest-file: Directory.Build.props # <--- Ensure this path is correct and file exists
+          # --- CRITICAL CHANGE HERE ---
+          # Use the config-file instead of individual parameters
+          config-file: ./.release-please-config.json # <--- Point to your new config file
+          # Remove 'release-type', 'path', 'manifest-file' from here, they are in the config-file
+          # release-type: simple
+          # path: CHANGELOG.md
+          # manifest-file: Directory.Build.props
