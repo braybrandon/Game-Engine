@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.0-alpha.1](https://github.com/braybrandon/Game-Engine/compare/v0.0.3-alpha.1...v0.1.0-alpha.1) (2025-07-26)
+
+
+### Features
+
+* Configure projects for fat NuGet package bundling ([12df167](https://github.com/braybrandon/Game-Engine/commit/12df167f131a911dc7138b58d4533fe2d621881b))
+
 ## [0.0.3-alpha.1](https://github.com/braybrandon/Game-Engine/compare/v0.0.2-alpha.1...v0.0.3-alpha.1) (2025-07-26)
 
 
