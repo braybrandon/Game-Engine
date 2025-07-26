@@ -26,8 +26,8 @@ jobs:
         uses: googleapis/release-please-action@v4.2.0
         id: release # <--- This ID is crucial
         with:
-          config-file: ./.release-please-config.json
-          manifest-file: ./.release-please-manifest.json
+          config-file: .release-please-config.json
+          manifest-file: .release-please-manifest.json
 
       - name: Setup .NET SDK
         if: ${{ steps.release.outputs.release_created }} # Correctly referencing 'release' ID
