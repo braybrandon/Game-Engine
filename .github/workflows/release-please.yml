@@ -26,4 +26,5 @@ jobs:
         with:
           # --- CRITICAL CHANGE HERE ---
           # Use the config-file. Remove 'release-type', 'path', 'manifest-file' from here.
-          config-file: ./.release-please-config.json # <--- Point to your new config file
+          config-file: .release-please-config.json # <--- Point to your new config file
+          manifest-file: .release-please-manifest.json
