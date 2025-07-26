@@ -26,8 +26,8 @@ jobs:
         uses: googleapis/release-please-action@v4.2.0
         id: release
         with:
-          config-file: ./.release-please-config.json # <--- Ensure the dot is there if file is in root
-          manifest-file: ./.release-please-manifest.json # <--- Ensure the dot is there if file is in root
+          config-file: .release-please-config.json # <--- Ensure the dot is there if file is in root
+          manifest-file: .release-please-manifest.json # <--- Ensure the dot is there if file is in root
 
       # --- GitHub Packages Publishing Steps (Conditional) ---
       - name: Setup .NET SDK
