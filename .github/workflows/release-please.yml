@@ -60,3 +60,16 @@ jobs:
       - name: Push All NuGet packages to GitHub Packages
         if: ${{ steps.release.outputs.release_created }}
         run: dotnet nuget push .nupkg/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json --skip-duplicate
+
+      - name: Upload Individual NuGet Packages to GitHub Release
+        if: ${{ steps.release.outputs.release_created }}
+        run: |
+          for file in ./.nupkg/*.nupkg; do
+            ASSET_NAME=$(basename $file)
+            curl -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Content-Type: application/zip" \
+            --data-binary "@$file" \
+            "${{ steps.release.outputs.upload_url }}?name=$ASSET_NAME"
+          done
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
