@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.1.8-alpha.1](https://github.com/braybrandon/Game-Engine/compare/v0.1.7-alpha.1...v0.1.8-alpha.1) (2025-07-26)
+
+
+### Bug Fixes
+
+* Change script for connecting release to package ([57c356e](https://github.com/braybrandon/Game-Engine/commit/57c356e5ba403cbc1bf15a2efdbdc77fa1113204))
+* Indent error ([a2257f9](https://github.com/braybrandon/Game-Engine/commit/a2257f9ecff4819a31d8060e169cd5d9446eb50a))
+* remove release write ([4eb9235](https://github.com/braybrandon/Game-Engine/commit/4eb9235fa1562d1ec032535038842f0da65cf4cd))
+
 ## [0.1.7-alpha.1](https://github.com/braybrandon/Game-Engine/compare/v0.1.6-alpha.1...v0.1.7-alpha.1) (2025-07-26)
 
 
