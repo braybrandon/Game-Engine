@@ -6,7 +6,6 @@
 ### Bug Fixes
 
 * change back to start position ([e67bbb8](https://github.com/braybrandon/Game-Engine/commit/e67bbb88a1a91d43cb26f07b20c8390597253401))
-* change back to start position ([b3a0b4c](https://github.com/braybrandon/Game-Engine/commit/b3a0b4c5196dfe7af069d1c40445e3f72e2beb4c))
 
 ## [0.1.0](https://github.com/braybrandon/Game-Engine/compare/v0.0.1...v0.1.0) (2025-07-26)
 
