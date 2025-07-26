@@ -10,7 +10,8 @@ permissions:
   contents: write
   pull-requests: write
   issues: write
-  packages: write # Crucial for GitHub Packages
+  packages: write
+  release: write # <--- CRITICAL: This is needed for uploading assets
 
 jobs:
   release-please:
@@ -24,72 +25,83 @@ jobs:
 
       - name: Run Release Please
         uses: googleapis/release-please-action@v4.2.0
-        id: release # <--- Keep this ID, we'll use its outputs
+        id: release
         with:
-          config-file: .release-please-config.json # <--- Ensure the dot is there if file is in root
-          manifest-file: .release-please-manifest.json # <--- Ensure the dot is there if file is in root
+          config-file: .release-please-config.json
+          manifest-file: .release-please-manifest.json
 
-      # --- GitHub Packages Publishing Steps (Conditional) ---
       - name: Setup .NET SDK
         if: ${{ steps.release.outputs.release_created }}
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x' # Specify your .NET SDK version
+          dotnet-version: '8.0.x'
           source-url: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
         env:
-          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Corrected env var name
+          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Restore dependencies
         if: ${{ steps.release.outputs.release_created }}
-        run: dotnet restore GameEngine.sln # Restore the entire solution
+        run: dotnet restore GameEngine.sln
 
       - name: Build Solution
         if: ${{ steps.release.outputs.release_created }}
         run: dotnet build GameEngine.sln --configuration Release --no-restore
 
-      - name: Pack All NuGet packages with Release Version # <--- NAME CHANGED FOR CLARITY
+      - name: Pack All NuGet packages with Release Version
         if: ${{ steps.release.outputs.release_created }}
         run: |
-          # Get the version from release-please output
           RELEASE_VERSION="${{ steps.release.outputs.version }}"
           echo "Packing NuGet packages with version: $RELEASE_VERSION"
-          # Pack all packable projects in the solution, overriding the version
-          dotnet pack GameEngine.sln --configuration Release --output .nupkg /p:Version=$RELEASE_VERSION --no-build # <--- CRITICAL CHANGE HERE
-        # This will create a .nupkg file for each project with IsPackable=true
+          dotnet pack GameEngine.sln --configuration Release --output .nupkg /p:Version=$RELEASE_VERSION --no-build
 
       - name: Push All NuGet packages to GitHub Packages
-        if: ${{ steps.release.outputs.release_created }}
+        if: ${{ steps.outputs.release_created }} # Use outputs from release step
         run: dotnet nuget push .nupkg/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json --skip-duplicate
 
-       # --- Corrected Upload Individual NuGet Packages to GitHub Release ---
+      # --- NEW DEFINITIVE STEP: Upload Individual NuGet Packages using actions/github-script ---
       - name: Upload Individual NuGet Packages to GitHub Release
-        if: ${{ steps.release.outputs.release_created }}
-        run: |
-          # Ensure the .nupkg directory exists and contains files
-          ls -l ./.nupkg/
-          
-          # Get the upload URL from release-please output
-          UPLOAD_URL="${{ steps.release.outputs.upload_url }}"
-          
-          # Loop through each .nupkg file and upload it
-          for file in ./.nupkg/*.nupkg; do
-            if [ -f "$file" ]; then # Check if the file actually exists
-              ASSET_NAME=$(basename "$file")
-              echo "Uploading $ASSET_NAME to release assets..."
+        if: ${{ steps.release.outputs.release_created }} # Only run if a release was created
+        uses: actions/github-script@v7 # Use a recent version of github-script
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            
+            // Get the release ID from the release-please output
+            // The `upload_url` from release-please includes the release ID
+            const uploadUrl = "${{ steps.release.outputs.upload_url }}";
+            const releaseId = uploadUrl.match(/\/releases\/(\d+)\/assets/)[1]; // Extract ID from URL
+            
+            const nupkgDir = './.nupkg';
+            const files = fs.readdirSync(nupkgDir).filter(f => f.endsWith('.nupkg'));
+            
+            console.log(`Found ${files.length} .nupkg files to upload.`);
+            
+            for (const file of files) {
+              const filePath = path.join(nupkgDir, file);
+              const assetName = file; // Use the filename as the asset name
+              const assetContentType = 'application/zip'; // .nupkg files are zip archives
               
-              curl -X POST \
-              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-              -H "Content-Type: application/octet-stream" \
-              --data-binary "@$file" \
-              "${{ steps.release.outputs.upload_url }}?name=$ASSET_NAME"
+              console.log(`Attempting to upload ${assetName} from ${filePath}...`);
               
-              # Add -v for verbose output to debug if it fails again
-              # curl -v -X POST ...
+              const fileContent = fs.readFileSync(filePath);
               
-              echo "Finished uploading $ASSET_NAME."
-            else
-              echo "Warning: No .nupkg files found in ./.nupkg/"
-            fi
-          done
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Ensure token is available for curl
+              try {
+                await github.rest.repos.uploadReleaseAsset({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  release_id: releaseId, // Use the extracted release ID
+                  name: assetName,
+                  data: fileContent,
+                  headers: {
+                    'content-type': assetContentType,
+                    'content-length': fileContent.length // Required for binary uploads
+                  }
+                });
+                console.log(`Successfully uploaded ${assetName}.`);
+              } catch (error) {
+                console.error(`Failed to upload ${assetName}: ${error.message}`);
+                core.setFailed(`Failed to upload ${assetName}: ${error.message}`); // Fail the step
+              }
+            }
+          github-token: ${{ secrets.GITHUB_TOKEN }} # Provide the token to the script
