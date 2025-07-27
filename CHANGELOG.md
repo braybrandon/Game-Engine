@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.19-alpha.1](https://github.com/braybrandon/Game-Engine/compare/v0.1.18-alpha.1...v0.1.19-alpha.1) (2025-07-27)
+
+
+### Bug Fixes
+
+* updating links ([c931f96](https://github.com/braybrandon/Game-Engine/commit/c931f96f5dc0f5f364a586e0c68156d5ffc1210c))
+
 ## [0.1.18-alpha.1](https://github.com/braybrandon/Game-Engine/compare/v0.1.17-alpha.1...v0.1.18-alpha.1) (2025-07-27)
 
 
