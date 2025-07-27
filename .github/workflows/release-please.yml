@@ -71,8 +71,10 @@ jobs:
             const REPO_OWNER = context.repo.owner;
             const REPO_NAME = context.repo.repo;
             
-            // Define footerContent as a single-line JavaScript string using explicit \n for newlines
-            const footerContent = "## Package Links\\n\\n**GitHub Packages:**\\n\\n" +
+            // Define footerContent by concatenating multiple explicit string literals
+            const footerContent = 
+              "## Package Links\\n\\n" +
+              "**GitHub Packages:**\\n\\n" +
               "- [GameEngine.AI](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.AI)\\n" +
               "- [GameEngine.Animation](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.Animation)\\n" +
               "- [GameEngine.Assets](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.Assets)\\n" +
