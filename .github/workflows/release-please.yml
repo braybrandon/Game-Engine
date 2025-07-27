@@ -62,9 +62,10 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const { release } = context.payload;
-            const releaseId = release.id;
-            const currentBody = release.body || '';
+            // Get release details directly from the outputs of the 'release' step
+            const releaseId = "${{ steps.release.outputs.id }}";
+            const releaseHtmlUrl = "${{ steps.release.outputs.html_url }}";
+            const currentBody = "${{ steps.release.outputs.body }}" || ''; // Get existing body from release-please output
             
             const REPO_OWNER = context.repo.owner;
             const REPO_NAME = context.repo.repo;
