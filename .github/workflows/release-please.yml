@@ -26,8 +26,8 @@ jobs:
         uses: googleapis/release-please-action@v4.2.0
         id: release
         with:
-          config-file: .release-please-config.json # Corrected path
-          manifest-file: .release-please-manifest.json # Corrected path
+          config-file: .release-please-config.json
+          manifest-file: .release-please-manifest.json
 
       - name: Setup .NET SDK
         if: ${{ steps.release.outputs.release_created }}
@@ -53,24 +53,11 @@ jobs:
           echo "Packing NuGet packages with version: $RELEASE_VERSION"
           dotnet pack GameEngine.sln --configuration Release --output .nupkg /p:Version=$RELEASE_VERSION --no-build
 
-      # --- Diagnostic Step: Check GitHub Token Permissions ---
-      - name: Check GitHub Token Permissions
-        if: ${{ steps.release.outputs.release_created }}
-        run: |
-          echo "Checking permissions for GITHUB_TOKEN..."
-          # This command will list the permissions granted to the GITHUB_TOKEN for this workflow run.
-          # It requires the GitHub CLI to be available on the runner, which it usually is.
-          gh auth status --show-token --hostname github.com
-          gh api /user/permissions --jq .
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Ensure token is available for gh CLI
-
       - name: Push All NuGet packages to GitHub Packages
         if: ${{ steps.release.outputs.release_created }}
-        # Pass the token via an environment variable for dotnet nuget push
         run: dotnet nuget push .nupkg/*.nupkg --api-key "$GITHUB_TOKEN" --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json --skip-duplicate
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Explicitly make GITHUB_TOKEN available as an env var
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update GitHub Release Description with Links
         if: ${{ steps.release.outputs.release_created }}
@@ -104,6 +91,9 @@ jobs:
               "**Direct Downloads (Release Assets):**\\n\\n" +
               "- [View Source Code Assets for this Release](" + releaseHtmlUrl + "#assets)\\n";
             
+            console.log("DEBUG: Constructed footerContent:");
+            console.log(footerContent); // Log the string to see its exact content in the workflow logs
+
             const newBody = currentBody + '\n\n' + footerContent;
             
             console.log(`Updating release ${releaseId} with new body...`);
