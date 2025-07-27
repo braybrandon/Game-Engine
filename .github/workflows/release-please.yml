@@ -7,10 +7,10 @@ on:
       - master
 
 permissions:
-  contents: write # Needed for creating/updating releases, tags, and uploading assets
-  pull-requests: write # Needed for creating Release PRs
-  issues: write # Needed for release-please to apply labels
-  packages: write # Needed for pushing packages to GitHub Packages
+  contents: write
+  pull-requests: write
+  issues: write
+  packages: write
 
 jobs:
   release-please:
@@ -20,11 +20,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Required for release-please to analyze full history
+          fetch-depth: 0
 
       - name: Run Release Please
         uses: googleapis/release-please-action@v4.2.0
-        id: release # ID to access outputs like release_created, version, html_url
+        id: release
         with:
           config-file: .release-please-config.json
           manifest-file: .release-please-manifest.json
@@ -62,39 +62,32 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            // Get release details directly from the outputs of the 'release' step
             const releaseId = "${{ steps.release.outputs.id }}";
             const releaseHtmlUrl = "${{ steps.release.outputs.html_url }}";
-            const currentBody = "${{ steps.release.outputs.body }}" || ''; // Get existing body from release-please output
+            const currentBody = "${{ steps.release.outputs.body }}" || '';
             
             const REPO_OWNER = context.repo.owner;
             const REPO_NAME = context.repo.repo;
             
-            const footerContent = `
-            ## Package Links
-
-            **GitHub Packages:**
-
-            - [GameEngine.AI](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.AI)
-            - [GameEngine.Animation](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.Animation)
-            - [GameEngine.Assets](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.Assets)
-            - [GameEngine.Audio](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.Audio)
-            - [GameEngine.Core](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.Core)
-            - [GameEngine.Input](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.Input)
-            - [GameEngine.Particles](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.Particles)
-            - [GameEngine.Physics](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.Physics)
-            - [GameEngine.Rendering](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.Rendering)
-            - [GameEngine.SaveLoad](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.SaveLoad)
-            - [GameEngine.Scene](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.Scene)
-            - [GameEngine.State](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.State)
-            - [GameEngine.Tiles](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.Tiles)
-            - [GameEngine.UI](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.UI)
-            - [GameEnginePlayground](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEnginePlayground)
-
-            **Direct Downloads (Release Assets):**
-
-            - [View Source Code Assets for this Release](${release.html_url}#assets)
-            `;
+            // Define footerContent as a single-line JavaScript string using explicit \n for newlines
+            const footerContent = "## Package Links\\n\\n**GitHub Packages:**\\n\\n" +
+              "- [GameEngine.AI](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.AI)\\n" +
+              "- [GameEngine.Animation](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.Animation)\\n" +
+              "- [GameEngine.Assets](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.Assets)\\n" +
+              "- [GameEngine.Audio](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.Audio)\\n" +
+              "- [GameEngine.Core](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.Core)\\n" +
+              "- [GameEngine.Input](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.Input)\\n" +
+              "- [GameEngine.Particles](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.Particles)\\n" +
+              "- [GameEngine.Physics](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.Physics)\\n" +
+              "- [GameEngine.Rendering](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.Rendering)\\n" +
+              "- [GameEngine.SaveLoad](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.SaveLoad)\\n" +
+              "- [GameEngine.Scene](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.Scene)\\n" +
+              "- [GameEngine.State](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.State)\\n" +
+              "- [GameEngine.Tiles](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.Tiles)\\n" +
+              "- [GameEngine.UI](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.UI)\\n" +
+              "- [GameEnginePlayground](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEnginePlayground)\\n\\n" +
+              "**Direct Downloads (Release Assets):**\\n\\n" +
+              "- [View Source Code Assets for this Release](" + releaseHtmlUrl + "#assets)\\n";
             
             const newBody = currentBody + '\n\n' + footerContent;
             
