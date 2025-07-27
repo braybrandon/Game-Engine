@@ -70,30 +70,30 @@ jobs:
             const REPO_NAME = context.repo.repo;
             
             const footerContent = `
-## Package Links
+            ## Package Links
 
-**GitHub Packages:**
+            **GitHub Packages:**
 
-- [GameEngine.AI](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.AI)
-- [GameEngine.Animation](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.Animation)
-- [GameEngine.Assets](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.Assets)
-- [GameEngine.Audio](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.Audio)
-- [GameEngine.Core](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.Core)
-- [GameEngine.Input](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.Input)
-- [GameEngine.Particles](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.Particles)
-- [GameEngine.Physics](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.Physics)
-- [GameEngine.Rendering](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.Rendering)
-- [GameEngine.SaveLoad](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.SaveLoad)
-- [GameEngine.Scene](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.Scene)
-- [GameEngine.State](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.State)
-- [GameEngine.Tiles](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.Tiles)
-- [GameEngine.UI](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.UI)
-- [GameEnginePlayground](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEnginePlayground)
+            - [GameEngine.AI](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.AI)
+            - [GameEngine.Animation](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.Animation)
+            - [GameEngine.Assets](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.Assets)
+            - [GameEngine.Audio](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.Audio)
+            - [GameEngine.Core](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.Core)
+            - [GameEngine.Input](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.Input)
+            - [GameEngine.Particles](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.Particles)
+            - [GameEngine.Physics](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.Physics)
+            - [GameEngine.Rendering](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.Rendering)
+            - [GameEngine.SaveLoad](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.SaveLoad)
+            - [GameEngine.Scene](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.Scene)
+            - [GameEngine.State](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.State)
+            - [GameEngine.Tiles](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.Tiles)
+            - [GameEngine.UI](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.UI)
+            - [GameEnginePlayground](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEnginePlayground)
 
-**Direct Downloads (Release Assets):**
+            **Direct Downloads (Release Assets):**
 
-- [View Source Code Assets for this Release](${release.html_url}#assets)
-`;
+            - [View Source Code Assets for this Release](${release.html_url}#assets)
+            `;
             
             const newBody = currentBody + '\n\n' + footerContent;
             
