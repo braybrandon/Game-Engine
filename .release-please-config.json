@@ -19,6 +19,26 @@
       "extra-files": [
         "Directory.Build.props" 
       ]
+    },
+    "GameEngine.Core": {
+      "path": "GameEngine.Core",
+      "release-type": "dotnet",
+      "changelog-path": "GameEngine.Core/CHANGELOG.md"
+    },
+    "GameEngine.Graphics": {
+      "path": "GameEngine.Graphics",
+      "release-type": "dotnet",
+      "changelog-path": "GameEngine.Graphics/CHANGELOG.md"
+    },
+    "GameEngine.Physics": {
+      "path": "GameEngine.Physics",
+      "release-type": "dotnet",
+      "changelog-path": "GameEngine.Physics/CHANGELOG.md"
+    },
+    "GameEngine.IO": {
+      "path": "GameEngine.IO",
+      "release-type": "dotnet",
+      "changelog-path": "GameEngine.IO/CHANGELOG.md"
     }
   }
 }
