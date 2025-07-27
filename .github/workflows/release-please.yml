@@ -7,10 +7,10 @@ on:
       - master
 
 permissions:
-  contents: write
-  pull-requests: write
-  issues: write
-  packages: write
+  contents: write # Needed for creating/updating releases, tags, and uploading assets
+  pull-requests: write # Needed for creating Release PRs
+  issues: write # Needed for release-please to apply labels
+  packages: write # Needed for pushing packages to GitHub Packages
 
 jobs:
   release-please:
@@ -20,82 +20,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0 # Required for release-please to analyze full history
 
       - name: Run Release Please
         uses: googleapis/release-please-action@v4.2.0
-        id: release # <--- This ID is crucial
+        id: release # ID to access outputs like release_created, version, html_url
         with:
           config-file: .release-please-config.json
           manifest-file: .release-please-manifest.json
-      
-            # --- Install release-please CLI for dynamic footer ---
-      - name: Install release-please CLI
-        # This step is needed because we'll run `release-please` as a script
-        # to pass the dynamic footer content.
-        # If you were previously using a direct `uses: googleapis/release-please-action`
-        # and it was handling the release notes, this is the workaround.
-        run: npm install -g release-please
-
-      # --- Generate Release Notes and Run Release Please with Dynamic Footer ---
-      - name: Generate Release Notes and Run Release Please
-        id: generate_release # Give this step an ID to capture its outputs
-        run: |
-          # Construct the dynamic release notes footer using GitHub Actions context variables
-          REPO_OWNER="${{ github.repository_owner }}"
-          REPO_NAME="${{ github.event.repository.name }}" # Or 'Game-Engine' if you prefer hardcoding
-
-          # The HTML URL for the release will be available after release-please creates it.
-          # We can construct a placeholder or use the output from the 'release' step later.
-          # For the footer, we'll use the output of the 'release' step for the URL.
-          
-          # Construct the footer content
-          RELEASE_FOOTER_CONTENT="## Package Links\n\n**GitHub Packages:**\n\n"
-          RELEASE_FOOTER_CONTENT+=" - [GameEngine.AI](https://github.com/$REPO_OWNER/$REPO_NAME/packages/GameEngine.AI)\n"
-          RELEASE_FOOTER_CONTENT+=" - [GameEngine.Animation](https://github.com/$REPO_OWNER/$REPO_NAME/packages/GameEngine.Animation)\n"
-          RELEASE_FOOTER_CONTENT+=" - [GameEngine.Assets](https://github.com/$REPO_OWNER/$REPO_NAME/packages/GameEngine.Assets)\n"
-          RELEASE_FOOTER_CONTENT+=" - [GameEngine.Audio](https://github.com/$REPO_OWNER/$REPO_NAME/packages/GameEngine.Audio)\n"
-          RELEASE_FOOTER_CONTENT+=" - [GameEngine.Core](https://github.com/$REPO_OWNER/$REPO_NAME/packages/GameEngine.Core)\n"
-          RELEASE_FOOTER_CONTENT+=" - [GameEngine.Input](https://github.com/$REPO_OWNER/$REPO_NAME/packages/GameEngine.Input)\n"
-          RELEASE_FOOTER_CONTENT+=" - [GameEngine.Particles](https://github.com/$REPO_OWNER/$REPO_NAME/packages/GameEngine.Particles)\n"
-          RELEASE_FOOTER_CONTENT+=" - [GameEngine.Physics](https://github.com/$REPO_OWNER/$REPO_NAME/packages/GameEngine.Physics)\n"
-          RELEASE_FOOTER_CONTENT+=" - [GameEngine.Rendering](https://github.com/$REPO_OWNER/$REPO_NAME/packages/GameEngine.Rendering)\n"
-          RELEASE_FOOTER_CONTENT+=" - [GameEngine.SaveLoad](https://github.com/$REPO_OWNER/$REPO_NAME/packages/GameEngine.SaveLoad)\n"
-          RELEASE_FOOTER_CONTENT+=" - [GameEngine.Scene](https://github.com/$REPO_OWNER/$REPO_NAME/packages/GameEngine.Scene)\n"
-          RELEASE_FOOTER_CONTENT+=" - [GameEngine.State](https://github.com/$REPO_OWNER/$REPO_NAME/packages/GameEngine.State)\n"
-          RELEASE_FOOTER_CONTENT+=" - [GameEngine.Tiles](https://github.com/$REPO_OWNER/$REPO_NAME/packages/GameEngine.Tiles)\n"
-          RELEASE_FOOTER_CONTENT+=" - [GameEngine.UI](https://github.com/$REPO_OWNER/$REPO_NAME/packages/GameEngine.UI)\n"
-          RELEASE_FOOTER_CONTENT+=" - [GameEnginePlayground](https://github.com/$REPO_OWNER/$REPO_NAME/packages/GameEnginePlayground)\n\n"
-          RELEASE_FOOTER_CONTENT+="**Direct Downloads (Release Assets):**\n\n"
-          # The HTML URL for the release is output by the 'release' step.
-          # We can use it here directly.
-          RELEASE_FOOTER_CONTENT+=" - [View Source Code Assets for this Release](${{ steps.release.outputs.html_url }}#assets)\n"
-          
-          # Run release-please CLI with the dynamic footer
-          # Capture output to pass to subsequent steps
-          RELEASE_PLEASE_CLI_OUTPUT=$(release-please release \
-            --token="${{ secrets.GITHUB_TOKEN }}" \
-            --config="./.release-please-config.json" \
-            --manifest="./.release-please-manifest.json" \
-            --release-notes-footer "$RELEASE_FOOTER_CONTENT") # <--- Pass footer as CLI argument
-          
-          echo "$RELEASE_PLEASE_CLI_OUTPUT"
-          
-          # Parse the output from the CLI command and set as step outputs
-          # This parsing logic is crucial to get the version and release_created flag
-          RELEASE_CREATED=$(echo "$RELEASE_PLEASE_CLI_OUTPUT" | grep '"release_created":' | head -n 1 | sed -e 's/.*"release_created": *//' -e 's/,.*//')
-          RELEASE_VERSION=$(echo "$RELEASE_PLEASE_CLI_OUTPUT" | grep '"version":' | head -n 1 | sed -e 's/.*"version": *//' -e 's/,.*//' -e 's/"//g')
-          RELEASE_HTML_URL=$(echo "$RELEASE_PLEASE_CLI_OUTPUT" | grep '"html_url":' | head -n 1 | sed -e 's/.*"html_url": *//' -e 's/,.*//' -e 's/"//g')
-          
-          echo "release_created=$RELEASE_CREATED" >> "$GITHUB_OUTPUT"
-          echo "version=$RELEASE_VERSION" >> "$GITHUB_OUTPUT"
-          echo "html_url=$RELEASE_HTML_URL" >> "$GITHUB_OUTPUT"
-        env:
-          # Ensure GITHUB_TOKEN is available for the script
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup .NET SDK
-        if: ${{ steps.release.outputs.release_created }} # Correctly referencing 'release' ID
+        if: ${{ steps.release.outputs.release_created }}
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
@@ -104,20 +39,76 @@ jobs:
           NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Restore dependencies
-        if: ${{ steps.release.outputs.release_created }} # Correctly referencing 'release' ID
+        if: ${{ steps.release.outputs.release_created }}
         run: dotnet restore GameEngine.sln
 
       - name: Build Solution
-        if: ${{ steps.release.outputs.release_created }} # Correctly referencing 'release' ID
+        if: ${{ steps.release.outputs.release_created }}
         run: dotnet build GameEngine.sln --configuration Release --no-restore
 
       - name: Pack All NuGet packages with Release Version
-        if: ${{ steps.release.outputs.release_created }} # Correctly referencing 'release' ID
+        if: ${{ steps.release.outputs.release_created }}
         run: |
           RELEASE_VERSION="${{ steps.release.outputs.version }}"
           echo "Packing NuGet packages with version: $RELEASE_VERSION"
           dotnet pack GameEngine.sln --configuration Release --output .nupkg /p:Version=$RELEASE_VERSION --no-build
 
       - name: Push All NuGet packages to GitHub Packages
-        if: ${{ steps.release.outputs.release_created }} # <--- CRITICAL FIX: Changed from steps.outputs to steps.release.outputs
+        if: ${{ steps.release.outputs.release_created }}
         run: dotnet nuget push .nupkg/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json --skip-duplicate
+
+      - name: Update GitHub Release Description with Links
+        if: ${{ steps.release.outputs.release_created }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { release } = context.payload;
+            const releaseId = release.id;
+            const currentBody = release.body || '';
+            
+            const REPO_OWNER = context.repo.owner;
+            const REPO_NAME = context.repo.repo;
+            
+            const footerContent = `
+## Package Links
+
+**GitHub Packages:**
+
+- [GameEngine.AI](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.AI)
+- [GameEngine.Animation](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.Animation)
+- [GameEngine.Assets](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.Assets)
+- [GameEngine.Audio](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.Audio)
+- [GameEngine.Core](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.Core)
+- [GameEngine.Input](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.Input)
+- [GameEngine.Particles](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.Particles)
+- [GameEngine.Physics](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.Physics)
+- [GameEngine.Rendering](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.Rendering)
+- [GameEngine.SaveLoad](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.SaveLoad)
+- [GameEngine.Scene](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.Scene)
+- [GameEngine.State](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.State)
+- [GameEngine.Tiles](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.Tiles)
+- [GameEngine.UI](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEngine.UI)
+- [GameEnginePlayground](https://github.com/${REPO_OWNER}/${REPO_NAME}/packages/GameEnginePlayground)
+
+**Direct Downloads (Release Assets):**
+
+- [View Source Code Assets for this Release](${release.html_url}#assets)
+`;
+            
+            const newBody = currentBody + '\n\n' + footerContent;
+            
+            console.log(`Updating release ${releaseId} with new body...`);
+            
+            try {
+              await github.rest.repos.updateRelease({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                release_id: releaseId,
+                body: newBody
+              });
+              console.log(`Successfully updated release ${releaseId} description.`);
+            } catch (error) {
+              console.error(`Failed to update release ${releaseId}: ${error.message}`);
+              core.setFailed(`Failed to update release ${releaseId}: ${error.message}`);
+            }
+          github-token: ${{ secrets.GITHUB_TOKEN }}
