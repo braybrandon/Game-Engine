@@ -27,7 +27,7 @@ jobs:
         id: release
         with:
           config-file: .release-please-config.json
-          manifest-file: .release-please-manifest.json
+          manifest-file: ./.release-please-manifest.json
 
       - name: Setup .NET SDK
         if: ${{ steps.release.outputs.release_created }}
@@ -71,32 +71,39 @@ jobs:
             const REPO_OWNER = context.repo.owner;
             const REPO_NAME = context.repo.repo;
             
-            // Define footerContent by concatenating multiple explicit string literals
-            const footerContent = 
-              "## Package Links\\n\\n" +
-              "**GitHub Packages:**\\n\\n" +
-              "- [GameEngine.AI](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.AI)\\n" +
-              "- [GameEngine.Animation](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.Animation)\\n" +
-              "- [GameEngine.Assets](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.Assets)\\n" +
-              "- [GameEngine.Audio](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.Audio)\\n" +
-              "- [GameEngine.Core](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.Core)\\n" +
-              "- [GameEngine.Input](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.Input)\\n" +
-              "- [GameEngine.Particles](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.Particles)\\n" +
-              "- [GameEngine.Physics](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.Physics)\\n" +
-              "- [GameEngine.Rendering](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.Rendering)\\n" +
-              "- [GameEngine.SaveLoad](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.SaveLoad)\\n" +
-              "- [GameEngine.Scene](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.Scene)\\n" +
-              "- [GameEngine.State](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.State)\\n" +
-              "- [GameEngine.Tiles](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.Tiles)\\n" +
-              "- [GameEngine.UI](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.UI)\\n" +
-              "- [GameEnginePlayground](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEnginePlayground)\\n\\n" +
-              "**Direct Downloads (Release Assets):**\\n\\n" +
-              "- [View Source Code Assets for this Release](" + releaseHtmlUrl + "#assets)\\n";
-            
+            // Define footerContent as an array of strings, then join them with newlines.
+            // This avoids complex YAML parsing issues with embedded multi-line JS strings.
+            const footerLines = [
+              "## Package Links",
+              "", // Empty line for spacing
+              "**GitHub Packages:**",
+              "",
+              "- [GameEngine.AI](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.AI)",
+              "- [GameEngine.Animation](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.Animation)",
+              "- [GameEngine.Assets](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.Assets)",
+              "- [GameEngine.Audio](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.Audio)",
+              "- [GameEngine.Core](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.Core)",
+              "- [GameEngine.Input](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.Input)",
+              "- [GameEngine.Particles](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.Particles)",
+              "- [GameEngine.Physics](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.Physics)",
+              "- [GameEngine.Rendering](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.Rendering)",
+              "- [GameEngine.SaveLoad](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.SaveLoad)",
+              "- [GameEngine.Scene](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.Scene)",
+              "- [GameEngine.State](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.State)",
+              "- [GameEngine.Tiles](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.Tiles)",
+              "- [GameEngine.UI](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.UI)",
+              "- [GameEnginePlayground](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEnginePlayground)",
+              "", // Empty line for spacing
+              "**Direct Downloads (Release Assets):**",
+              "",
+              "- [View Source Code Assets for this Release](" + releaseHtmlUrl + "#assets)"
+            ];
+            const footerContent = footerLines.join('\\n'); // Join with explicit newline characters
+
             console.log("DEBUG: Constructed footerContent:");
             console.log(footerContent); // Log the string to see its exact content in the workflow logs
 
-            const newBody = currentBody + '\n\n' + footerContent;
+            const newBody = currentBody + '\\n\\n' + footerContent; // Use \\n for adding newlines between current and new body
             
             console.log(`Updating release ${releaseId} with new body...`);
             
