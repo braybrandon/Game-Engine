@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.17-alpha.1](https://github.com/braybrandon/Game-Engine/compare/v0.1.16-alpha.1...v0.1.17-alpha.1) (2025-07-27)
+
+
+### Bug Fixes
+
+* syntax ([97a4abc](https://github.com/braybrandon/Game-Engine/commit/97a4abc3d25009571da7f7b9585e2ee668f3d9d5))
+* yaml ([fbe1102](https://github.com/braybrandon/Game-Engine/commit/fbe1102f50e38cd3a84c91a6483f960d4b7e9741))
+
 ## [0.1.16-alpha.1](https://github.com/braybrandon/Game-Engine/compare/v0.1.15-alpha.1...v0.1.16-alpha.1) (2025-07-27)
 
 
