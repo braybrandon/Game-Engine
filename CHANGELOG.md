@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.12-alpha.1](https://github.com/braybrandon/Game-Engine/compare/v0.1.11-alpha.1...v0.1.12-alpha.1) (2025-07-27)
+
+
+### Bug Fixes
+
+* unknow id ([0a06da8](https://github.com/braybrandon/Game-Engine/commit/0a06da8d160eb914e40aa0736d8ea1f4d8fa6524))
+
 ## [0.1.11-alpha.1](https://github.com/braybrandon/Game-Engine/compare/v0.1.10-alpha.1...v0.1.11-alpha.1) (2025-07-27)
 
 
