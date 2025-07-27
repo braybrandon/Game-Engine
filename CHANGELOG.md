@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.13-alpha.1](https://github.com/braybrandon/Game-Engine/compare/v0.1.12-alpha.1...v0.1.13-alpha.1) (2025-07-27)
+
+
+### Bug Fixes
+
+* footer content ([11461b5](https://github.com/braybrandon/Game-Engine/commit/11461b50c450cf59aa165841d2c79f5865dbdd89))
+
 ## [0.1.12-alpha.1](https://github.com/braybrandon/Game-Engine/compare/v0.1.11-alpha.1...v0.1.12-alpha.1) (2025-07-27)
 
 
