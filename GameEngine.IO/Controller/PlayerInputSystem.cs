@@ -3,7 +3,7 @@ using GameEngine.Core.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
-namespace GameEngine.Input
+namespace GameEngine.IO.Controller
 {
     public class PlayerInputSystem : EngineSystem
     {

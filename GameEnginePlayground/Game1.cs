@@ -1,12 +1,12 @@
-﻿using GameEngine.Animation;
-using GameEngine.Core;
+﻿using GameEngine.Core;
 using GameEngine.Core.Components;
 using GameEngine.Core.Entities;
 using GameEngine.Core.Services;
-using GameEngine.Input;
-using GameEngine.Physics;
-using GameEngine.Rendering;
-using GameEngine.Rendering.Camera;
+using GameEngine.Graphics.Animations;
+using GameEngine.Graphics.Camera;
+using GameEngine.Graphics.Render;
+using GameEngine.IO.Controller;
+using GameEngine.Physics.Motion;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -70,7 +70,7 @@ namespace GameEnginePlayground
             // Order matters for systems that depend on each other's output!
             _gameLoop.RegisterSystem(new PlayerInputSystem());
             _gameLoop.RegisterSystem(new CalculateVelocitySystem());
-            _gameLoop.RegisterSystem(new MovementSystem());
+            _gameLoop.RegisterSystem(new MotionSystem());
             _gameLoop.RegisterSystem(new AnimationStateSystem());
             _gameLoop.RegisterSystem(new AnimationSystem());
             _gameLoop.RegisterSystem(new CameraUpdateSystem(_playerEntity));

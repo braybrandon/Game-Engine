@@ -3,7 +3,7 @@ using GameEngine.Core.Services;
 using GameEngine.Core.Systems;
 using Microsoft.Xna.Framework;
 
-namespace GameEngine.Animation
+namespace GameEngine.Graphics.Animations
 {
     public class AnimationSystem : EngineSystem
     {

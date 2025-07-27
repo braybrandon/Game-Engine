@@ -28,20 +28,10 @@
     <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.4" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GameEngine.AI\GameEngine.AI.csproj" />
-    <ProjectReference Include="..\GameEngine.Animation\GameEngine.Animation.csproj" />
-    <ProjectReference Include="..\GameEngine.Assets\GameEngine.Assets.csproj" />
-    <ProjectReference Include="..\GameEngine.Audio\GameEngine.Audio.csproj" />
     <ProjectReference Include="..\GameEngine.Core\GameEngine.Core.csproj" />
-    <ProjectReference Include="..\GameEngine.Input\GameEngine.Input.csproj" />
-    <ProjectReference Include="..\GameEngine.Particles\GameEngine.Particles.csproj" />
+    <ProjectReference Include="..\GameEngine.IO\GameEngine.IO.csproj" />
     <ProjectReference Include="..\GameEngine.Physics\GameEngine.Physics.csproj" />
-    <ProjectReference Include="..\GameEngine.Rendering\GameEngine.Rendering.csproj" />
-    <ProjectReference Include="..\GameEngine.SaveLoad\GameEngine.SaveLoad.csproj" />
-    <ProjectReference Include="..\GameEngine.Scene\GameEngine.Scene.csproj" />
-    <ProjectReference Include="..\GameEngine.State\GameEngine.State.csproj" />
-    <ProjectReference Include="..\GameEngine.Tiles\GameEngine.Tiles.csproj" />
-    <ProjectReference Include="..\GameEngine.UI\GameEngine.UI.csproj" />
+    <ProjectReference Include="..\GameEngine.Graphics\GameEngine.Graphics.csproj" />
   </ItemGroup>
   <Target Name="RestoreDotnetTools" BeforeTargets="CollectPackageReferences">
     <Message Text="Restoring dotnet tools (this might take a while depending on your internet speed and should only happen upon building your project for the first time, or after upgrading MonoGame, or clearing your nuget cache)" Importance="High" />

@@ -3,7 +3,7 @@ using GameEngine.Core.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
-namespace GameEngine.Physics
+namespace GameEngine.Physics.Motion
 {
     public class CalculateVelocitySystem : EngineSystem
     {

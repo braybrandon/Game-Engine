@@ -7,10 +7,10 @@
 		<IsPackable>true</IsPackable>
 		<Authors>Bray Brandon</Authors>
 		<Company>BrayTec</Company>
-		<Description>State module for the GameEngine.</Description>
+		<Description>Input module for the GameEngine.</Description>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageProjectUrl>https://github.com/braybrandon/Game-Engine</PackageProjectUrl>
-		<PackageTags>game-engine;state;monogame</PackageTags>
+		<PackageTags>game-engine;input;monogame</PackageTags>
 		<PackageOutputPath>./nupkg</PackageOutputPath>
 		<RepositoryUrl>https://github.com/braybrandon/Game-Engine</RepositoryUrl>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
@@ -19,6 +19,16 @@
 
   <ItemGroup>
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GameEngine.Core\GameEngine.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Audio\" />
+    <Folder Include="Assets\" />
+    <Folder Include="SaveLoad\" />
   </ItemGroup>
 
 </Project>

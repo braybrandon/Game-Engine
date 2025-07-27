@@ -3,9 +3,9 @@ using GameEngine.Core.Services;
 using GameEngine.Core.Systems;
 using Microsoft.Xna.Framework;
 
-namespace GameEngine.Physics
+namespace GameEngine.Physics.Motion
 {
-    public class MovementSystem : EngineSystem
+    public class MotionSystem : EngineSystem
     {
 
         public override void Update(World world)

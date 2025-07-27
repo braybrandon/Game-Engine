@@ -1,12 +1,11 @@
 ﻿using GameEngine.Core.Components;
 using GameEngine.Core.Systems;
-using GameEngine.Rendering.Camera;
+using GameEngine.Graphics.Camera;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 
-namespace GameEngine.Rendering
+namespace GameEngine.Graphics.Render
 {
     public class SpriteRenderSystem : EngineSystem
     {

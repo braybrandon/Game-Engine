@@ -1,11 +1,10 @@
 ﻿using GameEngine.Core.Components;
 using GameEngine.Core.Entities;
-using GameEngine.Core.Services;
 using GameEngine.Core.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
-namespace GameEngine.Rendering.Camera
+namespace GameEngine.Graphics.Camera
 {
     public class CameraUpdateSystem : EngineSystem
     {
