@@ -62,20 +62,21 @@ jobs:
       - name: Update GitHub Release Description with Links
         if: ${{ steps.release.outputs.release_created }}
         uses: actions/github-script@v7
+        env:
+          RELEASE_BODY: ${{ toJson(steps.release.outputs.body) }}
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const releaseId = "${{ steps.release.outputs.id }}";
             const releaseHtmlUrl = "${{ steps.release.outputs.html_url }}";
-            const currentBody = "${{ steps.release.outputs.body }}" || '';
-            
+            const currentBody = JSON.parse(process.env.RELEASE_BODY || '""');
+
             const REPO_OWNER = context.repo.owner;
             const REPO_NAME = context.repo.repo;
-            
-            // Define footerContent as an array of strings, then join them with newlines.
-            // This avoids complex YAML parsing issues with embedded multi-line JS strings.
+
             const footerLines = [
               "## Package Links",
-              "", // Empty line for spacing
+              "",
               "**GitHub Packages:**",
               "",
               "- [GameEngine.AI](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.AI)",
@@ -93,20 +94,16 @@ jobs:
               "- [GameEngine.Tiles](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.Tiles)",
               "- [GameEngine.UI](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEngine.UI)",
               "- [GameEnginePlayground](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/packages/GameEnginePlayground)",
-              "", // Empty line for spacing
+              "",
               "**Direct Downloads (Release Assets):**",
               "",
               "- [View Source Code Assets for this Release](" + releaseHtmlUrl + "#assets)"
             ];
-            const footerContent = footerLines.join('\\n'); // Join with explicit newline characters
 
-            console.log("DEBUG: Constructed footerContent:");
-            console.log(footerContent); // Log the string to see its exact content in the workflow logs
+            const footerContent = footerLines.join('\n');
+            const newBody = currentBody + '\n\n' + footerContent;
 
-            const newBody = currentBody + '\\n\\n' + footerContent; // Use \\n for adding newlines between current and new body
-            
-            console.log(`Updating release ${releaseId} with new body...`);
-            
+            console.log("Updating release with new body...");
             try {
               await github.rest.repos.updateRelease({
                 owner: context.repo.owner,
@@ -114,9 +111,7 @@ jobs:
                 release_id: releaseId,
                 body: newBody
               });
-              console.log(`Successfully updated release ${releaseId} description.`);
+              console.log(`Successfully updated release ${releaseId}.`);
             } catch (error) {
-              console.error(`Failed to update release ${releaseId}: ${error.message}`);
-              core.setFailed(`Failed to update release ${releaseId}: ${error.message}`);
+              core.setFailed(`Failed to update release: ${error.message}`);
             }
-          github-token: ${{ secrets.GITHUB_TOKEN }}
