@@ -5,6 +5,7 @@
     <RollForward>Major</RollForward>
     <PublishReadyToRun>false</PublishReadyToRun>
     <TieredCompilation>false</TieredCompilation>
+	<IsPackable>false</IsPackable>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -32,7 +33,6 @@
     <ProjectReference Include="..\GameEngine.Assets\GameEngine.Assets.csproj" />
     <ProjectReference Include="..\GameEngine.Audio\GameEngine.Audio.csproj" />
     <ProjectReference Include="..\GameEngine.Core\GameEngine.Core.csproj" />
-    <ProjectReference Include="..\GameEngine.Engine\GameEngine.Engine.csproj" />
     <ProjectReference Include="..\GameEngine.Input\GameEngine.Input.csproj" />
     <ProjectReference Include="..\GameEngine.Particles\GameEngine.Particles.csproj" />
     <ProjectReference Include="..\GameEngine.Physics\GameEngine.Physics.csproj" />
