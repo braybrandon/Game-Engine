@@ -7,7 +7,7 @@ namespace GameEngine.Core.Systems
     /// <summary>
     /// Base abstract class for all engine systems.
     /// This acts as your GameComponent base class in an ECS context.
-    /// Systems contain logic and operate on components.
+    /// Systems contain logic and operate on components. 
     /// </summary>
     public abstract class EngineSystem : IDisposable
     {
