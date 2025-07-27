@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.14-alpha.1](https://github.com/braybrandon/Game-Engine/compare/v0.1.13-alpha.1...v0.1.14-alpha.1) (2025-07-27)
+
+
+### Bug Fixes
+
+* update token ([e105263](https://github.com/braybrandon/Game-Engine/commit/e10526321184577d35b577acff2121c13b540627))
+
 ## [0.1.13-alpha.1](https://github.com/braybrandon/Game-Engine/compare/v0.1.12-alpha.1...v0.1.13-alpha.1) (2025-07-27)
 
 
