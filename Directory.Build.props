@@ -1,0 +1,22 @@
+<!-- Directory.Build.props -->
+<Project>
+  <PropertyGroup>
+  <!-- ... existing properties like TargetFramework, Version ... -->
+  <Version>0.0.1</Version>
+  <!-- Essential NuGet Package Metadata -->
+  <Authors>Brandon Bray</Authors>
+  <Company>Bray Software</Company>
+  <Description>A brief description of what your game engine package provides.</Description>
+  <PackageLicenseExpression>MIT</PackageLicenseExpression> <!-- Or another SPDX license identifier -->
+  <PackageProjectUrl>https://github.com/braybrandon/Game-Engine</PackageProjectUrl>
+  <PackageTags>game-engine;ecs;monogame;csharp</PackageTags> <!-- Keywords for discoverability -->
+
+  <!-- Output path for the .nupkg file -->
+  <PackageOutputPath>./nupkg</PackageOutputPath>
+
+  <!-- Repository Information for Source Link -->
+  <RepositoryUrl>https://github.com/braybrandon/Game-Engine</RepositoryUrl>
+  <PublishRepositoryUrl>true</PublishRepositoryUrl>
+  <EmbedUntrackedSources>true</EmbedUntrackedSources>
+</PropertyGroup>
+</Project>
