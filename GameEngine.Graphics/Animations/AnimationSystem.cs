@@ -7,7 +7,8 @@ namespace GameEngine.Graphics.Animations
 {
     public class AnimationSystem : EngineSystem
     {
-        private const int SPRITE_SIZE = 96;
+        private const int SPRITE_WIDTH = 32;
+        private const int SPRITE_HEIGHT = 32;
 
         public override void Update(World world )
         {
@@ -60,7 +61,7 @@ namespace GameEngine.Graphics.Animations
 
                 sprite.Texture = currentClip.Texture;
                 sprite.SourceRectangle = currentClip.Frames[animation.CurrentFrameIndex];
-                sprite.Origin = new Vector2(SPRITE_SIZE / 2f, SPRITE_SIZE / 2f);
+                sprite.Origin = new Vector2(SPRITE_WIDTH / 2f, SPRITE_HEIGHT / 2f);
             }
         }
     }

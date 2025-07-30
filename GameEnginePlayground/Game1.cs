@@ -5,6 +5,7 @@ using GameEngine.Core.Services;
 using GameEngine.Graphics.Animations;
 using GameEngine.Graphics.Camera;
 using GameEngine.Graphics.Render;
+using GameEngine.IO.Assets;
 using GameEngine.IO.Controller;
 using GameEngine.Physics.Motion;
 using Microsoft.Xna.Framework;
@@ -33,8 +34,13 @@ namespace GameEnginePlayground
         private Texture2D _playerWalkDownTexture;
         private Texture2D _playerWalkLeftTexture;
         private Texture2D _playerWalkRightTexture;
+        private Texture2D _playerWalkUpLeftTexture;
+        private Texture2D _playerWalkUpRightTexture;
+        private Texture2D _playerWalkDownLeftTexture;
+        private Texture2D _playerWalkDownRightTexture;
 
-        private const int SPRITE_SIZE = 96;
+        private const int SPRITE_WIDTH = 32;
+        private const int SPRITE_HEIGHT = 32;
 
         public Game1()
         {
@@ -53,6 +59,17 @@ namespace GameEnginePlayground
             
 
             _world = new World();
+
+            TiledMapLoader.LoadTileLayersFromTmx(
+            _world,
+            "Content/dungeon_tilemap.tmx" // Path to your .tmx file
+             );
+
+            TiledMapLoader.LoadEnemiesFromTmx(
+            _world,
+            "Content/dungeon_tilemap.tmx", // Path to your .tmx file
+            "EnemySpawns"                 // Name of your enemy object layer in Tiled
+        );
 
             _playerEntity = _world.CreateEntity();
             _playerEntity.AddComponent(new TransformComponent { Position = new Vector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2), Rotation = 0f, Scale = Vector2.One });
@@ -86,10 +103,14 @@ namespace GameEnginePlayground
             // TODO: use this.Content to load your game content here
 
             _playerTexture = Content.Load<Texture2D>("player");
-            _playerWalkUpTexture = Content.Load<Texture2D>("walkUp");
-            _playerWalkDownTexture = Content.Load<Texture2D>("walkDown");
-            _playerWalkLeftTexture = Content.Load<Texture2D>("walkLeft");
-            _playerWalkRightTexture = Content.Load<Texture2D>("walkRight");
+            _playerWalkUpTexture = Content.Load<Texture2D>("Player/Character_Up");
+            _playerWalkDownTexture = Content.Load<Texture2D>("Player/Character_Down");
+            _playerWalkLeftTexture = Content.Load<Texture2D>("Player/Character_Left");
+            _playerWalkRightTexture = Content.Load<Texture2D>("Player/Character_Right");
+            _playerWalkUpRightTexture = Content.Load<Texture2D>("Player/Character_UpRight");
+            _playerWalkDownRightTexture = Content.Load<Texture2D>("Player/Character_DownRight");
+            _playerWalkUpLeftTexture = Content.Load<Texture2D>("Player/Character_UpLeft");
+            _playerWalkDownLeftTexture = Content.Load<Texture2D>("Player/Character_DownLeft");
 
             if (_playerEntity.HasComponent<TransformComponent>())
             {
@@ -115,7 +136,7 @@ namespace GameEnginePlayground
             {
                 Name = "Idle",
                 Texture = _playerWalkDownTexture, // Idle uses the down-facing sheet
-                Frames = new List<Rectangle> { new Rectangle(0, 0, SPRITE_SIZE, SPRITE_SIZE) },
+                Frames = new List<Rectangle> { new Rectangle(0, 0, SPRITE_WIDTH, SPRITE_HEIGHT) },
                 FrameDuration = 0.2f,
                 IsLooping = true
             };
@@ -127,10 +148,10 @@ namespace GameEnginePlayground
                 Texture = _playerWalkUpTexture,
                 Frames = new List<Rectangle>
             {
-                new Rectangle(0 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE),
-                new Rectangle(1 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE),
-                new Rectangle(2 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE),
-                new Rectangle(3 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE)
+                new Rectangle(0 * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT),
+                new Rectangle(1 * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT),
+                new Rectangle(2 * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT),
+                new Rectangle(3 * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT)
             },
                 FrameDuration = 0.1f,
                 IsLooping = true
@@ -143,10 +164,10 @@ namespace GameEnginePlayground
                 Texture = _playerWalkDownTexture,
                 Frames = new List<Rectangle>
             {
-                new Rectangle(0 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE),
-                new Rectangle(1 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE),
-                new Rectangle(2 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE),
-                new Rectangle(3 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE)
+                new Rectangle(0 * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT),
+                new Rectangle(1 * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT),
+                new Rectangle(2 * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT),
+                new Rectangle(3 * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT),
             },
                 FrameDuration = 0.1f,
                 IsLooping = true
@@ -159,10 +180,11 @@ namespace GameEnginePlayground
                 Texture = _playerWalkLeftTexture,
                 Frames = new List<Rectangle>
             {
-                new Rectangle(0 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE),
-                new Rectangle(1 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE),
-                new Rectangle(2 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE),
-                new Rectangle(3 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE)
+                new Rectangle(0 * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT),
+                new Rectangle(1 * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT),
+                new Rectangle(2 * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT),
+                new Rectangle(3 * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT),
+
             },
                 FrameDuration = 0.1f,
                 IsLooping = true
@@ -175,10 +197,66 @@ namespace GameEnginePlayground
                 Texture = _playerWalkRightTexture,
                 Frames = new List<Rectangle>
             {
-                new Rectangle(0 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE),
-                new Rectangle(1 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE),
-                new Rectangle(2 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE),
-                new Rectangle(3 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE)
+                new Rectangle(0 * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT),
+                new Rectangle(1 * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT),
+                new Rectangle(2 * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT),
+                new Rectangle(3 * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT)
+            },
+                FrameDuration = 0.1f,
+                IsLooping = true
+            };
+            playerAnimationComponent.Clips[AnimationType.WalkUpRight] = new AnimationClip
+            {
+                Name = "WalkUpRight",
+                Texture = _playerWalkUpRightTexture,
+                Frames = new List<Rectangle>
+            {
+                new Rectangle(0 * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT),
+                new Rectangle(1 * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT),
+                new Rectangle(2 * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT),
+                new Rectangle(3 * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT)
+            },
+                FrameDuration = 0.1f,
+                IsLooping = true
+            };
+            playerAnimationComponent.Clips[AnimationType.WalkDownRight] = new AnimationClip
+            {
+                Name = "WalkDownRight",
+                Texture = _playerWalkDownRightTexture,
+                Frames = new List<Rectangle>
+            {
+                new Rectangle(0 * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT),
+                new Rectangle(1 * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT),
+                new Rectangle(2 * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT),
+                new Rectangle(3 * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT)
+            },
+                FrameDuration = 0.1f,
+                IsLooping = true
+            };
+            playerAnimationComponent.Clips[AnimationType.WalkUpLeft] = new AnimationClip
+            {
+                Name = "WalkUpLeft",
+                Texture = _playerWalkUpLeftTexture,
+                Frames = new List<Rectangle>
+            {
+                new Rectangle(0 * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT),
+                new Rectangle(1 * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT),
+                new Rectangle(2 * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT),
+                new Rectangle(3 * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT)
+            },
+                FrameDuration = 0.1f,
+                IsLooping = true
+            };
+            playerAnimationComponent.Clips[AnimationType.WalkDownLeft] = new AnimationClip
+            {
+                Name = "WalkDownLeft",
+                Texture = _playerWalkDownLeftTexture,
+                Frames = new List<Rectangle>
+            {
+                new Rectangle(0 * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT),
+                new Rectangle(1 * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT),
+                new Rectangle(2 * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT),
+                new Rectangle(3 * SPRITE_WIDTH, 0, SPRITE_WIDTH, SPRITE_HEIGHT)
             },
                 FrameDuration = 0.1f,
                 IsLooping = true
@@ -186,7 +264,7 @@ namespace GameEnginePlayground
 
             playerSpriteComponent.Texture = playerAnimationComponent.CurrentClip.Texture;
             playerSpriteComponent.SourceRectangle = playerAnimationComponent.CurrentClip.Frames[0]; 
-            playerSpriteComponent.Origin = new Vector2(SPRITE_SIZE / 2, SPRITE_SIZE / 2); 
+            playerSpriteComponent.Origin = new Vector2(SPRITE_WIDTH / 2, SPRITE_HEIGHT / 2); 
 
             _playerEntity.AddComponent(playerAnimationComponent);
             _playerEntity.AddComponent(playerSpriteComponent);

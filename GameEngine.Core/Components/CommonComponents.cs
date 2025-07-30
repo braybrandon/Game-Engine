@@ -58,13 +58,42 @@ namespace GameEngine.Core.Components
         public bool IsLooping;
     }
 
+    public struct EnemyTypeComponent: IComponent
+    {
+        public string Type;
+    }
+
+    public struct TileComponent : IComponent
+    {
+        public int GID; // Global Tile ID (0 for empty)
+        public string LayerName; // Name of the layer this tile belongs to
+
+        public override string ToString() => $"GID: {GID}, Layer: {LayerName}";
+    }
+
+    public struct TilesetInfo
+    {
+        public int FirstGID;
+        public string Name;
+        public int TileWidth;
+        public int TileHeight;
+        public string ImageSource; // Path to the tileset image
+        public int ImageWidth;
+        public int ImageHeight;
+    }
+
+
     public enum AnimationType
     {
         Idle,
         WalkUp,
         WalkDown,
         WalkLeft,
-        WalkRight
+        WalkRight,
+        WalkUpRight,
+        WalkUpLeft,
+        WalkDownRight,
+        WalkDownLeft
     }
 
     /// <summary>
