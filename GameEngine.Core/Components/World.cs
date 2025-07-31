@@ -1,33 +1,8 @@
-﻿using GameEngine.Core.Entities;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
+﻿using Common.Interfaces;
+using GameEngine.Core.Entities;
 
 namespace GameEngine.Core.Components
 {
-    /// <summary>
-    /// Non-generic interface for component pools, allowing the World to manage them polymorphically.
-    /// </summary>
-    internal interface IComponentPool
-    {
-        /// <summary>
-        /// Removes the component associated with the given entity ID from this pool.
-        /// </summary>
-        /// <param name="entityId">The ID of the entity whose component to remove.</param>
-        void Remove(int entityId);
-
-        /// <summary>
-        /// Checks if this pool contains a component for the given entity ID.
-        /// </summary>
-        /// <param name="entityId">The ID of the entity to check.</param>
-        /// <returns>True if a component exists for the entity, false otherwise.</returns>
-        bool Has(int entityId);
-
-        /// <summary>
-        /// Gets an enumerable collection of entity IDs that have a component in this pool.
-        /// </summary>
-        /// <returns>An enumerable of entity IDs.</returns>
-        IEnumerable<int> GetEntityIds();
-    }
 
     /// <summary>
     /// A generic pool for storing components of a specific type (T).
@@ -35,7 +10,7 @@ namespace GameEngine.Core.Components
     /// Implements a swap-remove strategy for efficient deletion.
     /// </summary>
     /// <typeparam name="T">The type of component this pool manages (must be a struct implementing IComponent).</typeparam>
-    internal class ComponentPool<T> : IComponentPool where T : struct, Entities.IComponent
+    internal class ComponentPool<T> : IComponentPool where T : struct, IComponent
     {
         private T[] _componentsArray; // The actual array where component structs are stored
         private Dictionary<int, int> _entityIdToIndex; // Maps Entity ID to its index in _componentsArray
@@ -173,7 +148,7 @@ namespace GameEngine.Core.Components
     /// It manages the creation and destruction of entities, and the storage and retrieval of their components
     /// using specialized component pools for performance.
     /// </summary>
-    public class World : IDisposable
+    public class World : IWorld
     {
         // --- Entity Management Fields ---
         private int _nextEntityId = 0; // Counter for generating unique entity IDs
@@ -197,7 +172,7 @@ namespace GameEngine.Core.Components
         /// Creates a new unique entity in this World.
         /// </summary>
         /// <returns>The newly created Entity struct, which acts as a handle.</returns>
-        public Entity CreateEntity()
+        public IEntity CreateEntity()
         {
             int entityId = _nextEntityId++;
             _activeEntityIds.Add(entityId); // Add the new entity's ID to the active set
@@ -208,7 +183,7 @@ namespace GameEngine.Core.Components
         /// Destroys an entity and removes all its associated components from this World.
         /// </summary>
         /// <param name="entity">The entity to destroy.</param>
-        public void DestroyEntity(Entity entity)
+        public void DestroyEntity(IEntity entity)
         {
             // Check if the entity is actually active in this world before attempting to destroy
             if (!_activeEntityIds.Contains(entity.Id))
@@ -253,7 +228,7 @@ namespace GameEngine.Core.Components
         /// <param name="component">The component instance to add.</param>
         /// <returns>A reference to the added/updated component in the World's storage.</returns>
         /// <exception cref="InvalidOperationException">Thrown if attempting to add a component to an inactive entity.</exception>
-        public ref T AddComponent<T>(int entityId, T component) where T : struct, Entities.IComponent
+        public ref T AddComponent<T>(int entityId, T component) where T : struct, IComponent
         {
             if (!_activeEntityIds.Contains(entityId))
             {
@@ -279,7 +254,7 @@ namespace GameEngine.Core.Components
         /// <returns>A reference to the component in the World's storage.</returns>
         /// <exception cref="InvalidOperationException">Thrown if attempting to get a component from an inactive entity.</exception>
         /// <exception cref="KeyNotFoundException">Thrown if the component is not found for the entity.</exception>
-        public ref T GetComponent<T>(int entityId) where T : struct, Entities.IComponent
+        public ref T GetComponent<T>(int entityId) where T : struct, IComponent
         {
             if (!_activeEntityIds.Contains(entityId))
             {
@@ -301,7 +276,7 @@ namespace GameEngine.Core.Components
         /// <typeparam name="T">The type of the component to check for (must be a struct implementing IComponent).</typeparam>
         /// <param name="entityId">The ID of the entity to check.</param>
         /// <returns>True if the entity has the component, false otherwise.</returns>
-        public bool HasComponent<T>(int entityId) where T : struct, Entities.IComponent
+        public bool HasComponent<T>(int entityId) where T : struct, IComponent
         {
             // An inactive entity is considered not to have components in a meaningful way
             if (!_activeEntityIds.Contains(entityId)) return false;
@@ -313,7 +288,7 @@ namespace GameEngine.Core.Components
         /// </summary>
         /// <typeparam name="T">The type of the component to remove (must be a struct implementing IComponent).</typeparam>
         /// <param name="entityId">The ID of the entity to remove the component from.</param>
-        public void RemoveComponent<T>(int entityId) where T : struct, Entities.IComponent
+        public void RemoveComponent<T>(int entityId) where T : struct, IComponent
         {
             // No need to remove from an inactive entity
             if (!_activeEntityIds.Contains(entityId)) return;
@@ -335,7 +310,7 @@ namespace GameEngine.Core.Components
         /// </summary>
         /// <typeparam name="T1">The type of the component to filter by.</typeparam>
         /// <returns>An enumerable collection of matching Entity structs.</returns>
-        public IEnumerable<Entity> GetEntitiesWith<T1>() where T1 : struct, Entities.IComponent
+        public IEnumerable<IEntity> GetEntitiesWith<T1>() where T1 : struct, IComponent
         {
             // Try to get the component pool for T1
             if (_componentPools.TryGetValue(typeof(T1), out var pool1))
@@ -358,7 +333,7 @@ namespace GameEngine.Core.Components
         /// <typeparam name="T1">The first component type.</typeparam>
         /// <typeparam name="T2">The second component type.</typeparam>
         /// <returns>An enumerable collection of matching Entity structs.</returns>
-        public IEnumerable<Entity> GetEntitiesWith<T1, T2>() where T1 : struct, Entities.IComponent where T2 : struct, Entities.IComponent
+        public IEnumerable<IEntity> GetEntitiesWith<T1, T2>() where T1 : struct, IComponent where T2 : struct, IComponent
         {
             // Try to get component pools for both types
             if (_componentPools.TryGetValue(typeof(T1), out var pool1) &&
@@ -383,7 +358,7 @@ namespace GameEngine.Core.Components
         /// <typeparam name="T2">The second component type.</typeparam>
         /// <typeparam name="T3">The third component type.</typeparam>
         /// <returns>An enumerable collection of matching Entity structs.</returns>
-        public IEnumerable<Entity> GetEntitiesWith<T1, T2, T3>() where T1 : struct, Entities.IComponent where T2 : struct, Entities.IComponent where T3 : struct, Entities.IComponent
+        public IEnumerable<IEntity> GetEntitiesWith<T1, T2, T3>() where T1 : struct, IComponent where T2 : struct, IComponent where T3 : struct, IComponent
         {
             // Try to get component pools for all three types
             if (_componentPools.TryGetValue(typeof(T1), out var pool1) &&

@@ -1,7 +1,7 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Common.Interfaces;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using GameEngine.Core.Entities;
 namespace GameEngine.Core.Components
 {
     public struct VelocityComponent : IComponent

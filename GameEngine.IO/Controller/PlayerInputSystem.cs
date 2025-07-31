@@ -1,16 +1,15 @@
-﻿using GameEngine.Core.Components;
-using GameEngine.Core.Systems;
-using Microsoft.Xna.Framework;
+﻿using Common.Interfaces;
+using GameEngine.Core.Components;
 using Microsoft.Xna.Framework.Input;
 
 namespace GameEngine.IO.Controller
 {
-    public class PlayerInputSystem : EngineSystem
+    public class PlayerInputSystem : IUpdateSystem
     {
         private float _playerSpeed = 300f;
         private MouseState _previousMouseState;
 
-        public override void Update(World world)
+        public void Update(IWorld world)
         {
 
             foreach (var entity in world.GetEntitiesWith<PlayerInputComponent>())

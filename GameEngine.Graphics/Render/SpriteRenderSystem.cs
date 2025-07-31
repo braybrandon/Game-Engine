@@ -1,5 +1,5 @@
-﻿using GameEngine.Core.Components;
-using GameEngine.Core.Systems;
+﻿using Common.Interfaces;
+using GameEngine.Core.Components;
 using GameEngine.Graphics.Camera;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -7,10 +7,10 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace GameEngine.Graphics.Render
 {
-    public class SpriteRenderSystem : EngineSystem
+    public class SpriteRenderSystem : IDrawSystem
     {
 
-        public override void Draw(SpriteBatch spriteBatch, World world)
+        public void Draw(SpriteBatch spriteBatch, IWorld world)
         {
             Matrix cameraViewMatrix = Matrix.Identity;
 

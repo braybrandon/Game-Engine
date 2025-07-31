@@ -1,16 +1,18 @@
-﻿using GameEngine.Core;
+﻿using Common.Interfaces;
+using GameEngine.Core;
 using GameEngine.Core.Components;
-using GameEngine.Core.Entities;
 using GameEngine.Core.Services;
 using GameEngine.Graphics.Animations;
 using GameEngine.Graphics.Camera;
 using GameEngine.Graphics.Render;
-using GameEngine.IO.Assets;
+using GameEngine.IO.Asset;
+using GameEngine.IO.Asset.models;
 using GameEngine.IO.Controller;
 using GameEngine.Physics.Motion;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 using System.Collections.Generic;
 
 namespace GameEnginePlayground
@@ -20,13 +22,19 @@ namespace GameEnginePlayground
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         private Engine _gameLoop;
+        private IAssetManager _assetManager;
+        private ITileMapManager _tileMapManager;
+        private IServiceLocator _serviceLocator;
 
-        private World _world;
-        private TimeManager _timeManager;
+        private IWorld _world;
+        private ITimeManager _timeManager;
+
+        private TileMap _gameMap;
+        Dictionary<Tileset, Texture2D> _tilesetTextures = new Dictionary<Tileset, Texture2D>();
 
         // Entities
-        private Entity _playerEntity;
-        private Entity _cameraEntity;
+        private IEntity _playerEntity;
+        private IEntity _cameraEntity;
 
         // Textures
         private Texture2D _playerTexture;
@@ -42,34 +50,33 @@ namespace GameEnginePlayground
         private const int SPRITE_WIDTH = 32;
         private const int SPRITE_HEIGHT = 32;
 
+        // Declare instances of your parsed map and renderer
+        private Texture2D _dungeonTilesetTexture;
+        //private TileMapRenderer _mapRenderer;
+
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+            _serviceLocator  = new ServiceLocator();
         }
 
         protected override void Initialize()
         {
             _timeManager = new TimeManager();
-            ServiceLocator.Register<ITimeManager>(_timeManager);
+            _serviceLocator.Register<ITimeManager>(_timeManager);
+
+            _graphics.SynchronizeWithVerticalRetrace = true; // Enable VSync
+            IsFixedTimeStep = true;                         // Cap update rate
+            TargetElapsedTime = TimeSpan.FromSeconds(1.0 / 60.0); // 60 FPS
 
             // TODO: Add your initialization logic here
-            _gameLoop = new Engine(this);
+            _gameLoop = new Engine(this, _serviceLocator);
+            _assetManager = new AssetManager(Content, _tileMapManager);
             
 
             _world = new World();
-
-            TiledMapLoader.LoadTileLayersFromTmx(
-            _world,
-            "Content/dungeon_tilemap.tmx" // Path to your .tmx file
-             );
-
-            TiledMapLoader.LoadEnemiesFromTmx(
-            _world,
-            "Content/dungeon_tilemap.tmx", // Path to your .tmx file
-            "EnemySpawns"                 // Name of your enemy object layer in Tiled
-        );
 
             _playerEntity = _world.CreateEntity();
             _playerEntity.AddComponent(new TransformComponent { Position = new Vector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2), Rotation = 0f, Scale = Vector2.One });
@@ -85,14 +92,14 @@ namespace GameEnginePlayground
 
             // 3. Register EngineSystems with the GameLoop
             // Order matters for systems that depend on each other's output!
-            _gameLoop.RegisterSystem(new PlayerInputSystem());
-            _gameLoop.RegisterSystem(new CalculateVelocitySystem());
-            _gameLoop.RegisterSystem(new MotionSystem());
-            _gameLoop.RegisterSystem(new AnimationStateSystem());
-            _gameLoop.RegisterSystem(new AnimationSystem());
-            _gameLoop.RegisterSystem(new CameraUpdateSystem(_playerEntity));
+            _gameLoop.RegisterUpdateSystem(new PlayerInputSystem());
+            _gameLoop.RegisterUpdateSystem(new CalculateVelocitySystem());
+            _gameLoop.RegisterUpdateSystem(new MotionSystem(_serviceLocator));
+            _gameLoop.RegisterUpdateSystem(new AnimationStateSystem());
+            _gameLoop.RegisterUpdateSystem(new AnimationSystem(_serviceLocator));
+            _gameLoop.RegisterUpdateSystem(new CameraUpdateSystem(_playerEntity.Id));
 
-            _gameLoop.Initialize();
+            //_gameLoop.Initialize();
             base.Initialize();
         }
         
@@ -102,15 +109,24 @@ namespace GameEnginePlayground
 
             // TODO: use this.Content to load your game content here
 
-            _playerTexture = Content.Load<Texture2D>("player");
-            _playerWalkUpTexture = Content.Load<Texture2D>("Player/Character_Up");
-            _playerWalkDownTexture = Content.Load<Texture2D>("Player/Character_Down");
-            _playerWalkLeftTexture = Content.Load<Texture2D>("Player/Character_Left");
-            _playerWalkRightTexture = Content.Load<Texture2D>("Player/Character_Right");
-            _playerWalkUpRightTexture = Content.Load<Texture2D>("Player/Character_UpRight");
-            _playerWalkDownRightTexture = Content.Load<Texture2D>("Player/Character_DownRight");
-            _playerWalkUpLeftTexture = Content.Load<Texture2D>("Player/Character_UpLeft");
-            _playerWalkDownLeftTexture = Content.Load<Texture2D>("Player/Character_DownLeft");
+            //_gameMap = Content.Load<TiledMap>('')
+
+            _playerTexture = _assetManager.LoadTexture("player");
+            _playerWalkUpTexture = _assetManager.LoadTexture("Player/Character_Up");
+            _playerWalkDownTexture = _assetManager.LoadTexture("Player/Character_Down");
+            _playerWalkLeftTexture = _assetManager.LoadTexture("Player/Character_Left");
+            _playerWalkRightTexture = _assetManager.LoadTexture("Player/Character_Right");
+            _playerWalkUpRightTexture = _assetManager.LoadTexture("Player/Character_UpRight");
+            _playerWalkDownRightTexture = _assetManager.LoadTexture("Player/Character_DownRight");
+            _playerWalkUpLeftTexture = _assetManager.LoadTexture("Player/Character_UpLeft");
+            _playerWalkDownLeftTexture = _assetManager.LoadTexture("Player/Character_DownLeft");
+
+            _gameMap = Content.Load<TileMap>("test_map");
+            foreach (var tileset in _gameMap.Tilesets)
+            {
+                var texture = _assetManager.LoadTexture(tileset.Name);
+                _tilesetTextures[tileset] = texture;
+            }
 
             if (_playerEntity.HasComponent<TransformComponent>())
             {
@@ -271,7 +287,7 @@ namespace GameEnginePlayground
 
 
 
-            _gameLoop.RegisterSystem(new SpriteRenderSystem());
+            _gameLoop.RegisterDrawSystem(new SpriteRenderSystem());
             _gameLoop.LoadContent(_spriteBatch);
         }
 
@@ -290,9 +306,91 @@ namespace GameEnginePlayground
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
+            var camera = _world.GetComponent<CameraComponent>(_cameraEntity.Id);
+            var viewport = camera.Viewport;
+            var viewMatrix = camera.ViewMatrix;
+
+            _spriteBatch.Begin(transformMatrix: viewMatrix);
+
+            // Get camera position in world space (inverse of translation)
+            Matrix inverseView = Matrix.Invert(viewMatrix);
+            Vector2 cameraPosition = new Vector2(inverseView.Translation.X, inverseView.Translation.Y);
+
+            // Tile culling bounds
+            int tileWidth = _gameMap.TileWidth;
+            int tileHeight = _gameMap.TileHeight;
+
+            int mapWidth = _gameMap.Width;
+            int mapHeight = _gameMap.Height;
+
+            float zoom = camera.Zoom;
+            float viewWidth = viewport.Width / zoom;
+            float viewHeight = viewport.Height / zoom;
+
+            int minX = Math.Max((int)(cameraPosition.X / tileWidth), 0);
+            int minY = Math.Max((int)(cameraPosition.Y / tileHeight), 0);
+
+            int maxX = Math.Min((int)((cameraPosition.X + viewWidth) / tileWidth) + 1, mapWidth);
+            int maxY = Math.Min((int)((cameraPosition.Y + viewHeight) / tileHeight) + 1, mapHeight);
+
+            foreach (var layer in _gameMap.Layers)
+            {
+                for (int y = minY; y < maxY; y++)
+                {
+                    for (int x = minX; x < maxX; x++)
+                    {
+                        int tileId = layer.GetTileId(x, y);
+                        if (tileId == 0)
+                            continue;
+
+                        // Find the tileset for this tile
+                        Tileset tileset = null;
+                        for (int i = _gameMap.Tilesets.Count - 1; i >= 0; i--)
+                        {
+                            if (tileId >= _gameMap.Tilesets[i].FirstGID)
+                            {
+                                tileset = _gameMap.Tilesets[i];
+                                break;
+                            }
+                        }
+
+                        if (tileset == null || !_tilesetTextures.TryGetValue(tileset, out var tilesetTexture))
+                            continue;
+
+                        int localTileId = tileId - tileset.FirstGID;
+                        int tilesPerRow = tilesetTexture.Width / tileset.TileWidth;
+
+                        int tileX = localTileId % tilesPerRow;
+                        int tileY = localTileId / tilesPerRow;
+
+                        Rectangle sourceRect = new Rectangle(
+                            tileX * tileset.TileWidth,
+                            tileY * tileset.TileHeight,
+                            tileset.TileWidth,
+                            tileset.TileHeight
+                        );
+
+                        Vector2 position = new Vector2(
+                            x * tileset.TileWidth,
+                            y * tileset.TileHeight
+                        );
+
+                        _spriteBatch.Draw(tilesetTexture, position, sourceRect, Color.White);
+                    }
+                }
+            }
+
+            _spriteBatch.End();
+
+
+
 
             // TODO: Add your drawing code here
+
             _gameLoop.Draw(gameTime, _world);
+     
+
+
             base.Draw(gameTime);
         }
 

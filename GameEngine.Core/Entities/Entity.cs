@@ -1,17 +1,17 @@
-﻿using GameEngine.Core.Components;
+﻿using Common.Interfaces;
+using GameEngine.Core.Components;
 using System.Runtime.CompilerServices;
+using static Common.Interfaces.IComponent;
 
 namespace GameEngine.Core.Entities
 {
-    // IComponent: A marker interface that all your component structs should implement.
-    // This helps enforce that only structs intended as components can be used with the World.
-    public interface IComponent { }
+
 
     /// <summary>
     /// Represents a unique identifier for an object in the game world.
     /// It's a lightweight struct that acts as a handle to components stored in the World.
     /// </summary>
-    public readonly struct Entity
+    public readonly struct Entity: IEntity
     {
         /// <summary>
         /// The unique integer ID of this entity.
@@ -22,7 +22,7 @@ namespace GameEngine.Core.Entities
         /// A reference to the World instance this entity belongs to.
         /// This allows convenience methods on Entity to delegate to the World's component management.
         /// </summary>
-        private readonly World _world;
+        public IWorld _world { get; }
 
         /// <summary>
         /// Initializes a new instance of the Entity struct.

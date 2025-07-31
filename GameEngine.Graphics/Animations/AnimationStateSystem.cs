@@ -1,13 +1,13 @@
-﻿using GameEngine.Core.Components;
-using GameEngine.Core.Systems;
+﻿using Common.Interfaces;
+using GameEngine.Core.Components;
 using Microsoft.Xna.Framework.Input;
 
 namespace GameEngine.Graphics.Animations
 {
-    public class AnimationStateSystem : EngineSystem
+    public class AnimationStateSystem : IUpdateSystem
     {
 
-        public override void Update(World world)
+        public void Update(IWorld world)
         {
             // Player Walk Animations
             foreach (var entity in world.GetEntitiesWith<PlayerInputComponent, AnimationComponent>())

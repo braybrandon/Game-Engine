@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GameEngine.Core.Events
+﻿namespace GameEngine.Core.Events
 {
     public class PlayerDiedEvent(string playerId, string cause, int score, float posX, float posY) : IEvent
     {

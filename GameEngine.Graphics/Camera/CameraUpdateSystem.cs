@@ -1,34 +1,34 @@
-﻿using GameEngine.Core.Components;
+﻿using Common.Interfaces;
+using GameEngine.Core.Components;
 using GameEngine.Core.Entities;
-using GameEngine.Core.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
 namespace GameEngine.Graphics.Camera
 {
-    public class CameraUpdateSystem : EngineSystem
+    public class CameraUpdateSystem : IUpdateSystem
     {
-        private Entity _playerEntity;
+        private int _playerId;
         private Vector2 _previousPlayerPosition = Vector2.Zero;
 
-        public CameraUpdateSystem(Entity playerEntity)
+        public CameraUpdateSystem(int playerId)
         {
-            _playerEntity = playerEntity;
+            _playerId = playerId;
         }
 
-        public override void Update(World world)
+        public void Update(IWorld world)
         {
 
-            if (!_playerEntity.HasComponent<TransformComponent>()) {
+            if (!world.HasComponent<TransformComponent>(_playerId)) {
                 return;
             }
-            if (!_playerEntity.HasComponent<PlayerInputComponent>())
+            if (!world.HasComponent<PlayerInputComponent>(_playerId))
             {
                 return;
             }
 
-            ref TransformComponent playerTransformComponent = ref _playerEntity.GetComponent<TransformComponent>();
-            ref PlayerInputComponent playerInputComponent = ref _playerEntity.GetComponent<PlayerInputComponent>();
+            ref TransformComponent playerTransformComponent = ref world.GetComponent<TransformComponent>(_playerId);
+            ref PlayerInputComponent playerInputComponent = ref world.GetComponent<PlayerInputComponent>(_playerId);
 
             foreach (var cameraEntity in world.GetEntitiesWith<TransformComponent, CameraComponent>()) {
                 ref TransformComponent cameraTransformComponent = ref cameraEntity.GetComponent<TransformComponent>();
@@ -47,12 +47,12 @@ namespace GameEngine.Graphics.Camera
                 if (playerInputComponent.CurrentMouseState.MiddleButton == ButtonState.Pressed)
                 {
                     Vector2 previousPosition = new Vector2(playerInputComponent.PreviousMouseState.X, playerInputComponent.PreviousMouseState.Y);
-                    Vector2 currentPosition = new Vector2(playerInputComponent.CurrentMouseState.X, playerInputComponent.PreviousMouseState.Y);
+                    Vector2 currentPosition = new Vector2(playerInputComponent.CurrentMouseState.X, playerInputComponent.CurrentMouseState.Y);
                     Vector2 mPositionDelta = currentPosition - previousPosition;
                     cameraTransformComponent.Position -= mPositionDelta / cameraComponent.Zoom;
                 }
 
-                float cameraFollowDamping = 0.1f;
+                float cameraFollowDamping = 0.3f;
                 if (playerTransformComponent.Position != _previousPlayerPosition)
                 {
                     cameraTransformComponent.Position = Vector2.Lerp(cameraTransformComponent.Position, playerTransformComponent.Position, cameraFollowDamping);

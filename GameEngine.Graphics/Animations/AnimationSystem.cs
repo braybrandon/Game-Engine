@@ -1,18 +1,18 @@
-﻿using GameEngine.Core.Components;
-using GameEngine.Core.Services;
-using GameEngine.Core.Systems;
+﻿using Common.Interfaces;
+using GameEngine.Core.Components;
 using Microsoft.Xna.Framework;
 
 namespace GameEngine.Graphics.Animations
 {
-    public class AnimationSystem : EngineSystem
+    public class AnimationSystem(IServiceLocator serviceLocator) : IUpdateSystem
     {
         private const int SPRITE_WIDTH = 32;
         private const int SPRITE_HEIGHT = 32;
+        IServiceLocator _serviceLocator = serviceLocator;
 
-        public override void Update(World world )
+        public void Update(IWorld world )
         {
-            ITimeManager timeManager = ServiceLocator.GetService<ITimeManager>();
+            ITimeManager timeManager = _serviceLocator.GetService<ITimeManager>();
             float dt = timeManager.ScaledDeltaTime;
 
             foreach (var entity in world.GetEntitiesWith<SpriteComponent, AnimationComponent>())

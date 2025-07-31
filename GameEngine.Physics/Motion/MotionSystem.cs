@@ -1,16 +1,16 @@
-﻿using GameEngine.Core.Components;
+﻿using Common.Interfaces;
+using GameEngine.Core.Components;
 using GameEngine.Core.Services;
-using GameEngine.Core.Systems;
-using Microsoft.Xna.Framework;
 
 namespace GameEngine.Physics.Motion
 {
-    public class MotionSystem : EngineSystem
+    public class MotionSystem(IServiceLocator serviceLocator) : IUpdateSystem
     {
+        IServiceLocator _serviceLocator = serviceLocator;
 
-        public override void Update(World world)
+        public void Update(IWorld world)
         {
-            ITimeManager timeManager = ServiceLocator.GetService<ITimeManager>();
+            ITimeManager timeManager = _serviceLocator.GetService<ITimeManager>();
             float dt = timeManager.ScaledDeltaTime;
 
             foreach (var entity in world.GetEntitiesWith<TransformComponent, VelocityComponent>())

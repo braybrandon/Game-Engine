@@ -1,10 +1,12 @@
-﻿namespace GameEngine.Core.Services
-{
-    public static class ServiceLocator
-    {
-        public static Dictionary<Type, object> _services = new Dictionary<Type, object>();
+﻿using Common.Interfaces;
 
-        public static void Register<TInterface>(TInterface service)
+namespace GameEngine.Core.Services
+{
+    public  class ServiceLocator: IServiceLocator
+    {
+        public Dictionary<Type, object> _services = new Dictionary<Type, object>();
+
+        public void Register<TInterface>(TInterface service)
         {
             if(service == null)
             {
@@ -13,12 +15,12 @@
             _services[typeof(TInterface)] = service;
         }
 
-        public static bool HasService<TInterface>()
+        public bool HasService<TInterface>()
         {
             return _services.ContainsKey(typeof(TInterface));
         }
 
-        public static void UnregisterService<TInterface>()
+        public void UnregisterService<TInterface>()
         {
             if(HasService<TInterface>())
             {
@@ -26,7 +28,7 @@
             }
         }
 
-        public static TInterface GetService<TInterface>() where TInterface : class
+        public TInterface GetService<TInterface>() where TInterface : class
         {
             if(!HasService<TInterface>())
             {
@@ -35,7 +37,7 @@
             return (TInterface)_services[typeof(TInterface)];
         }
 
-        public static void Clear()
+        public void Clear()
         {
             _services.Clear();
         }

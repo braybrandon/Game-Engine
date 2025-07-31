@@ -1,15 +1,15 @@
-﻿using GameEngine.Core.Components;
-using GameEngine.Core.Systems;
+﻿using Common.Interfaces;
+using GameEngine.Core.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
 namespace GameEngine.Physics.Motion
 {
-    public class CalculateVelocitySystem : EngineSystem
+    public class CalculateVelocitySystem : IUpdateSystem
     {
-        private float _playerSpeed = 300f;
+        private float _playerSpeed = 100f;
 
-        public override void Update(World world)
+        public void Update(IWorld world)
         {
             foreach (var entity in world.GetEntitiesWith<PlayerInputComponent, VelocityComponent>())
             {

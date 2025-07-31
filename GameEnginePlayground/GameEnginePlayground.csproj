@@ -24,11 +24,13 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.7" />
+    <PackageReference Include="MonoGame.Extended.Content.Pipeline" Version="4.1.0" />
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.4" />
     <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.4" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GameEngine.Core\GameEngine.Core.csproj" />
+    <ProjectReference Include="..\GameEngine.Core\GameEngine.Engine.csproj" />
     <ProjectReference Include="..\GameEngine.IO\GameEngine.IO.csproj" />
     <ProjectReference Include="..\GameEngine.Physics\GameEngine.Physics.csproj" />
     <ProjectReference Include="..\GameEngine.Graphics\GameEngine.Graphics.csproj" />
