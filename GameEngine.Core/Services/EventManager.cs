@@ -1,12 +1,14 @@
-﻿namespace GameEngine.Core.Services
+﻿using Common.Interfaces;
+
+namespace GameEngine.Core.Services
 {
-    public static class EventManager
+    public class EventManager : IEventManager
     {
-        private static readonly object _lockObject = new object();
+        private readonly object _lockObject = new object();
 
-        private static Dictionary<Type, List<Delegate>> _eventListeners = new Dictionary<Type, List<Delegate>>();
+        private Dictionary<Type, List<Delegate>> _eventListeners = new Dictionary<Type, List<Delegate>>();
 
-        public static bool HasEvent<T>()
+        public bool HasEvent<T>()
         {
             lock (_lockObject)
             {
@@ -14,7 +16,7 @@
             }
         }
 
-        public static void AddListener<T>(Action<T> handler)
+        public void AddListener<T>(Action<T> handler)
         {
             if (handler == null)
             {
@@ -32,7 +34,7 @@
             }
         }
 
-        public static void RemoveListener<T>(Action<T> handler) {
+        public void RemoveListener<T>(Action<T> handler) {
 
             if (handler == null)
             {
@@ -48,7 +50,7 @@
             }
         }
 
-        public static void Publish<T>(T data)
+        public void Publish<T>(T data)
         {
             List<Delegate> handlersToInvoke = null;
 
@@ -70,7 +72,7 @@
             }
         }
 
-        public static void Clear()
+        public void Clear()
         {
             lock (_lockObject)
             {

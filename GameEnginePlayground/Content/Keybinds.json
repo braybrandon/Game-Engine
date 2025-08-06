@@ -1,0 +1,11 @@
+﻿{
+  "Movement": {
+    "MoveUp": "W",
+    "MoveDown": "S",
+    "MoveLeft": "A",
+    "MoveRight": "D"
+  },
+  "Attack": {
+    "Fireball":  "Q"
+  }
+}

@@ -7,13 +7,15 @@ namespace GameEngine.IO.Asset
     public class AssetManager : IAssetManager
     {
         private ContentManager _contentManager;
-        private ITileMapManager _tileMapManager;
         private Dictionary<string, object> _assetCache;
-        public AssetManager(ContentManager contentManager, ITileMapManager tileMapManager)
+        public AssetManager()
         {
-            _contentManager = contentManager;
             _assetCache = new Dictionary<string, object>();
-            _tileMapManager = tileMapManager;
+        }
+
+        public void Initialize(ContentManager content)
+        {
+            _contentManager = content;
         }
 
         public Texture2D LoadTexture(string path)
@@ -26,12 +28,6 @@ namespace GameEngine.IO.Asset
             Texture2D texture = _contentManager.Load<Texture2D>(path);
             _assetCache[path] = texture;
             return texture;
-        }
-
-        public ITileMapData LoadTileMap(string path)
-        {
-            if(string.IsNullOrEmpty(path)) throw new ArgumentNullException("path");
-            return _tileMapManager.LoadTileMap( path);
         }
 
         public void UnloadAsset(string assetName)
@@ -48,7 +44,7 @@ namespace GameEngine.IO.Asset
 
         public T Load<T>(string path)
         {
-            throw new NotImplementedException();
+            return _contentManager.Load<T>(path);
         }
     }
 }

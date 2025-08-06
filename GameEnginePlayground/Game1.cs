@@ -1,19 +1,22 @@
-﻿using Common.Interfaces;
+﻿using Common.Config;
+using Common.Events;
+using Common.Interfaces;
 using GameEngine.Core;
 using GameEngine.Core.Components;
 using GameEngine.Core.Services;
 using GameEngine.Graphics.Animations;
 using GameEngine.Graphics.Camera;
 using GameEngine.Graphics.Render;
-using GameEngine.IO.Asset;
 using GameEngine.IO.Asset.models;
 using GameEngine.IO.Controller;
 using GameEngine.Physics.Motion;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.Extended.ECS;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace GameEnginePlayground
 {
@@ -23,8 +26,11 @@ namespace GameEnginePlayground
         private SpriteBatch _spriteBatch;
         private Engine _gameLoop;
         private IAssetManager _assetManager;
+        private IEventManager _eventManager;
         private ITileMapManager _tileMapManager;
         private IServiceLocator _serviceLocator;
+        private IInputManager _inputManager;
+        private readonly IKeybindFactory _keybindFactory;
 
         private IWorld _world;
         private ITimeManager _timeManager;
@@ -54,8 +60,12 @@ namespace GameEnginePlayground
         private Texture2D _dungeonTilesetTexture;
         //private TileMapRenderer _mapRenderer;
 
-        public Game1()
+        public Game1(IAssetManager assetManager, IEventManager eventManager, IInputManager inputManager, IKeybindFactory keybindFactory)
         {
+            _assetManager = assetManager;
+            _eventManager = eventManager;
+            _inputManager = inputManager;
+            _keybindFactory = keybindFactory;
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
@@ -64,6 +74,7 @@ namespace GameEnginePlayground
 
         protected override void Initialize()
         {
+
             _timeManager = new TimeManager();
             _serviceLocator.Register<ITimeManager>(_timeManager);
 
@@ -73,10 +84,10 @@ namespace GameEnginePlayground
 
             // TODO: Add your initialization logic here
             _gameLoop = new Engine(this, _serviceLocator);
-            _assetManager = new AssetManager(Content, _tileMapManager);
+            //_assetManager = new AssetManager(Content);
             
 
-            _world = new World();
+            _world = new GameEngine.Core.Components.World();
 
             _playerEntity = _world.CreateEntity();
             _playerEntity.AddComponent(new TransformComponent { Position = new Vector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2), Rotation = 0f, Scale = Vector2.One });
@@ -92,13 +103,11 @@ namespace GameEnginePlayground
 
             // 3. Register EngineSystems with the GameLoop
             // Order matters for systems that depend on each other's output!
-            _gameLoop.RegisterUpdateSystem(new PlayerInputSystem());
-            _gameLoop.RegisterUpdateSystem(new CalculateVelocitySystem());
             _gameLoop.RegisterUpdateSystem(new MotionSystem(_serviceLocator));
-            _gameLoop.RegisterUpdateSystem(new AnimationStateSystem());
+            _gameLoop.RegisterUpdateSystem(new AnimationStateSystem(_inputManager));
             _gameLoop.RegisterUpdateSystem(new AnimationSystem(_serviceLocator));
             _gameLoop.RegisterUpdateSystem(new CameraUpdateSystem(_playerEntity.Id));
-
+            _gameLoop.RegisterUpdateSystem(new CalculateVelocitySystem(_inputManager));
             //_gameLoop.Initialize();
             base.Initialize();
         }
@@ -106,22 +115,23 @@ namespace GameEnginePlayground
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-
+            _assetManager.Initialize(Content);
+            _keybindFactory.LoadContent();
             // TODO: use this.Content to load your game content here
 
             //_gameMap = Content.Load<TiledMap>('')
 
-            _playerTexture = _assetManager.LoadTexture("player");
-            _playerWalkUpTexture = _assetManager.LoadTexture("Player/Character_Up");
-            _playerWalkDownTexture = _assetManager.LoadTexture("Player/Character_Down");
-            _playerWalkLeftTexture = _assetManager.LoadTexture("Player/Character_Left");
-            _playerWalkRightTexture = _assetManager.LoadTexture("Player/Character_Right");
-            _playerWalkUpRightTexture = _assetManager.LoadTexture("Player/Character_UpRight");
-            _playerWalkDownRightTexture = _assetManager.LoadTexture("Player/Character_DownRight");
-            _playerWalkUpLeftTexture = _assetManager.LoadTexture("Player/Character_UpLeft");
-            _playerWalkDownLeftTexture = _assetManager.LoadTexture("Player/Character_DownLeft");
+            _playerTexture = _assetManager.LoadTexture(FileNameConfig.Player);
+            _playerWalkUpTexture = _assetManager.LoadTexture(FileNameConfig.PlayerCharacterUp);
+            _playerWalkDownTexture = _assetManager.LoadTexture(FileNameConfig.PlayerCharacterDown);
+            _playerWalkLeftTexture = _assetManager.LoadTexture(FileNameConfig.PlayerCharacterLeft);
+            _playerWalkRightTexture = _assetManager.LoadTexture(FileNameConfig.PlayerCharacterRight);
+            _playerWalkUpRightTexture = _assetManager.LoadTexture(FileNameConfig.PlayerCharacterUpRight);
+            _playerWalkDownRightTexture = _assetManager.LoadTexture(FileNameConfig.PlayerCharacterDownRight);
+            _playerWalkUpLeftTexture = _assetManager.LoadTexture(FileNameConfig.PlayerCharacterUpLeft);
+            _playerWalkDownLeftTexture = _assetManager.LoadTexture(FileNameConfig.PlayerCharacterDownLeft);
 
-            _gameMap = Content.Load<TileMap>("test_map");
+            _gameMap = Content.Load<TileMap>(FileNameConfig.TestMap);
             foreach (var tileset in _gameMap.Tilesets)
             {
                 var texture = _assetManager.LoadTexture(tileset.Name);
@@ -294,6 +304,8 @@ namespace GameEnginePlayground
         protected override void Update(GameTime gameTime)
         {
             _timeManager.Update(gameTime);
+            
+            _inputManager.Update();
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 

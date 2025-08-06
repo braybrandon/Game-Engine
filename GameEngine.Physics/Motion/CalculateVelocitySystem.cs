@@ -1,13 +1,15 @@
-﻿using Common.Interfaces;
+﻿using Common.Enums;
+using Common.Interfaces;
 using GameEngine.Core.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
 namespace GameEngine.Physics.Motion
 {
-    public class CalculateVelocitySystem : IUpdateSystem
+    public class CalculateVelocitySystem(IInputManager inputManager) : IUpdateSystem
     {
         private float _playerSpeed = 100f;
+        private IInputManager _inputManager = inputManager;
 
         public void Update(IWorld world)
         {
@@ -19,10 +21,10 @@ namespace GameEngine.Physics.Motion
                 velocity.Value = Vector2.Zero;
                 Vector2 movement = Vector2.Zero;
 
-                if (input.CurrentKeyboardState.IsKeyDown(Keys.W)) movement.Y -= 1;
-                if (input.CurrentKeyboardState.IsKeyDown(Keys.S)) movement.Y += 1;
-                if (input.CurrentKeyboardState.IsKeyDown(Keys.A)) movement.X -= 1;
-                if (input.CurrentKeyboardState.IsKeyDown(Keys.D)) movement.X += 1;
+                if (_inputManager.IsKeyDown(InputAction.MoveUp)) movement.Y -= 1;
+                if (_inputManager.IsKeyDown(InputAction.MoveDown)) movement.Y += 1;
+                if (_inputManager.IsKeyDown(InputAction.MoveLeft)) movement.X -= 1;
+                if (_inputManager.IsKeyDown(InputAction.MoveRight)) movement.X += 1;
 
                 if (movement != Vector2.Zero)
                 {

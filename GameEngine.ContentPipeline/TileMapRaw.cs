@@ -14,6 +14,12 @@ namespace GameEngine.ContentPipeline
         public List<TiledLayer> layers { get; set; }
     }
 
+    public class KeybindRaw
+    {
+        public Dictionary<string, string> Movement { get; set; }
+        public Dictionary<string, string> Attack { get; set; }
+    }
+
     public class TiledTileset
     {
         public int? columns { get; set; }

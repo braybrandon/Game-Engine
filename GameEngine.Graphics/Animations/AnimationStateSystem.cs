@@ -1,11 +1,13 @@
-﻿using Common.Interfaces;
+﻿using Common.Enums;
+using Common.Interfaces;
 using GameEngine.Core.Components;
 using Microsoft.Xna.Framework.Input;
 
 namespace GameEngine.Graphics.Animations
 {
-    public class AnimationStateSystem : IUpdateSystem
+    public class AnimationStateSystem(IInputManager inputManager) : IUpdateSystem
     {
+        IInputManager _inputManager = inputManager;
 
         public void Update(IWorld world)
         {
@@ -16,21 +18,21 @@ namespace GameEngine.Graphics.Animations
                 ref var animation = ref entity.GetComponent<AnimationComponent>();
                 AnimationType newClipName = animation.CurrentClipName;
 
-                if (input.CurrentKeyboardState.IsKeyDown(Keys.W) && input.CurrentKeyboardState.IsKeyDown(Keys.A))
+                if (_inputManager.IsKeyDown(InputAction.MoveUp) && _inputManager.IsKeyDown(InputAction.MoveLeft))
                     newClipName = AnimationType.WalkUpLeft;
-                else if (input.CurrentKeyboardState.IsKeyDown(Keys.W) && input.CurrentKeyboardState.IsKeyDown(Keys.D))
+                else if (_inputManager.IsKeyDown(InputAction.MoveUp) && _inputManager.IsKeyDown(InputAction.MoveRight))
                     newClipName = AnimationType.WalkUpRight;
-                else if (input.CurrentKeyboardState.IsKeyDown(Keys.S) && input.CurrentKeyboardState.IsKeyDown(Keys.A))
+                else if (_inputManager.IsKeyDown(InputAction.MoveDown) && _inputManager.IsKeyDown(InputAction.MoveLeft))
                     newClipName = AnimationType.WalkDownLeft;
-                else if (input.CurrentKeyboardState.IsKeyDown(Keys.S) && input.CurrentKeyboardState.IsKeyDown(Keys.D))
+                else if (_inputManager.IsKeyDown(InputAction.MoveDown) && _inputManager.IsKeyDown(InputAction.MoveRight))
                     newClipName = AnimationType.WalkDownRight;
-                else if (input.CurrentKeyboardState.IsKeyDown(Keys.W))
+                else if (_inputManager.IsKeyDown(InputAction.MoveUp))
                     newClipName = AnimationType.WalkUp;
-                else if (input.CurrentKeyboardState.IsKeyDown(Keys.S))
+                else if (_inputManager.IsKeyDown(InputAction.MoveDown))
                     newClipName = AnimationType.WalkDown;
-                else if (input.CurrentKeyboardState.IsKeyDown(Keys.A))
+                else if (_inputManager.IsKeyDown(InputAction.MoveLeft))
                     newClipName = AnimationType.WalkLeft;
-                else if (input.CurrentKeyboardState.IsKeyDown(Keys.D))
+                else if (_inputManager.IsKeyDown(InputAction.MoveRight))
                     newClipName = AnimationType.WalkRight;
                 else
                     newClipName = AnimationType.Idle;

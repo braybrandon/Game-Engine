@@ -26,6 +26,11 @@
 /processorParam:TextureFormat=Color
 /build:Dungeon_Tiles.png
 
+#begin Keybinds.json
+/importer:JsonImporter
+/processor:KeybindProcessor
+/build:Keybinds.json
+
 #begin player.png
 /importer:TextureImporter
 /processor:TextureProcessor

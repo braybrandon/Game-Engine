@@ -1,4 +1,6 @@
-﻿namespace GameEngine.Core.Events
+﻿using Common.Interfaces;
+
+namespace GameEngine.Core.Events
 {
     public class PlayerDiedEvent(string playerId, string cause, int score, float posX, float posY) : IEvent
     {

@@ -1,4 +1,4 @@
-﻿namespace GameEngine.Core.Events
+﻿namespace Common.Interfaces
 {
     public interface IEvent
     {
