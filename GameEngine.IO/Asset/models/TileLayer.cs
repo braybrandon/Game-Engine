@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace GameEngine.IO.Asset.models
 {
-public class TileLayer
+public class TileLayer: ITileLayer
 {
     public string Name { get; set; }
-    public string Type { get; set; }  // Important to know it's "tilelayer"
+    public string Type { get; set; }
     public int Width { get; set; }
     public int Height { get; set; }
     public int[] Tiles { get; set; }

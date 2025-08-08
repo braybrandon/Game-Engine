@@ -8,14 +8,12 @@ namespace GameEngine.Engine.Scene
     {
         private SpriteBatch _spriteBatch;
         private IWorld _world;
-        private IServiceLocator _serviceLocator;
         private IAssetManager _assetManager;
         private List<IUpdateSystem> _updateSystems = new List<IUpdateSystem>();
         private List<IDrawSystem> _drawSystems = new List<IDrawSystem>();
 
-        public Scene(IServiceLocator serviceLocator, IAssetManager assetManager)
+        public Scene(IAssetManager assetManager)
         {
-            _serviceLocator = serviceLocator;
             _world = new World();
             _assetManager = assetManager;
         }

@@ -1,5 +1,4 @@
 ﻿using Common.Config;
-using Common.Events;
 using Common.Interfaces;
 using GameEngine.Core;
 using GameEngine.Core.Components;
@@ -8,15 +7,12 @@ using GameEngine.Graphics.Animations;
 using GameEngine.Graphics.Camera;
 using GameEngine.Graphics.Render;
 using GameEngine.IO.Asset.models;
-using GameEngine.IO.Controller;
 using GameEngine.Physics.Motion;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using MonoGame.Extended.ECS;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace GameEnginePlayground
 {
@@ -27,16 +23,21 @@ namespace GameEnginePlayground
         private Engine _gameLoop;
         private IAssetManager _assetManager;
         private IEventManager _eventManager;
-        private ITileMapManager _tileMapManager;
         private IServiceLocator _serviceLocator;
         private IInputManager _inputManager;
         private readonly IKeybindFactory _keybindFactory;
+
+        //lighting
+        private RenderTarget2D mainTarget;
+        private RenderTarget2D lightTarget;
+        private Effect lightEffect;
+        private Texture2D lightTexture;
 
         private IWorld _world;
         private ITimeManager _timeManager;
 
         private TileMap _gameMap;
-        Dictionary<Tileset, Texture2D> _tilesetTextures = new Dictionary<Tileset, Texture2D>();
+        Dictionary<ITileset, Texture2D> _tilesetTextures = new Dictionary<ITileset, Texture2D>();
 
         // Entities
         private IEntity _playerEntity;
@@ -56,9 +57,6 @@ namespace GameEnginePlayground
         private const int SPRITE_WIDTH = 32;
         private const int SPRITE_HEIGHT = 32;
 
-        // Declare instances of your parsed map and renderer
-        private Texture2D _dungeonTilesetTexture;
-        //private TileMapRenderer _mapRenderer;
 
         public Game1(IAssetManager assetManager, IEventManager eventManager, IInputManager inputManager, IKeybindFactory keybindFactory)
         {
@@ -131,7 +129,7 @@ namespace GameEnginePlayground
             _playerWalkUpLeftTexture = _assetManager.LoadTexture(FileNameConfig.PlayerCharacterUpLeft);
             _playerWalkDownLeftTexture = _assetManager.LoadTexture(FileNameConfig.PlayerCharacterDownLeft);
 
-            _gameMap = Content.Load<TileMap>(FileNameConfig.TestMap);
+            _gameMap = _assetManager.Load<TileMap>(FileNameConfig.TestMap);
             foreach (var tileset in _gameMap.Tilesets)
             {
                 var texture = _assetManager.LoadTexture(tileset.Name);
@@ -290,14 +288,17 @@ namespace GameEnginePlayground
 
             playerSpriteComponent.Texture = playerAnimationComponent.CurrentClip.Texture;
             playerSpriteComponent.SourceRectangle = playerAnimationComponent.CurrentClip.Frames[0]; 
-            playerSpriteComponent.Origin = new Vector2(SPRITE_WIDTH / 2, SPRITE_HEIGHT / 2); 
+            playerSpriteComponent.Origin = new Vector2(SPRITE_WIDTH / 2, SPRITE_HEIGHT / 2);
 
-            _playerEntity.AddComponent(playerAnimationComponent);
-            _playerEntity.AddComponent(playerSpriteComponent);
+            var pp = GraphicsDevice.PresentationParameters;
+            mainTarget = new RenderTarget2D(GraphicsDevice, pp.BackBufferWidth, pp.BackBufferHeight);
+            lightTarget = new RenderTarget2D(GraphicsDevice, pp.BackBufferWidth, pp.BackBufferHeight);
+            lightEffect = Content.Load<Effect>("lighteffect");
+            lightTexture = _assetManager.LoadTexture(FileNameConfig.LightMask);
 
-
-
+            _gameLoop.RegisterDrawSystem(new TileMapRenderSystem(_gameMap, _tilesetTextures, _cameraEntity, mainTarget, GraphicsDevice));
             _gameLoop.RegisterDrawSystem(new SpriteRenderSystem());
+            _gameLoop.RegisterDrawSystem(new LightFxRenderSystem(GraphicsDevice, _playerEntity, _cameraEntity, lightTarget, mainTarget, lightTexture, lightEffect));
             _gameLoop.LoadContent(_spriteBatch);
         }
 
@@ -317,92 +318,9 @@ namespace GameEnginePlayground
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
-            var camera = _world.GetComponent<CameraComponent>(_cameraEntity.Id);
-            var viewport = camera.Viewport;
-            var viewMatrix = camera.ViewMatrix;
-
-            _spriteBatch.Begin(transformMatrix: viewMatrix);
-
-            // Get camera position in world space (inverse of translation)
-            Matrix inverseView = Matrix.Invert(viewMatrix);
-            Vector2 cameraPosition = new Vector2(inverseView.Translation.X, inverseView.Translation.Y);
-
-            // Tile culling bounds
-            int tileWidth = _gameMap.TileWidth;
-            int tileHeight = _gameMap.TileHeight;
-
-            int mapWidth = _gameMap.Width;
-            int mapHeight = _gameMap.Height;
-
-            float zoom = camera.Zoom;
-            float viewWidth = viewport.Width / zoom;
-            float viewHeight = viewport.Height / zoom;
-
-            int minX = Math.Max((int)(cameraPosition.X / tileWidth), 0);
-            int minY = Math.Max((int)(cameraPosition.Y / tileHeight), 0);
-
-            int maxX = Math.Min((int)((cameraPosition.X + viewWidth) / tileWidth) + 1, mapWidth);
-            int maxY = Math.Min((int)((cameraPosition.Y + viewHeight) / tileHeight) + 1, mapHeight);
-
-            foreach (var layer in _gameMap.Layers)
-            {
-                for (int y = minY; y < maxY; y++)
-                {
-                    for (int x = minX; x < maxX; x++)
-                    {
-                        int tileId = layer.GetTileId(x, y);
-                        if (tileId == 0)
-                            continue;
-
-                        // Find the tileset for this tile
-                        Tileset tileset = null;
-                        for (int i = _gameMap.Tilesets.Count - 1; i >= 0; i--)
-                        {
-                            if (tileId >= _gameMap.Tilesets[i].FirstGID)
-                            {
-                                tileset = _gameMap.Tilesets[i];
-                                break;
-                            }
-                        }
-
-                        if (tileset == null || !_tilesetTextures.TryGetValue(tileset, out var tilesetTexture))
-                            continue;
-
-                        int localTileId = tileId - tileset.FirstGID;
-                        int tilesPerRow = tilesetTexture.Width / tileset.TileWidth;
-
-                        int tileX = localTileId % tilesPerRow;
-                        int tileY = localTileId / tilesPerRow;
-
-                        Rectangle sourceRect = new Rectangle(
-                            tileX * tileset.TileWidth,
-                            tileY * tileset.TileHeight,
-                            tileset.TileWidth,
-                            tileset.TileHeight
-                        );
-
-                        Vector2 position = new Vector2(
-                            x * tileset.TileWidth,
-                            y * tileset.TileHeight
-                        );
-
-                        _spriteBatch.Draw(tilesetTexture, position, sourceRect, Color.White);
-                    }
-                }
-            }
-
-            _spriteBatch.End();
-
-
-
-
             // TODO: Add your drawing code here
 
             _gameLoop.Draw(gameTime, _world);
-     
-
-
             base.Draw(gameTime);
         }
 

@@ -11,6 +11,7 @@
         public static readonly string PlayerCharacterDownRight = "Player/Character_DownRight";
         public static readonly string PlayerCharacterUpLeft = "Player/Character_UpLeft";
         public static readonly string PlayerCharacterDownLeft = "Player/Character_DownLeft";
+        public static readonly string LightMask = "lightmap";
 
         public static readonly string TestMap = "test_map";
         public static readonly string Keybinds = "Keybinds";

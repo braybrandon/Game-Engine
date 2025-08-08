@@ -1,4 +1,5 @@
-﻿using GameEngine.ContentPipeline;
+﻿using Common.Interfaces;
+using GameEngine.ContentPipeline;
 using GameEngine.IO.Asset.models;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using System.Collections.Generic;
@@ -15,8 +16,6 @@ public class TiledProcessor : ContentProcessor<TiledMapRaw, TileMap>
             Height = input.height,
             TileWidth = input.tilewidth,
             TileHeight = input.tileheight,
-            Tilesets = new List<Tileset>(),
-            Layers = new List<TileLayer>()
         };
 
         foreach (var ts in input.tilesets)
@@ -51,7 +50,7 @@ public class TiledProcessor : ContentProcessor<TiledMapRaw, TileMap>
                     Name = p.name,
                     Type = p.type,
                     Value = p.value
-                }).ToList(),
+                }).ToList<IProperty>(),
 
                 Tiles = ts.tiles?.Select(tile => new Tile
                 {
@@ -61,14 +60,14 @@ public class TiledProcessor : ContentProcessor<TiledMapRaw, TileMap>
                         Name = p.name,
                         Type = p.type,
                         Value = p.value
-                    }).ToList(),
+                    }).ToList<IProperty>(),
 
                     Animation = tile.animation?.Select(frame => new GameEngine.IO.Asset.models.TileAnimationFrame
                     {
                         Duration = frame.duration,
                         TileId = frame.tileid
-                    }).ToList()
-                }).ToList()
+                    }).ToList<ITileAnimationFrame>()
+                }).ToList<ITile>()
             };
 
             tileMap.Tilesets.Add(tileset);

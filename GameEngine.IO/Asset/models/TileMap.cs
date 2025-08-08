@@ -1,17 +1,19 @@
-﻿namespace GameEngine.IO.Asset.models
+﻿using Common.Interfaces;
+
+namespace GameEngine.IO.Asset.models
 {
-    public class TileMap
+    public class TileMap : ITileMap
     {
         public int Width { get; set; }
         public int Height { get; set; }
         public int TileWidth { get; set; }
         public int TileHeight { get; set; }
-        public List<TileLayer> Layers { get; set; } = new List<TileLayer>();
-        public List<Tileset> Tilesets { get; set; } = new List<Tileset>();
+        public List<ITileLayer> Layers { get; set; } = new();
+        public List<ITileset> Tilesets { get; set; } = new();
 
-        public Tileset GetTilesetForTile(int tileId)
+        public ITileset GetTilesetForTile(int tileId)
         {
-            Tileset result = null;
+            ITileset result = null;
             foreach (var tileset in Tilesets)
             {
                 if (tileset.FirstGID <= tileId)

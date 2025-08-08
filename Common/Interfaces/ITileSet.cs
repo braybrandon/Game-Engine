@@ -1,10 +1,12 @@
-﻿using Common.Interfaces;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace GameEngine.IO.Asset.models
+namespace Common.Interfaces
 {
-    public class Tileset: ITileset
+    public interface ITileset
     {
         public int FirstGID { get; set; }
         public string Source { get; set; }          // external tsx file reference, if any
@@ -32,21 +34,21 @@ namespace GameEngine.IO.Asset.models
         // Optional: add texture or other runtime data here if needed
     }
 
-    public class Grid: IGrid
+    public interface IGrid
     {
         public int Height { get; set; }
         public int Width { get; set; }
         public string Orientation { get; set; }
     }
 
-    public class Property: IProperty
+    public interface IProperty
     {
         public string Name { get; set; }
         public string Type { get; set; }
         public object Value { get; set; }
     }
 
-    public class Tile: ITile
+    public interface ITile
     {
         public int Id { get; set; }
         public List<IProperty> Properties { get; set; }
@@ -54,10 +56,9 @@ namespace GameEngine.IO.Asset.models
         // Add objectgroup or others as needed
     }
 
-    public class TileAnimationFrame: ITileAnimationFrame
+    public interface ITileAnimationFrame
     {
         public int Duration { get; set; }
         public int TileId { get; set; }
     }
-
 }
