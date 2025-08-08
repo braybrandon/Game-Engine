@@ -22,6 +22,7 @@ namespace GameEngine.IO.Asset.models
         public string Type { get; set; }
         public double? Version { get; set; }
         public string TiledVersion { get; set; }
+        public Texture2D? Texture { get; set; }
 
         public IGrid Grid { get; set; }
 

@@ -1,14 +1,11 @@
 ﻿using Common.Config;
 using Common.Enums;
-using Common.Events;
 using Common.Interfaces;
 using GameEngine.IO.Asset.models;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 
-namespace GameEnginePlayground
+namespace GameEnginePlayground.Factories
 {
     public class KeybindFactory : IKeybindFactory
     {

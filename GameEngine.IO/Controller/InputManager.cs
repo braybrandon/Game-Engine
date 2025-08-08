@@ -1,11 +1,15 @@
 ﻿using Common.Enums;
 using Common.Interfaces;
+using GameEngine.Core.Components;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
 namespace GameEngine.IO.Controller
 {
     public class InputManager : IInputManager
     {
+        private MouseState _currentMouseState;
+        private MouseState _previousMouseState;
         private KeyboardState _currentKeyboardState;
         private Dictionary<InputAction, Keys> _movementKeys = new Dictionary<InputAction, Keys>();
         private Dictionary<Keys, Action> _keyDownBinds = new Dictionary<Keys, Action>();
@@ -30,9 +34,27 @@ namespace GameEngine.IO.Controller
             return false;
         }
 
+        public bool IsMiddleMousePressed()
+        {
+            return _currentMouseState.MiddleButton == ButtonState.Pressed;
+        }
+
+        public Vector2 GetMousePositionDelta()
+        {
+            Vector2 previousPosition = new Vector2(_previousMouseState.X, _previousMouseState.Y);
+            Vector2 currentPosition = new Vector2(_currentMouseState.X, _currentMouseState.Y);
+            return currentPosition - previousPosition;
+        }
+
+        public float GetScrollWheelDelta()
+        {
+            return _currentMouseState.ScrollWheelValue - _previousMouseState.ScrollWheelValue;
+        }
+
         public void Update()
         {
-            MouseState currentMouseState = Mouse.GetState();
+            _previousMouseState = _currentMouseState;
+            _currentMouseState = Mouse.GetState();
             _currentKeyboardState = Keyboard.GetState();
 
             // Handle Events

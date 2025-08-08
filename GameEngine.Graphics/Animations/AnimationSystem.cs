@@ -4,16 +4,16 @@ using Microsoft.Xna.Framework;
 
 namespace GameEngine.Graphics.Animations
 {
-    public class AnimationSystem(IServiceLocator serviceLocator) : IUpdateSystem
+    public class AnimationSystem(ITimeManager timeManager) : IUpdateSystem
     {
+        private readonly ITimeManager _timeManager = timeManager;
         private const int SPRITE_WIDTH = 32;
         private const int SPRITE_HEIGHT = 32;
-        IServiceLocator _serviceLocator = serviceLocator;
+
 
         public void Update(IWorld world )
         {
-            ITimeManager timeManager = _serviceLocator.GetService<ITimeManager>();
-            float dt = timeManager.ScaledDeltaTime;
+            float dt = _timeManager.ScaledDeltaTime;
 
             foreach (var entity in world.GetEntitiesWith<SpriteComponent, AnimationComponent>())
             {

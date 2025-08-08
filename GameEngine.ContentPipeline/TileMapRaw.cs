@@ -1,5 +1,6 @@
 ﻿using GameEngine.IO.Asset.models;
 using System.Collections.Generic;
+using System.Text.Json;
 
 namespace GameEngine.ContentPipeline
 {
@@ -58,7 +59,7 @@ namespace GameEngine.ContentPipeline
     {
         public string name { get; set; }
         public string type { get; set; }
-        public object value { get; set; }  // object to handle bool, int, string, etc.
+        public JsonElement value { get; set; }  // object to handle bool, int, string, etc.
     }
 
     public class TiledTile

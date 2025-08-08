@@ -2,8 +2,9 @@
 using GameEngine.ContentPipeline;
 using GameEngine.IO.Asset.models;
 using Microsoft.Xna.Framework.Content.Pipeline;
-using System.Collections.Generic;
+using System;
 using System.Linq;
+using System.Text.Json;
 
 [ContentProcessor(DisplayName = "Tiled Processor")]
 public class TiledProcessor : ContentProcessor<TiledMapRaw, TileMap>
@@ -59,7 +60,7 @@ public class TiledProcessor : ContentProcessor<TiledMapRaw, TileMap>
                     {
                         Name = p.name,
                         Type = p.type,
-                        Value = p.value
+                        Value = ParseTiledValue(p.type, p.value)
                     }).ToList<IProperty>(),
 
                     Animation = tile.animation?.Select(frame => new GameEngine.IO.Asset.models.TileAnimationFrame
@@ -91,5 +92,17 @@ public class TiledProcessor : ContentProcessor<TiledMapRaw, TileMap>
         }
 
         return tileMap;
+    }
+
+    private object ParseTiledValue(string type, JsonElement value)
+    {
+        return type switch
+        {
+            "bool" => value.GetBoolean(),
+            "int" => value.GetInt32(),
+            "float" => value.GetSingle(),
+            "string" => value.GetString(),
+            _ => throw new NotSupportedException($"Unsupported property type '{type}'")
+        };
     }
 }

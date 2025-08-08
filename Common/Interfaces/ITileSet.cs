@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,6 +25,7 @@ namespace Common.Interfaces
         public string Type { get; set; }
         public double? Version { get; set; }
         public string TiledVersion { get; set; }
+        public Texture2D? Texture { get; set; }
 
         public IGrid Grid { get; set; }
 

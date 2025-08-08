@@ -11,9 +11,13 @@ namespace Common.Interfaces
 {
     public interface IScene
     {
-        public void LoadContent(SpriteBatch spriteBatch);
+        public void RegisterUpdateSystem(IUpdateSystem system);
+        public void UnregiserUpdateSystem(IUpdateSystem system);
+        public IWorld GetWorld();
+        public void RegisterDrawSystem(IDrawSystem system);
+        public void UnregiserDrawSystem(IDrawSystem system);
         public void Update();
-        public void Draw();
+        public void Draw(SpriteBatch spriteBatch);
         public void UnloadContent();
     }
 }
