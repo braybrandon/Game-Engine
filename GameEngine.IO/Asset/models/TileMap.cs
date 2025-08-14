@@ -8,6 +8,9 @@ namespace GameEngine.IO.Asset.models
         public int Height { get; set; }
         public int TileWidth { get; set; }
         public int TileHeight { get; set; }
+        public ITileLayer TreeLayer { get; set; }
+        public ITileLayer PlayerLayer { get; set; }
+        public ITileLayer ObjectTileLayer { get; set; }
         public List<ITileLayer> Layers { get; set; } = new();
         public List<ITileset> Tilesets { get; set; } = new();
 

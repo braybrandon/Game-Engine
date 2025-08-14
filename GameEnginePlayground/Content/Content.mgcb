@@ -26,6 +26,40 @@
 /processorParam:TextureFormat=Color
 /build:Dungeon_Tiles.png
 
+#begin fireball.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:fireball.png
+
+#begin grass_dirt.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:grass_dirt.png
+
+#begin grassy_with_objects.tmj
+/importer:TiledImporter
+/processor:TiledProcessor
+/build:grassy_with_objects.tmj
+
+#begin grassy.tmj
+/importer:TiledImporter
+/processor:TiledProcessor
+/build:grassy.tmj
+
 #begin Keybinds.json
 /importer:JsonImporter
 /processor:KeybindProcessor
@@ -301,8 +335,32 @@
 /processorParam:TextureFormat=Color
 /build:Player/Character_UpRight.png
 
+#begin tall-grass.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:tall-grass.png
+
 #begin test_map.tmj
 /importer:TiledImporter
 /processor:TiledProcessor
 /build:test_map.tmj
+
+#begin tree.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:tree.png
 

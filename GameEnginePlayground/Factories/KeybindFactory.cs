@@ -1,5 +1,6 @@
 ﻿using Common.Config;
 using Common.Enums;
+using Common.Events;
 using Common.Interfaces;
 using GameEngine.IO.Asset.models;
 using System;
@@ -41,6 +42,7 @@ namespace GameEnginePlayground.Factories
         {
             _inputActions = new Dictionary<InputAction, Action>()
             {
+                { InputAction.Fireball, () => _eventManager.Publish(new FireballPressedEvent())}
             };
         }
     }

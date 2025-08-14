@@ -1,4 +1,5 @@
-﻿using GameEngine.IO.Asset.models;
+﻿using Common.Interfaces;
+using GameEngine.IO.Asset.models;
 using System.Collections.Generic;
 using System.Text.Json;
 
@@ -67,7 +68,12 @@ namespace GameEngine.ContentPipeline
         public int id { get; set; }
         public List<TiledProperty> properties { get; set; }
         public List<TileAnimationFrame> animation { get; set; }
-        public object objectgroup { get; set; }  // can be expanded into a class if needed
+        public TiledObjectGroup objectgroup { get; set; }  // can be expanded into a class if needed
+    }
+
+    public class TiledObjectGroup
+    {
+        public List<TiledObject> objects { get; set; }
     }
 
     public class TileAnimationFrame
@@ -84,6 +90,28 @@ namespace GameEngine.ContentPipeline
 
         public string type { get; set; } 
         public int[] data { get; set; }  
+        public string draworder { get; set; }
+        public int id { get; set; }
+        public List<TiledObject> objects { get; set; }
+        public int opacity { get; set; }
+        public bool visible {  get; set; }
+        public int x { get; set; }
+        public int y { get; set; }
                                          
+    }
+
+    public class TiledObject
+    {
+        public double height { get; set; }
+        public int id { get; set; }
+        public int gid { get; set; }
+        public string name { get; set; }
+        public bool point { get; set; }
+        public int rotation { get; set; }
+        public string type { get; set; }
+        public bool visible { get; set; }
+        public double width { get; set; }
+        public double x { get; set; }
+        public double y { get; set; }
     }
 }

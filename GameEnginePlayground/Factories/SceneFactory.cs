@@ -1,13 +1,17 @@
-﻿using Common.Config;
+﻿using Common.Components;
+using Common.Config;
 using Common.Interfaces;
 using GameEngine.Core.Components;
+using GameEngine.Engine;
 using GameEngine.Graphics.Animations;
 using GameEngine.Graphics.Camera;
 using GameEngine.Graphics.Render;
 using GameEngine.Physics;
 using GameEngine.Physics.Motion;
+using GameEnginePlayground.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Linq;
 
 namespace GameEnginePlayground.Factories
 {
@@ -18,13 +22,17 @@ namespace GameEnginePlayground.Factories
         private readonly GraphicsDevice _graphicsDevice;
         private readonly ITimeManager _timeManager;
         private readonly IFactory<ITileMap> _mapFactory;
+        private readonly SpriteBatch _spriteBatch;
+        private readonly IEventManager _eventManager;
 
-        public SceneFactory(IAssetManager assetManager, IInputManager inputManager, GraphicsDevice graphicsDevice, ITimeManager timeManager) {
+        public SceneFactory(IAssetManager assetManager, IInputManager inputManager, GraphicsDevice graphicsDevice, ITimeManager timeManager, SpriteBatch spriteBatch, IEventManager eventManager) {
             _assetManager = assetManager;
             _inputManager = inputManager;
             _graphicsDevice = graphicsDevice;
             _timeManager = timeManager;
             _mapFactory = new GameMapFactory(_assetManager);
+            _spriteBatch = spriteBatch;
+            _eventManager = eventManager;
         }
         
         public IScene Create()
@@ -37,11 +45,22 @@ namespace GameEnginePlayground.Factories
         private void AddSystems(IScene scene)
         {
             IWorld sceneWorld = scene.GetWorld();
-            PlayerFactory playerFactory = new PlayerFactory(_graphicsDevice, _assetManager, sceneWorld);
-            IEntity playerEntity = playerFactory.Create();
-            IEntity cameraEntity = CreateCamera(sceneWorld);
-
             var gameMap = _mapFactory.Create();
+            PlayerFactory playerFactory = new PlayerFactory(_graphicsDevice, _assetManager, sceneWorld, gameMap.PlayerLayer);
+            IEntity playerEntity = playerFactory.Create();
+            IEntity cameraEntity = CreateCamera(sceneWorld, gameMap.PlayerLayer);
+
+
+
+            cameraEntity.AddComponent(new CullingComponent { MaxX = 0, MaxY = 0, MinX = 0, MinY = 0 });
+            var grassTexture = _assetManager.Load<Texture2D>("tall-grass");
+            AddObjects(gameMap, sceneWorld, gameMap.ObjectTileLayer, grassTexture);
+
+            var treeTexture = _assetManager.Load<Texture2D>("tree");
+            AddObjects(gameMap, sceneWorld, gameMap.TreeLayer, treeTexture);
+
+            Texture2D _pixel = new Texture2D(_graphicsDevice, 1, 1);
+            _pixel.SetData(new[] { Color.White });
             ICollisionMap collisionMap = new CollisionMap(gameMap, gameMap.Layers[0]);
 
             // 3. Register EngineSystems with the GameLoop
@@ -51,6 +70,9 @@ namespace GameEnginePlayground.Factories
             scene.RegisterUpdateSystem(new AnimationSystem(_timeManager));
             scene.RegisterUpdateSystem(new CameraUpdateSystem(playerEntity.Id, _inputManager));
             scene.RegisterUpdateSystem(new CalculateVelocitySystem(_inputManager));
+            scene.RegisterUpdateSystem(new CullingSystem(cameraEntity, gameMap));
+            scene.RegisterUpdateSystem(new MouseEventHandlerSystem(sceneWorld, cameraEntity, gameMap, _eventManager, playerEntity, _assetManager, _inputManager));
+            scene.RegisterUpdateSystem(new ProjectileLiftetimeSystem(_timeManager));
 
             var pp = _graphicsDevice.PresentationParameters;
             var mainTarget = new RenderTarget2D(_graphicsDevice, pp.BackBufferWidth, pp.BackBufferHeight);
@@ -58,18 +80,66 @@ namespace GameEnginePlayground.Factories
             var lightEffect = _assetManager.Load<Effect>("lighteffect");
             var lightTexture = _assetManager.LoadTexture(FileNameConfig.LightMask);
 
-            Texture2D _pixel = new Texture2D(_graphicsDevice, 1, 1);
-            _pixel.SetData(new[] { Color.White });
-
-            scene.RegisterDrawSystem(new TileMapRenderSystem(gameMap, cameraEntity, mainTarget, _graphicsDevice, collisionMap, _pixel));
+            scene.RegisterDrawSystem(new TileMapRenderSystem(gameMap, cameraEntity, mainTarget, _graphicsDevice));
             scene.RegisterDrawSystem(new SpriteRenderSystem(_pixel));
-            scene.RegisterDrawSystem(new LightFxRenderSystem(_graphicsDevice, playerEntity, cameraEntity, lightTarget, mainTarget, lightTexture, lightEffect));
+            //scene.RegisterDrawSystem(new LightFxRenderSystem(_graphicsDevice, playerEntity, cameraEntity, lightTarget, mainTarget, lightTexture, lightEffect));
+            scene.RegisterDrawSystem(new DebugRendererSystem(_pixel, cameraEntity, collisionMap));
         }
 
-        private IEntity CreateCamera(IWorld world)
+        private void AddObjects(ITileMap map, IWorld world, ITileLayer layer, Texture2D grassTexture)
         {
+            
+            foreach (var item in layer.Objects)
+            {
+                var grass = world.CreateEntity();
+                grass.AddComponent(new TransformComponent { Position = new Vector2((float)item.X, (float)item.Y), Scale = Vector2.One });
+                var tileset = map.GetTilesetForTile(item.Gid);
+                var width = tileset.TileWidth;
+                var height = tileset.TileHeight;
+                var colliderHeight = 0.0;
+                var colliderWidth = 0.0;
+                if (tileset.Tiles?.Count > 0 && tileset.Tiles[0].Objects.Count > 0)
+                {
+                    colliderHeight = tileset.Tiles[0].Objects[0].Height;
+                    colliderWidth = tileset.Tiles[0].Objects[0].Width;
+                    var colliderX = tileset.Tiles[0].Objects[0].X;
+                    var colliderY = tileset.Tiles[0].Objects[0].Y;
+                    grass.AddComponent(new ColliderComponent { Bounds = new Rectangle((int)(- (colliderX - width/2)), (int)(- (colliderY-height/2)), (int)colliderWidth, (int)colliderHeight), IsStatic = true});
+                }
+
+                // Correctly calculate the tile ID and its row/column
+                var id = item.Gid - tileset.FirstGID;
+                var tileX = id % tileset.Columns; // Correctly get the column
+                var tileY = id / tileset.Columns; // Correctly get the row
+
+                // Multiply by tile dimensions to get the pixel coordinates for the source rectangle
+                var bounds = new Rectangle((int)tileX * width, (int)tileY * height, width, height);
+
+                grass.AddComponent(new SpriteComponent
+                {
+                    Texture = grassTexture,
+                    SourceRectangle = bounds,
+                    Color = Color.White,
+                    Scale = 1f,
+                    Rotation = 0f,
+                    Origin = new Vector2(width / 2, height / 2),
+                    Effects = SpriteEffects.None,
+                    LayerDepth = 0f
+                });
+            }
+        }
+
+        private IEntity CreateCamera(IWorld world, ITileLayer playerLayer)
+        {
+            var positionObject = playerLayer.Objects.FirstOrDefault(o => o.Name == "PlayerSpawn");
+            var position = new Vector2(400, 240);
+            if(positionObject != default)
+            {
+                position.X = (int)positionObject.X;
+                position.Y = (int)positionObject.Y;
+            }
             IEntity cameraEntity = world.CreateEntity();
-            cameraEntity.AddComponent(new TransformComponent { Position = new Vector2(400, 240), Rotation = 0f, Scale = Vector2.One });
+            cameraEntity.AddComponent(new TransformComponent { Position = position, Rotation = 0f, Scale = Vector2.One });
             cameraEntity.AddComponent(new CameraComponent(_graphicsDevice.Viewport) { Zoom = 1f });
             return cameraEntity;
         }

@@ -53,6 +53,7 @@ namespace Common.Interfaces
     public interface ITile
     {
         public int Id { get; set; }
+        public List<ITileObject> Objects { get; set; }
         public List<IProperty> Properties { get; set; }
         public List<ITileAnimationFrame> Animation { get; set; }
         // Add objectgroup or others as needed

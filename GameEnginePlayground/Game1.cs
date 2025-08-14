@@ -40,14 +40,13 @@ namespace GameEnginePlayground.Factories
             _graphics.SynchronizeWithVerticalRetrace = true;
             IsFixedTimeStep = true; 
             TargetElapsedTime = TimeSpan.FromSeconds(1.0 / 60.0);
-
-            _sceneFactory = new SceneFactory(_assetManager, _inputManager, GraphicsDevice, _timeManager);
             base.Initialize();
         }
         
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+            _sceneFactory = new SceneFactory(_assetManager, _inputManager, GraphicsDevice, _timeManager, _spriteBatch, _eventManager);
             _assetManager.Initialize(Content);         
             _keybindFactory.LoadContent();
             // TODO: use this.Content to load your game content here

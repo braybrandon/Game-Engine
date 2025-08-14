@@ -1,12 +1,6 @@
 ﻿using Common.Config;
 using Common.Interfaces;
-using GameEngine.IO.Asset;
 using GameEngine.IO.Asset.models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GameEnginePlayground.Factories
 {
@@ -18,7 +12,7 @@ namespace GameEnginePlayground.Factories
         }
         public ITileMap Create()
         {
-            var gameMap = _assetManager.Load<TileMap>(FileNameConfig.TestMap);
+            var gameMap = _assetManager.Load<TileMap>(FileNameConfig.GrassMap);
 
             foreach (var tileset in gameMap.Tilesets)
             {

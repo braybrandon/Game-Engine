@@ -24,6 +24,8 @@ namespace Common.Interfaces
             /// <param name="entity">The entity to destroy.</param>
             void DestroyEntity(IEntity entity);
 
+            void RemoveInactiveEntities();
+
             /// <summary>
             /// Checks if a given entity ID currently represents an active entity in this World.
             /// </summary>

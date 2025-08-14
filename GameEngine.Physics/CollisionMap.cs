@@ -6,21 +6,44 @@ namespace GameEngine.Physics
     public class CollisionMap: ICollisionMap
     {
         private readonly bool[,] _solidTiles;
+        private int _layerWidth;
+        private int _layerHeight;
+        private int _tileWidth;
+        private int _tileHeight;
+
+        public int TileWidth
+        {
+            get => _tileWidth;
+        }
+
+        public int TileHeight { get => _tileHeight; }
+
+        public int LayerWidth
+        {
+            get => _layerWidth;
+        }
+
+        public int LayerHeight { get => _layerHeight; }
 
         public CollisionMap(ITileMap map, ITileLayer layer)
         {
             _solidTiles = new bool[layer.Width, layer.Height];
+            _tileWidth = map.TileWidth;
+            _tileHeight = map.TileHeight;
+            _layerWidth = layer.Width;
+            _layerHeight = layer.Height;
 
             for (int y = 0; y < layer.Height; y++)
             {
                 for (int x = 0; x < layer.Width; x++)
                 {
+
                     int tileId = layer.GetTileId(x, y);
 
                     var tileset = map.GetTilesetForTile(tileId);
                     if (tileset == null) continue;
 
-                    var tile = tileset.Tiles?.FirstOrDefault(t => t.Id == tileId);
+                    var tile = tileset.Tiles?.FirstOrDefault(t => t.Id == tileId - 1);
                     if (tile == null) continue;
 
                     var prop = tile.Properties?.FirstOrDefault(p => p.Name == "IsSolid");
@@ -32,12 +55,12 @@ namespace GameEngine.Physics
             }
         }
 
-        public bool IsSolid(Rectangle boundingBox, int tileWidth, int tileHeight)
+        public bool IsSolid(Rectangle boundingBox)
         {
-            int left = boundingBox.Left / tileWidth;
-            int right = (boundingBox.Right - 1) / tileWidth;
-            int top = boundingBox.Top / tileHeight;
-            int bottom = (boundingBox.Bottom - 1) / tileHeight;
+            int left = boundingBox.Left / _tileWidth;
+            int right = (boundingBox.Right - 1) / _tileWidth;
+            int top = boundingBox.Top / _tileHeight;
+            int bottom = (boundingBox.Bottom - 1) / _tileHeight;
 
             for (int y = top; y <= bottom; y++)
             {
@@ -51,10 +74,10 @@ namespace GameEngine.Physics
             return false;
         }
 
-        public bool IsSolid(Vector2 position, int tileWidth, int tileHeight)
+        public bool IsSolid(Vector2 position)
         {
-            int x = (int)(position.X / tileWidth);
-            int y = (int)(position.Y / tileHeight);
+            int x = (int)(position.X / _tileWidth);
+            int y = (int)(position.Y / _tileHeight);
             return IsSolid(x, y);
         }
 

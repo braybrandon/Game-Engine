@@ -1,0 +1,237 @@
+{ "compressionlevel":-1,
+ "height":20,
+ "infinite":false,
+ "layers":[
+        {
+         "data":[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            1, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 1,
+            1, 17, 9, 17, 2, 3, 4, 17, 9, 8, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 9, 9, 1,
+            1, 9, 17, 9, 10, 11, 11, 4, 17, 16, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 1,
+            1, 17, 9, 17, 10, 11, 11, 11, 6, 20, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 1,
+            1, 9, 17, 9, 18, 19, 19, 20, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 9, 9, 17, 9, 17, 9, 17, 9, 17, 1,
+            1, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 1,
+            1, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 9, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 1,
+            1, 17, 9, 17, 9, 17, 9, 9, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 1,
+            1, 9, 17, 9, 17, 9, 17, 9, 17, 9, 9, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 9, 9, 17, 9, 17, 9, 17, 1,
+            1, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 1,
+            1, 9, 17, 9, 17, 9, 9, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 9, 1,
+            1, 17, 9, 17, 9, 17, 9, 9, 9, 17, 17, 17, 9, 17, 9, 9, 9, 17, 9, 17, 9, 9, 9, 17, 9, 9, 9, 17, 9, 1,
+            1, 9, 17, 9, 17, 9, 17, 9, 9, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 1,
+            1, 17, 9, 17, 9, 17, 9, 17, 9, 17, 17, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 9, 9, 1,
+            1, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 1,
+            1, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 1,
+            1, 9, 17, 9, 17, 9, 17, 9, 9, 9, 17, 9, 17, 9, 17, 9, 17, 9, 9, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 1,
+            1, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 17, 9, 1,
+            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+         "height":20,
+         "id":1,
+         "name":"Tile Layer 1",
+         "opacity":1,
+         "type":"tilelayer",
+         "visible":true,
+         "width":30,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":2,
+         "name":"PlayerSpawn",
+         "objects":[
+                {
+                 "height":0,
+                 "id":1,
+                 "name":"PlayerSpawn",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":230,
+                 "y":150
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }],
+ "nextlayerid":3,
+ "nextobjectid":2,
+ "orientation":"orthogonal",
+ "renderorder":"right-down",
+ "tiledversion":"1.11.2",
+ "tileheight":16,
+ "tilesets":[
+        {
+         "columns":8,
+         "firstgid":1,
+         "image":"Pixel Art tutorial\/grass_dirt.png",
+         "imageheight":48,
+         "imagewidth":128,
+         "margin":0,
+         "name":"grass_dirt",
+         "spacing":0,
+         "tilecount":24,
+         "tileheight":16,
+         "tiles":[
+                {
+                 "id":0,
+                 "properties":[
+                        {
+                         "name":"IsSolid",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":1,
+                 "properties":[
+                        {
+                         "name":"IsDirt",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":2,
+                 "properties":[
+                        {
+                         "name":"IsDirt",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":3,
+                 "properties":[
+                        {
+                         "name":"IsDirt",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":4,
+                 "properties":[
+                        {
+                         "name":"IsDirt",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":5,
+                 "properties":[
+                        {
+                         "name":"IsDirt",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":6,
+                 "properties":[
+                        {
+                         "name":"IsDirt",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":7,
+                 "properties":[
+                        {
+                         "name":"IsDirt",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":9,
+                 "properties":[
+                        {
+                         "name":"IsDirt",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":10,
+                 "properties":[
+                        {
+                         "name":"IsDirt",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":11,
+                 "properties":[
+                        {
+                         "name":"IsDirt",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":13,
+                 "properties":[
+                        {
+                         "name":"IsDirt",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":15,
+                 "properties":[
+                        {
+                         "name":"IsDirt",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":17,
+                 "properties":[
+                        {
+                         "name":"IsDirt",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":18,
+                 "properties":[
+                        {
+                         "name":"IsDirt",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":19,
+                 "properties":[
+                        {
+                         "name":"IsDirt",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":23,
+                 "properties":[
+                        {
+                         "name":"IsDirt",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }],
+         "tilewidth":16
+        }],
+ "tilewidth":16,
+ "type":"map",
+ "version":"1.10",
+ "width":30
+}

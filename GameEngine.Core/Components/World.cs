@@ -153,6 +153,7 @@ namespace GameEngine.Core.Components
         // --- Entity Management Fields ---
         private int _nextEntityId = 0; // Counter for generating unique entity IDs
         private readonly HashSet<int> _activeEntityIds = new HashSet<int>(); // Stores IDs of currently active entities
+        private readonly HashSet<int> _entitiesToDestroy = new HashSet<int>();
 
         // --- Component Storage Field (Now using Component Pools) ---
         // Outer Dictionary maps Component Type -> IComponentPool instance for that type
@@ -179,33 +180,34 @@ namespace GameEngine.Core.Components
             return new Entity(entityId, this); // Create and return the Entity struct, linking it to this World instance
         }
 
-        /// <summary>
-        /// Destroys an entity and removes all its associated components from this World.
-        /// </summary>
-        /// <param name="entity">The entity to destroy.</param>
         public void DestroyEntity(IEntity entity)
         {
-            // Check if the entity is actually active in this world before attempting to destroy
             if (!_activeEntityIds.Contains(entity.Id))
             {
-                // Optionally log a warning if trying to destroy an already inactive/non-existent entity
                 return;
             }
 
-            _activeEntityIds.Remove(entity.Id); // Mark the entity ID as inactive
+            _activeEntityIds.Remove(entity.Id);
+            _entitiesToDestroy.Add(entity.Id);
+        }
 
-            // Iterate over a copy of component types to safely remove components
-            foreach (var componentType in _componentPools.Keys.ToList())
+        public void RemoveInactiveEntities()
+        {
+            foreach (var entityId in _entitiesToDestroy)
             {
-                // If this component type exists and has a component for the given entity ID
-                if (_componentPools.TryGetValue(componentType, out var pool))
+                foreach (var componentType in _componentPools.Keys.ToList())
                 {
-                    if (pool.Has(entity.Id)) // Check if this specific entity has the component in this pool
+                    if (_componentPools.TryGetValue(componentType, out var pool))
                     {
-                        pool.Remove(entity.Id); // Remove the component instance from its pool
+                        if (pool.Has(entityId))
+                        {
+                            pool.Remove(entityId);
+                        }
                     }
                 }
             }
+
+            _entitiesToDestroy.Clear(); // Clear the list for the next frame
         }
 
         /// <summary>

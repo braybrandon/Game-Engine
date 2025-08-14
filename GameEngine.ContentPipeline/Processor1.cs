@@ -2,6 +2,7 @@
 using GameEngine.ContentPipeline;
 using GameEngine.IO.Asset.models;
 using Microsoft.Xna.Framework.Content.Pipeline;
+using MonoGame.Extended.Collisions.Layers;
 using System;
 using System.Linq;
 using System.Text.Json;
@@ -56,6 +57,20 @@ public class TiledProcessor : ContentProcessor<TiledMapRaw, TileMap>
                 Tiles = ts.tiles?.Select(tile => new Tile
                 {
                     Id = tile.id,
+                    Objects = tile.objectgroup?.objects?.Select(obj => new TileObject
+                    {
+                        Gid = obj.gid,
+                        Height = obj.height,
+                        Id = obj.id,
+                        Name = obj.name,
+                        Point = obj.point,
+                        Rotation = obj.rotation,
+                        Type = obj.type,
+                        Visible = obj.visible,
+                        Width = obj.width,
+                        X = obj.x,
+                        Y = obj.y
+                    }).ToList<ITileObject>(),
                     Properties = tile.properties?.Select(p => new Property
                     {
                         Name = p.name,
@@ -89,10 +104,44 @@ public class TiledProcessor : ContentProcessor<TiledMapRaw, TileMap>
                 };
                 tileMap.Layers.Add(tileLayer);
             }
+            else if (layer.type == "objectgroup")
+            {
+                TileLayer tileLayer = new TileLayer
+                {
+                    Name = layer.name,
+                    Type = layer.type,
+                    Draworder = layer.draworder,
+                    Id = layer.id,
+                    Objects = layer.objects.Select(obj => new TileObject
+                    {
+                        Gid = obj.gid,
+                        Height = obj.height,
+                        Id = obj.id,
+                        Name = obj.name,
+                        Point = obj.point,
+                        Rotation = obj.rotation,
+                        Type = obj.type,
+                        Visible = obj.visible,
+                        Width = obj.width,
+                        X = obj.x,
+                        Y = obj.y
+                    }).ToList<ITileObject>(),
+                    Opacity = layer.opacity,
+                    Visible = layer.visible,
+                    X = layer.x,
+                    Y = layer.y
+                };
+                if(layer.name == "PlayerSpawn")
+                    tileMap.PlayerLayer = tileLayer;
+                else if(layer.name == "Grass")
+                    tileMap.ObjectTileLayer = tileLayer;
+                else if(layer.name == "Trees")
+                    tileMap.TreeLayer = tileLayer;
+                }
         }
 
-        return tileMap;
-    }
+            return tileMap;
+ }
 
     private object ParseTiledValue(string type, JsonElement value)
     {

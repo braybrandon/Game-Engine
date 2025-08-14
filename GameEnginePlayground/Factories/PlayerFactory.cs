@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace GameEnginePlayground.Factories
 {
@@ -16,19 +17,28 @@ namespace GameEnginePlayground.Factories
         private const int SPRITE_WIDTH = 32;
         private const int SPRITE_HEIGHT = 32;
         private IWorld _world;
+        private ITileLayer _playerLayer;
 
-        public PlayerFactory(GraphicsDevice graphicsDevice, IAssetManager assetManager, IWorld world)
+        public PlayerFactory(GraphicsDevice graphicsDevice, IAssetManager assetManager, IWorld world, ITileLayer playerLayer)
         {
             _graphicsDevice = graphicsDevice;
             _assetManager = assetManager;
             _world = world;
+            _playerLayer = playerLayer;
         }
         public IEntity Create()
         {
+            var positionObject = _playerLayer.Objects.FirstOrDefault(o => o.Name == "PlayerSpawn");
+            var position = new Vector2(400, 240);
+            if (positionObject != default)
+            {
+                position.X = (int)positionObject.X;
+                position.Y = (int)positionObject.Y;
+            }
             var playerEntity = _world.CreateEntity();
-            playerEntity.AddComponent(new TransformComponent { Position = new Vector2(_graphicsDevice.Viewport.Width / 2 - 50 , _graphicsDevice.Viewport.Height / 2), Rotation = 0f, Scale = Vector2.One });
+            playerEntity.AddComponent(new TransformComponent { Position = position, Rotation = 0f, Scale = Vector2.One });
             playerEntity.AddComponent(new VelocityComponent { Value = Vector2.Zero });
-            playerEntity.AddComponent(new HealthComponent { CurrentHealth = 130, MaxHealth = 100 });
+            playerEntity.AddComponent(new HealthComponent { CurrentHealth = 100, MaxHealth = 100 });
             playerEntity.AddComponent(new PlayerInputComponent { IsPlayerControlled = true });
             playerEntity.AddComponent(new AnimationComponent { Clips = new Dictionary<AnimationType, AnimationClip>(), CurrentClipName = AnimationType.Idle });
 
@@ -42,8 +52,8 @@ namespace GameEnginePlayground.Factories
             Texture2D _playerWalkUpLeftTexture = _assetManager.LoadTexture(FileNameConfig.PlayerCharacterUpLeft);
             Texture2D _playerWalkDownLeftTexture = _assetManager.LoadTexture(FileNameConfig.PlayerCharacterDownLeft);
 
-            if (playerEntity.HasComponent<TransformComponent>())
-            {
+
+            
                 playerEntity.AddComponent(new SpriteComponent
                 {
                     Texture = _playerTexture,
@@ -55,7 +65,7 @@ namespace GameEnginePlayground.Factories
                     Effects = SpriteEffects.None,
                     LayerDepth = 0f
                 });
-            }
+
 
             // --- Define Player Animations ---
             ref var playerAnimationComponent = ref playerEntity.GetComponent<AnimationComponent>();

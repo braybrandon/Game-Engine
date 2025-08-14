@@ -1,16 +1,6 @@
-﻿using Common.Config;
-using Common.Interfaces;
+﻿using Common.Interfaces;
 using GameEngine.Core.Components;
-using GameEngine.Core.Services;
-using GameEngine.Graphics.Animations;
-using GameEngine.Graphics.Camera;
-using GameEngine.Graphics.Render;
-using GameEngine.IO.Asset.models;
-using GameEngine.IO.Controller;
-using GameEngine.Physics.Motion;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 using System.Collections.Generic;
 
 namespace GameEnginePlayground
@@ -25,6 +15,7 @@ namespace GameEnginePlayground
         public TestScene()
         {
             _world = new World();
+
         }
 
         public IWorld GetWorld()
@@ -64,6 +55,7 @@ namespace GameEnginePlayground
                 {
                     system.Update(_world);
                 }
+            _world.RemoveInactiveEntities();
         }
         public void Draw(SpriteBatch spriteBatch)
         {

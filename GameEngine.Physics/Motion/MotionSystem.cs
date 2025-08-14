@@ -1,7 +1,10 @@
-﻿using Common.Interfaces;
+﻿using Common.Components;
+using Common.Events;
+using Common.Interfaces;
 using GameEngine.Core.Components;
 using GameEngine.Core.Services;
 using Microsoft.Xna.Framework;
+using System.Diagnostics;
 
 namespace GameEngine.Physics.Motion
 {
@@ -16,24 +19,25 @@ namespace GameEngine.Physics.Motion
             _collisionMap = new CollisionMap(tileMap, tileMap.Layers[0]);
         }
 
+
         public void Update(IWorld world)
         {
             float dt = _timeManager.ScaledDeltaTime;
 
-            foreach (var entity in world.GetEntitiesWith<TransformComponent, VelocityComponent>())
+            foreach (var player in world.GetEntitiesWith<TransformComponent, VelocityComponent>())
             {
                 // Get copies of the components
-                ref var velocity = ref entity.GetComponent<VelocityComponent>();
-                ref var transform = ref entity.GetComponent<TransformComponent>();
+                ref var velocity = ref player.GetComponent<VelocityComponent>();
+                ref var transform = ref player.GetComponent<TransformComponent>();
 
                 Vector2 proposedPosition = transform.Position + velocity.Value * dt;
 
                    // Default to 32x32 if no collider is available
                 Rectangle colliderBounds = new Rectangle(-16, -16, 32, 32);
 
-                if (entity.HasComponent<ColliderComponent>())
+                if (player.HasComponent<ColliderComponent>())
                 {
-                    ref var collider = ref entity.GetComponent<ColliderComponent>();
+                    ref var collider = ref player.GetComponent<ColliderComponent>();
                     colliderBounds = collider.Bounds;
                 }
 
@@ -43,14 +47,25 @@ namespace GameEngine.Physics.Motion
                     colliderBounds.Width,
                     colliderBounds.Height
                 );
-
-
-
-                if (!_collisionMap.IsSolid(bounds, 16, 16))
+                var collides = false;
+                foreach(var entity in world.GetEntitiesWith<ColliderComponent>())
+                {
+                    
+                    if (player.Id == entity.Id) continue;
+                    ref var collider = ref entity.GetComponent<ColliderComponent>();
+                    if (!collider.IsStatic) continue;
+                    ref var entTransform = ref entity.GetComponent<TransformComponent>();
+                    var bottomBounds = new Rectangle(bounds.X, bounds.Y + bounds.Height - 1, colliderBounds.Width, 1);
+                    var entBounds = new Rectangle((int)entTransform.Position.X - collider.Bounds.X, (int)entTransform.Position.Y - collider.Bounds.Y, collider.Bounds.Width, collider.Bounds.Height);
+                    collides = entBounds.Intersects(bottomBounds);
+                    if (collides) break;
+                }
+  
+                if (!_collisionMap.IsSolid(bounds) && !collides)
                 {
                     transform.Position = proposedPosition;
                 }
-                
+
             }
         }
     }
