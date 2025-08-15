@@ -1,7 +1,6 @@
 ﻿using Common.Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 namespace GameEngine.Core.Components
 {
     public struct HealthComponent : IComponent

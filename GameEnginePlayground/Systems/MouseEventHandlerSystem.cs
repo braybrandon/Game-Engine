@@ -1,18 +1,13 @@
 ﻿using Common.Components;
-using Common.Config;
 using Common.Events;
 using Common.Interfaces;
 using Common.Physics.Components;
 using GameEngine.Core.Components;
 using GameEngine.Graphics.Camera;
-using GameEngine.IO.Asset;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Extended.Collisions.Layers;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Reflection.Emit;
 
 namespace GameEnginePlayground.Systems
 {

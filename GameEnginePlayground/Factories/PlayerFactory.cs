@@ -55,17 +55,18 @@ namespace GameEnginePlayground.Factories
             Texture2D _playerWalkDownRightTexture = _assetManager.LoadTexture(FileNameConfig.PlayerCharacterDownRight);
             Texture2D _playerWalkUpLeftTexture = _assetManager.LoadTexture(FileNameConfig.PlayerCharacterUpLeft);
             Texture2D _playerWalkDownLeftTexture = _assetManager.LoadTexture(FileNameConfig.PlayerCharacterDownLeft);
+            var bounds = CalculateAverageBounds(_playerWalkUpTexture, SPRITE_WIDTH, SPRITE_HEIGHT);
+            var origin = new Vector2(bounds.X + bounds.Width / 2, bounds.Y + bounds.Height / 2);
 
 
-            
-                playerEntity.AddComponent(new SpriteComponent
+            playerEntity.AddComponent(new SpriteComponent
                 {
                     Texture = _playerTexture,
                     SourceRectangle = _playerTexture.Bounds,
                     Color = Color.White,
                     Scale = 1f,
                     Rotation = 0f,
-                    Origin = new Vector2(_playerTexture.Width / 2, _playerTexture.Height / 2),
+                    Origin = origin,
                     Effects = SpriteEffects.None,
                     LayerDepth = 0f
                 });
@@ -86,7 +87,7 @@ namespace GameEnginePlayground.Factories
             };
 
             AddAnimation(ref playerAnimationComponent, AnimationType.WalkUp, _playerWalkUpTexture);
-            var bounds = CalculateAverageBounds(_playerWalkUpTexture, SPRITE_WIDTH, SPRITE_HEIGHT);
+
             playerEntity.AddComponent(new ColliderComponent { Bounds = bounds, IsTrigger = false, IsStatic = false });
             AddAnimation(ref playerAnimationComponent, AnimationType.WalkDown, _playerWalkDownTexture);
             AddAnimation(ref playerAnimationComponent, AnimationType.WalkLeft, _playerWalkLeftTexture);
