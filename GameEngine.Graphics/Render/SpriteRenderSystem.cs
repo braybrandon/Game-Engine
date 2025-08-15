@@ -1,4 +1,5 @@
 ﻿using Common.Interfaces;
+using Common.Physics.Components;
 using GameEngine.Core.Components;
 using GameEngine.Graphics.Camera;
 using Microsoft.Xna.Framework;

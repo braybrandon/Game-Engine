@@ -24,8 +24,4 @@
     <ProjectReference Include="..\GameEngine.Core\GameEngine.Engine.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="CollisionDetection\" />
-  </ItemGroup>
-
 </Project>

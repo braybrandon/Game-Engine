@@ -1,4 +1,6 @@
 ﻿using Common.Interfaces;
+using Common.IO.Components;
+using Common.Physics.Components;
 using GameEngine.Core.Components;
 using GameEngine.Core.Entities;
 using Microsoft.Xna.Framework;

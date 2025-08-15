@@ -1,5 +1,7 @@
 ﻿using Common.Config;
 using Common.Interfaces;
+using Common.IO.Components;
+using Common.Physics.Components;
 using GameEngine.Core.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -37,9 +39,11 @@ namespace GameEnginePlayground.Factories
             }
             var playerEntity = _world.CreateEntity();
             playerEntity.AddComponent(new TransformComponent { Position = position, Rotation = 0f, Scale = Vector2.One });
-            playerEntity.AddComponent(new VelocityComponent { Value = Vector2.Zero });
+            playerEntity.AddComponent(new ProposedPositionComponent { Value = position });
+            playerEntity.AddComponent(new SpeedComponent() { Value = 100f });
+            playerEntity.AddComponent(new DirectionComponent { Value = Vector2.Zero });
             playerEntity.AddComponent(new HealthComponent { CurrentHealth = 100, MaxHealth = 100 });
-            playerEntity.AddComponent(new PlayerInputComponent { IsPlayerControlled = true });
+            playerEntity.AddComponent(new PlayerInputComponent());
             playerEntity.AddComponent(new AnimationComponent { Clips = new Dictionary<AnimationType, AnimationClip>(), CurrentClipName = AnimationType.Idle });
 
             Texture2D _playerTexture = _assetManager.LoadTexture(FileNameConfig.Player);

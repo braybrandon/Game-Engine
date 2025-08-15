@@ -4,11 +4,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 namespace GameEngine.Core.Components
 {
-    public struct VelocityComponent : IComponent
-    {
-        public Vector2 Value; 
-    }
-
     public struct HealthComponent : IComponent
     
     {
@@ -29,22 +24,8 @@ namespace GameEngine.Core.Components
         public float LayerDepth;
     }
 
-    public struct PlayerInputComponent : IComponent
-    
-    {
-        public bool IsPlayerControlled;
-        public KeyboardState CurrentKeyboardState;
-        public KeyboardState PreviousKeyboardState;
-        public MouseState CurrentMouseState;
-        public MouseState PreviousMouseState;
-    }
 
-    public struct ColliderComponent : IComponent
-    {
-        public Rectangle Bounds; 
-        public bool IsTrigger;
-        public bool IsStatic;
-    }
+
 
     /// <summary>
     /// Represents a single animation clip.
@@ -119,18 +100,6 @@ namespace GameEngine.Core.Components
         }
     }
 
-    public struct TransformComponent : IComponent
-    {
-        public Vector2 Position;
-        public float Rotation;
-        public Vector2 Scale;
 
-        public Matrix GetWorldMatrix()
-        {
-            return Matrix.CreateScale(Scale.X, Scale.Y, 1f) *
-                Matrix.CreateRotationZ(Rotation) *
-                Matrix.CreateTranslation(Position.X, Position.Y, 0f);
-        }
-    }
     
 }

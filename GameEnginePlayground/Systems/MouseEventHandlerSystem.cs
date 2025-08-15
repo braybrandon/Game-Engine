@@ -2,6 +2,7 @@
 using Common.Config;
 using Common.Events;
 using Common.Interfaces;
+using Common.Physics.Components;
 using GameEngine.Core.Components;
 using GameEngine.Graphics.Camera;
 using GameEngine.IO.Asset;
@@ -52,7 +53,9 @@ namespace GameEnginePlayground.Systems
             float projectileSpeed = 200f;
             Texture2D _fireballtexture = _assetManager.LoadTexture("fireball");
             fireball.AddComponent(new TransformComponent { Position = new Vector2(transformComponent.Position.X, transformComponent.Position.Y), Rotation = 0f, Scale = Vector2.One });
-            fireball.AddComponent(new VelocityComponent { Value = direction * projectileSpeed });
+            fireball.AddComponent(new DirectionComponent { Value = direction });
+            fireball.AddComponent(new SpeedComponent { Value = projectileSpeed });
+            fireball.AddComponent(new ProposedPositionComponent());
             fireball.AddComponent(new LifetimeComponent(160));
             var bounds = new Rectangle(_fireballtexture.Width / 2, _fireballtexture.Height / 2, _fireballtexture.Width, _fireballtexture.Height) ;
             fireball.AddComponent(new ColliderComponent { Bounds = bounds, IsTrigger = false, IsStatic = false });

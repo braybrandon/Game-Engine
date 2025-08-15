@@ -97,6 +97,15 @@ namespace Common.Interfaces
             /// <typeparam name="T3">The third component type.</typeparam>
             /// <returns>An enumerable collection of matching Entity structs.</returns>
              IEnumerable<IEntity> GetEntitiesWith<T1, T2, T3>() where T1 : struct, IComponent where T2 : struct, IComponent where T3 : struct, IComponent;
+        /// <summary>
+        ///  Gets all active entities that have components of type T1, T2, T3, and T4.
+        /// </summary>
+        /// <typeparam name="T1"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <typeparam name="T4"></typeparam>
+        /// <returns></returns>
+        IEnumerable<IEntity> GetEntitiesWith<T1, T2, T3, T4>() where T1 : struct, IComponent where T2 : struct, IComponent where T3 : struct, IComponent where T4: struct, IComponent;
 
             // --- IDisposable Implementation ---
 
@@ -105,5 +114,5 @@ namespace Common.Interfaces
             /// This should be called when a World is no longer needed (e.g., when changing scenes).
             /// </summary>
             void Dispose();
-        }
+            }
     }

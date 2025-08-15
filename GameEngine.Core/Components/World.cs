@@ -379,6 +379,37 @@ namespace GameEngine.Core.Components
             }
         }
 
+        /// <summary>
+        /// Gets all active entities that have components of type T1, T2, and T3, T4.
+        /// </summary>
+        /// <typeparam name="T1"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <typeparam name="T4"></typeparam>
+        /// <returns></returns>
+        public IEnumerable<IEntity> GetEntitiesWith<T1, T2, T3, T4>() where T1 : struct, IComponent where T2 : struct, IComponent where T3 : struct, IComponent where T4 : struct, IComponent
+        {
+            // Try to get component pools for all four types
+            if (_componentPools.TryGetValue(typeof(T1), out var pool1) &&
+                _componentPools.TryGetValue(typeof(T2), out var pool2) &&
+                _componentPools.TryGetValue(typeof(T3), out var pool3) &&
+                _componentPools.TryGetValue(typeof(T4), out var pool4))
+            {
+                // Find common entity IDs across all four component sets
+                foreach (var entityId in pool1.GetEntityIds()
+                    .Intersect(pool2.GetEntityIds())
+                    .Intersect(pool3.GetEntityIds())
+                    .Intersect(pool4.GetEntityIds()))
+                {
+                    // Only yield entities that are currently active in the world
+                    if (_activeEntityIds.Contains(entityId))
+                    {
+                        yield return new Entity(entityId, this);
+                    }
+                }
+            }
+        }
+
         // --- IDisposable Implementation ---
 
         /// <summary>

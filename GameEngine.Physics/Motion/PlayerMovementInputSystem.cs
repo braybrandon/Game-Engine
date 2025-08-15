@@ -1,24 +1,23 @@
 ﻿using Common.Enums;
 using Common.Interfaces;
-using GameEngine.Core.Components;
+using Common.IO.Components;
+using Common.Physics.Components;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 
 namespace GameEngine.Physics.Motion
 {
-    public class CalculateVelocitySystem(IInputManager inputManager) : IUpdateSystem
+    public class PlayerMovementInputSystem(IInputManager inputManager) : IUpdateSystem
     {
         private float _playerSpeed = 100f;
         private IInputManager _inputManager = inputManager;
 
         public void Update(IWorld world)
         {
-            foreach (var entity in world.GetEntitiesWith<PlayerInputComponent, VelocityComponent>())
+            foreach (var entity in world.GetEntitiesWith<PlayerInputComponent, DirectionComponent>())
             {
-                ref VelocityComponent velocity = ref entity.GetComponent<VelocityComponent>();
-                ref PlayerInputComponent input = ref entity.GetComponent<PlayerInputComponent>();
-                // Player Movement Logic
-                velocity.Value = Vector2.Zero;
+                ref DirectionComponent direction = ref entity.GetComponent<DirectionComponent>();
+
+                direction.Value = Vector2.Zero;
                 Vector2 movement = Vector2.Zero;
 
                 if (_inputManager.IsKeyDown(InputAction.MoveUp)) movement.Y -= 1;
@@ -29,8 +28,8 @@ namespace GameEngine.Physics.Motion
                 if (movement != Vector2.Zero)
                 {
                     movement.Normalize();
-                    velocity.Value = movement * _playerSpeed;
                 }
+                direction.Value = movement;
             }
         }
     }

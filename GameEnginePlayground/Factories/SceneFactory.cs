@@ -1,12 +1,14 @@
 ﻿using Common.Components;
 using Common.Config;
 using Common.Interfaces;
+using Common.Physics.Components;
 using GameEngine.Core.Components;
 using GameEngine.Engine;
 using GameEngine.Graphics.Animations;
 using GameEngine.Graphics.Camera;
 using GameEngine.Graphics.Render;
 using GameEngine.Physics;
+using GameEngine.Physics.CollisionDetection;
 using GameEngine.Physics.Motion;
 using GameEnginePlayground.Systems;
 using Microsoft.Xna.Framework;
@@ -65,11 +67,13 @@ namespace GameEnginePlayground.Factories
 
             // 3. Register EngineSystems with the GameLoop
             // Order matters for systems that depend on each other's output!
-            scene.RegisterUpdateSystem(new MotionSystem(_timeManager, gameMap));
+            scene.RegisterUpdateSystem(new PlayerMovementInputSystem(_inputManager));
+            scene.RegisterUpdateSystem(new MovementSystem(_timeManager, gameMap));
+            scene.RegisterUpdateSystem(new CollisionSystem(collisionMap));
             scene.RegisterUpdateSystem(new AnimationStateSystem(_inputManager));
             scene.RegisterUpdateSystem(new AnimationSystem(_timeManager));
             scene.RegisterUpdateSystem(new CameraUpdateSystem(playerEntity.Id, _inputManager));
-            scene.RegisterUpdateSystem(new CalculateVelocitySystem(_inputManager));
+
             scene.RegisterUpdateSystem(new CullingSystem(cameraEntity, gameMap));
             scene.RegisterUpdateSystem(new MouseEventHandlerSystem(sceneWorld, cameraEntity, gameMap, _eventManager, playerEntity, _assetManager, _inputManager));
             scene.RegisterUpdateSystem(new ProjectileLiftetimeSystem(_timeManager));
