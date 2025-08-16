@@ -15,25 +15,14 @@
 
 ### Bug Fixes
 
-* **core:** add changelog for all libraries ([c70731f](https://github.com/braybrandon/Game-Engine/commit/c70731fa2a3ce3e6a9a480c8f0591c4af18948c2))
 * **GameEngine.Graphics:** clean up draw loop ([e69c4d5](https://github.com/braybrandon/Game-Engine/commit/e69c4d5dbf0dcae7e9090ea7c2e94dd6b8eb09cc))
-* **Physics:** fix release type to simple ([3341e4c](https://github.com/braybrandon/Game-Engine/commit/3341e4cf50e4ce4cc7cf9646d3a8025f31d650db))
 
 
 ### Documentation
 
-* **GameEngine.Core:** add commitlint configuration and Husky setup for commit message validation ([2d1adae](https://github.com/braybrandon/Game-Engine/commit/2d1adae6b4175ba599038ba0b8529daa1a92021e))
 * **GameEngine.Core:** change in documentation ([06914f0](https://github.com/braybrandon/Game-Engine/commit/06914f0917da45a707d695897dc680e028a52571))
 
 
 ### Code Refactoring
 
 * **GameEngine.Graphics:** Add 8 direction animation ([966a253](https://github.com/braybrandon/Game-Engine/commit/966a2530e398d69ef8efb6781587b3207a25cf43))
-
-## [0.0.1](https://github.com/braybrandon/Game-Engine/compare/v0.1.19-alpha.1...v0.0.1) (2025-07-27)
-
-
-### Bug Fixes
-
-* Fix playground Environment ([eaac320](https://github.com/braybrandon/Game-Engine/commit/eaac320f17f62ad008d6f47662338a853542dfea))
-* restructure engine libraries to core components ([78d8980](https://github.com/braybrandon/Game-Engine/commit/78d898051a13c3418f64539c92dd177eb7fd7603))
