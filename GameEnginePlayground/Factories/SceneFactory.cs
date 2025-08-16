@@ -2,6 +2,7 @@
 using Common.Config;
 using Common.Interfaces;
 using Common.Physics.Components;
+using Common.Physics.Interfaces;
 using GameEngine.Core.Components;
 using GameEngine.Engine;
 using GameEngine.Graphics.Animations;
@@ -9,6 +10,7 @@ using GameEngine.Graphics.Camera;
 using GameEngine.Graphics.Render;
 using GameEngine.Physics;
 using GameEngine.Physics.CollisionDetection;
+using GameEngine.Physics.CollisionDetection.Models;
 using GameEngine.Physics.Motion;
 using GameEnginePlayground.Systems;
 using Microsoft.Xna.Framework;
@@ -48,7 +50,8 @@ namespace GameEnginePlayground.Factories
         {
             IWorld sceneWorld = scene.GetWorld();
             var gameMap = _mapFactory.Create();
-            PlayerFactory playerFactory = new PlayerFactory(_graphicsDevice, _assetManager, sceneWorld, gameMap.PlayerLayer);
+            var quadtree = new Quadtree(new Rectangle(0, 0, gameMap.Width, gameMap.Height), 4);
+            PlayerFactory playerFactory = new PlayerFactory(_graphicsDevice, _assetManager, sceneWorld, gameMap.PlayerLayer, quadtree);
             IEntity playerEntity = playerFactory.Create();
             IEntity cameraEntity = CreateCamera(sceneWorld, gameMap.PlayerLayer);
 
@@ -56,10 +59,10 @@ namespace GameEnginePlayground.Factories
 
             cameraEntity.AddComponent(new CullingComponent { MaxX = 0, MaxY = 0, MinX = 0, MinY = 0 });
             var grassTexture = _assetManager.Load<Texture2D>("tall-grass");
-            AddObjects(gameMap, sceneWorld, gameMap.ObjectTileLayer, grassTexture);
+            AddObjects(gameMap, sceneWorld, gameMap.ObjectTileLayer, grassTexture, quadtree);
 
             var treeTexture = _assetManager.Load<Texture2D>("tree");
-            AddObjects(gameMap, sceneWorld, gameMap.TreeLayer, treeTexture);
+            AddObjects(gameMap, sceneWorld, gameMap.TreeLayer, treeTexture, quadtree);
 
             Texture2D _pixel = new Texture2D(_graphicsDevice, 1, 1);
             _pixel.SetData(new[] { Color.White });
@@ -69,14 +72,14 @@ namespace GameEnginePlayground.Factories
             // Order matters for systems that depend on each other's output!
             scene.RegisterUpdateSystem(new PlayerMovementInputSystem(_inputManager));
             scene.RegisterUpdateSystem(new MovementSystem(_timeManager, gameMap));
-            scene.RegisterUpdateSystem(new CollisionSystem(collisionMap));
+            scene.RegisterUpdateSystem(new CollisionSystem(collisionMap, quadtree));
             scene.RegisterUpdateSystem(new AnimationStateSystem(_inputManager));
             scene.RegisterUpdateSystem(new AnimationSystem(_timeManager));
             scene.RegisterUpdateSystem(new CameraUpdateSystem(playerEntity.Id, _inputManager));
 
             scene.RegisterUpdateSystem(new CullingSystem(cameraEntity, gameMap));
-            scene.RegisterUpdateSystem(new MouseEventHandlerSystem(sceneWorld, cameraEntity, gameMap, _eventManager, playerEntity, _assetManager, _inputManager));
-            scene.RegisterUpdateSystem(new ProjectileLiftetimeSystem(_timeManager));
+            scene.RegisterUpdateSystem(new MouseEventHandlerSystem(sceneWorld, cameraEntity, gameMap, _eventManager, playerEntity, _assetManager, _inputManager, quadtree));
+            scene.RegisterUpdateSystem(new ProjectileLiftetimeSystem(_timeManager, quadtree));
 
             var pp = _graphicsDevice.PresentationParameters;
             var mainTarget = new RenderTarget2D(_graphicsDevice, pp.BackBufferWidth, pp.BackBufferHeight);
@@ -87,10 +90,10 @@ namespace GameEnginePlayground.Factories
             scene.RegisterDrawSystem(new TileMapRenderSystem(gameMap, cameraEntity, mainTarget, _graphicsDevice));
             scene.RegisterDrawSystem(new SpriteRenderSystem(_pixel));
             //scene.RegisterDrawSystem(new LightFxRenderSystem(_graphicsDevice, playerEntity, cameraEntity, lightTarget, mainTarget, lightTexture, lightEffect));
-            scene.RegisterDrawSystem(new DebugRendererSystem(_pixel, cameraEntity, collisionMap));
+            //scene.RegisterDrawSystem(new DebugRendererSystem(_pixel, cameraEntity, collisionMap));
         }
 
-        private void AddObjects(ITileMap map, IWorld world, ITileLayer layer, Texture2D grassTexture)
+        private void AddObjects(ITileMap map, IWorld world, ITileLayer layer, Texture2D grassTexture, IQuadTree quadTree)
         {
             
             foreach (var item in layer.Objects)
@@ -108,7 +111,15 @@ namespace GameEnginePlayground.Factories
                     colliderWidth = tileset.Tiles[0].Objects[0].Width;
                     var colliderX = tileset.Tiles[0].Objects[0].X;
                     var colliderY = tileset.Tiles[0].Objects[0].Y;
-                    grass.AddComponent(new ColliderComponent { Bounds = new Rectangle((int)(- (colliderX - width/2)), (int)(- (colliderY-height/2)), (int)colliderWidth, (int)colliderHeight), IsStatic = true});
+                    var cbounds = new Rectangle((int)(-(colliderX - width / 2)), (int)(-(colliderY - height / 2)), (int)colliderWidth, (int)colliderHeight);
+                    grass.AddComponent(new ColliderComponent { Bounds = cbounds, IsStatic = true});
+                    var transformBounds = new Rectangle(
+                        (int)item.X - cbounds.X,
+                        (int)item.Y - cbounds.Y,
+                        cbounds.Width,
+                        cbounds.Height
+                    );
+                    quadTree.Insert(grass, transformBounds);
                 }
 
                 // Correctly calculate the tile ID and its row/column

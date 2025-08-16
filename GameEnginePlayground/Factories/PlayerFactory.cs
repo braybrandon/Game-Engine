@@ -2,6 +2,7 @@
 using Common.Interfaces;
 using Common.IO.Components;
 using Common.Physics.Components;
+using Common.Physics.Interfaces;
 using GameEngine.Core.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -20,13 +21,15 @@ namespace GameEnginePlayground.Factories
         private const int SPRITE_HEIGHT = 32;
         private IWorld _world;
         private ITileLayer _playerLayer;
+        IQuadTree _quadTree;
 
-        public PlayerFactory(GraphicsDevice graphicsDevice, IAssetManager assetManager, IWorld world, ITileLayer playerLayer)
+        public PlayerFactory(GraphicsDevice graphicsDevice, IAssetManager assetManager, IWorld world, ITileLayer playerLayer, IQuadTree quadTree)
         {
             _graphicsDevice = graphicsDevice;
             _assetManager = assetManager;
             _world = world;
             _playerLayer = playerLayer;
+            _quadTree = quadTree;
         }
         public IEntity Create()
         {
@@ -89,6 +92,13 @@ namespace GameEnginePlayground.Factories
             AddAnimation(ref playerAnimationComponent, AnimationType.WalkUp, _playerWalkUpTexture);
 
             playerEntity.AddComponent(new ColliderComponent { Bounds = bounds, IsTrigger = false, IsStatic = false });
+            var transformBounds = new Rectangle(
+                    (int)position.X - bounds.X,
+                    (int)position.Y - bounds.Y,
+                    bounds.Width,
+                    bounds.Height
+                );
+            _quadTree.Insert(playerEntity, transformBounds);
             AddAnimation(ref playerAnimationComponent, AnimationType.WalkDown, _playerWalkDownTexture);
             AddAnimation(ref playerAnimationComponent, AnimationType.WalkLeft, _playerWalkLeftTexture);
             AddAnimation(ref playerAnimationComponent, AnimationType.WalkRight, _playerWalkRightTexture);
