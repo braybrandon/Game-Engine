@@ -2,6 +2,7 @@
 using Common.Events;
 using Common.Interfaces;
 using Common.Physics.Components;
+using Common.Physics.Interfaces;
 using GameEngine.Core.Components;
 using GameEngine.Graphics.Camera;
 using Microsoft.Xna.Framework;
@@ -20,8 +21,9 @@ namespace GameEnginePlayground.Systems
         private readonly IEntity _playerEntity;
         private readonly IAssetManager _assetManager;
         private readonly IInputManager _inputManager;
+        private readonly IQuadTree _quadTree;
 
-        public MouseEventHandlerSystem(IWorld world, IEntity camera, ITileMap gameMap, IEventManager eventManager, IEntity playerEntity, IAssetManager assetManager, IInputManager inputManager)
+        public MouseEventHandlerSystem(IWorld world, IEntity camera, ITileMap gameMap, IEventManager eventManager, IEntity playerEntity, IAssetManager assetManager, IInputManager inputManager, IQuadTree quadTree)
         {
              _world = world;
              _camera = camera;
@@ -32,6 +34,7 @@ namespace GameEnginePlayground.Systems
             _assetManager = assetManager;
             _playerEntity = playerEntity;
             _inputManager = inputManager;
+            _quadTree = quadTree;
         }
 
         private void handleFireballEvent(FireballPressedEvent fireballPressed)
@@ -54,6 +57,8 @@ namespace GameEnginePlayground.Systems
             fireball.AddComponent(new LifetimeComponent(160));
             var bounds = new Rectangle(_fireballtexture.Width / 2, _fireballtexture.Height / 2, _fireballtexture.Width, _fireballtexture.Height) ;
             fireball.AddComponent(new ColliderComponent { Bounds = bounds, IsTrigger = false, IsStatic = false });
+
+            _quadTree.Insert(fireball, new Rectangle((int)transformComponent.Position.X - bounds.X, (int)transformComponent.Position.Y - bounds.Y, bounds.Width, bounds.Height));
 
             fireball.AddComponent(new SpriteComponent
             {

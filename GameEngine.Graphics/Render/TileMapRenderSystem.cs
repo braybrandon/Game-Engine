@@ -21,7 +21,7 @@ namespace GameEngine.Graphics.Render
             var viewMatrix = camera.ViewMatrix;
 
             //_graphicsDevice.SetRenderTarget(_mainTarget);
-            _graphicsDevice.Clear(Color.Black);
+            _graphicsDevice.Clear(Color.DarkGreen);
             _spriteBatch.Begin(transformMatrix: viewMatrix);
 
             foreach (var layer in _gameMap.Layers)
