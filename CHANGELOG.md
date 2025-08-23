@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.3](https://github.com/braybrandon/Game-Engine/compare/v0.1.2...v0.1.3) (2025-08-23)
+
+
+### Bug Fixes
+
+* update restore ([19d96ec](https://github.com/braybrandon/Game-Engine/commit/19d96ece48d483e06526b82a20f15960abf7debf))
+
 ## [0.1.2](https://github.com/braybrandon/Game-Engine/compare/v0.1.1...v0.1.2) (2025-08-23)
 
 
