@@ -71,12 +71,11 @@ namespace GameEnginePlayground.Factories
             // 3. Register EngineSystems with the GameLoop
             // Order matters for systems that depend on each other's output!
             scene.RegisterUpdateSystem(new PlayerMovementInputSystem(_inputManager));
-            scene.RegisterUpdateSystem(new MovementSystem(_timeManager, gameMap));
+            scene.RegisterUpdateSystem(new MovementSystem(_timeManager));
             scene.RegisterUpdateSystem(new CollisionSystem(collisionMap, quadtree));
             scene.RegisterUpdateSystem(new AnimationStateSystem(_inputManager));
             scene.RegisterUpdateSystem(new AnimationSystem(_timeManager));
             scene.RegisterUpdateSystem(new CameraUpdateSystem(playerEntity.Id, _inputManager));
-
             scene.RegisterUpdateSystem(new CullingSystem(cameraEntity, gameMap));
             scene.RegisterUpdateSystem(new MouseEventHandlerSystem(sceneWorld, cameraEntity, gameMap, _eventManager, playerEntity, _assetManager, _inputManager, quadtree));
             scene.RegisterUpdateSystem(new ProjectileLiftetimeSystem(_timeManager, quadtree));
