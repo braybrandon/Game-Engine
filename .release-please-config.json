@@ -30,10 +30,15 @@
         "Directory.Build.props" 
       ]
     },
-    "GameEngine.Core": {
-      "path": "GameEngine.Core",
+    "GameEngine.Common": {
+      "path": "GameEngine.Common",
       "release-type": "simple",
-      "changelog-path": "GameEngine.Core/CHANGELOG.md"
+      "changelog-path": "GameEngine.Common/CHANGELOG.md"
+    },
+    "GameEngine.Core": {
+      "path": "GameEngine.Engine",
+      "release-type": "simple",
+      "changelog-path": "GameEngine.Engine/CHANGELOG.md"
     },
     "GameEngine.Graphics": {
       "path": "GameEngine.Graphics",

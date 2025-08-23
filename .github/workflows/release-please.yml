@@ -46,14 +46,30 @@ jobs:
         if: ${{ steps.release.outputs.release_created }}
         run: dotnet build GameEngine.sln --configuration Release --no-restore
 
-      - name: Pack All NuGet packages with Release Version
+      # 🚫 Do NOT pack the whole solution; only pack libraries explicitly.
+      - name: Pack NuGet (libraries only)
         if: ${{ steps.release.outputs.release_created }}
+        shell: bash
         run: |
+          set -e
           RELEASE_VERSION="${{ steps.release.outputs.version }}"
-          echo "Packing NuGet packages with version: $RELEASE_VERSION"
-          dotnet pack GameEngine.sln --configuration Release --output .nupkg /p:Version=$RELEASE_VERSION --no-build
+          echo "Packing libraries with version: $RELEASE_VERSION"
 
-      - name: Push All NuGet packages to GitHub Packages
+          declare -a PROJECTS=(
+            "GameEngine.Common/GameEngine.Common.csproj"
+            "GameEngine.Engine/GameEngine.Engine.csproj"
+            "GameEngine.Graphics/GameEngine.Graphics.csproj"
+            "GameEngine.Physics/GameEngine.Physics.csproj"
+            "GameEngine.IO/GameEngine.IO.csproj"
+          )
+
+          mkdir -p .nupkg
+          for PROJ in "${PROJECTS[@]}"; do
+            echo "Packing $PROJ"
+            dotnet pack "$PROJ" -c Release -o .nupkg /p:Version="$RELEASE_VERSION" --no-build
+          done
+
+      - name: Push NuGet packages to GitHub Packages
         if: ${{ steps.release.outputs.release_created }}
         run: dotnet nuget push .nupkg/*.nupkg --api-key "$GITHUB_TOKEN" --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json --skip-duplicate
         env:
@@ -79,21 +95,11 @@ jobs:
               "",
               "**GitHub Packages:**",
               "",
-              "- [GameEngine.AI](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/pkgs/nuget/GameEngine.AI)",
-              "- [GameEngine.Animation](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/pkgs/nuget/GameEngine.Animation)",
-              "- [GameEngine.Assets](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/pkgs/nuget/GameEngine.Assets)",
-              "- [GameEngine.Audio](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/pkgs/nuget/GameEngine.Audio)",
-              "- [GameEngine.Core](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/pkgs/nuget/GameEngine.Core)",
-              "- [GameEngine.Input](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/pkgs/nuget/GameEngine.Input)",
-              "- [GameEngine.Particles](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/pkgs/nuget/GameEngine.Particles)",
+              "- [GameEngine.Common](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/pkgs/nuget/GameEngine.Common)",
+              "- [GameEngine.Engine](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/pkgs/nuget/GameEngine.Engine)",
+              "- [GameEngine.Graphics](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/pkgs/nuget/GameEngine.Graphics)",
               "- [GameEngine.Physics](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/pkgs/nuget/GameEngine.Physics)",
-              "- [GameEngine.Rendering](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/pkgs/nuget/GameEngine.Rendering)",
-              "- [GameEngine.SaveLoad](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/pkgs/nuget/GameEngine.SaveLoad)",
-              "- [GameEngine.Scene](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/pkgs/nuget/GameEngine.Scene)",
-              "- [GameEngine.State](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/pkgs/nuget/GameEngine.State)",
-              "- [GameEngine.Tiles](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/pkgs/nuget/GameEngine.Tiles)",
-              "- [GameEngine.UI](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/pkgs/nuget/GameEngine.UI)",
-              "- [GameEnginePlayground](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/pkgs/nuget/GameEnginePlayground)",
+              "- [GameEngine.IO](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/pkgs/nuget/GameEngine.IO)",
               "",
               "**Direct Downloads (Release Assets):**",
               "",
@@ -101,7 +107,7 @@ jobs:
             ];
 
             const footerContent = footerLines.join('\n');
-            const newBody = currentBody + '\n\n' + footerContent;
+            const newBody = (currentBody || "") + '\n\n' + footerContent;
 
             console.log("Updating release with new body...");
             try {
