@@ -1,6 +1,7 @@
 ﻿using Common.Interfaces;
 using Common.Physics.Interfaces;
 using Microsoft.Xna.Framework;
+using System.Collections.Generic;
 
 namespace GameEngine.Physics.CollisionDetection.Models
 {
