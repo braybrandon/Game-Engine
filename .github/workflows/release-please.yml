@@ -148,4 +148,4 @@ jobs:
               console.log(`Successfully updated release ${releaseId}.`);
             } catch (error) {
               core.setFailed(`Failed to update release: ${error.message}`);
-            }
+            } 
