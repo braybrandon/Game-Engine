@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.2](https://github.com/braybrandon/Game-Engine/compare/v0.1.1...v0.1.2) (2025-08-23)
+
+
+### Bug Fixes
+
+* update to build only the libraries ([48d8e2f](https://github.com/braybrandon/Game-Engine/commit/48d8e2fbb119e90bdac66ff27753505a27dce03e))
+
 ## [0.1.1](https://github.com/braybrandon/Game-Engine/compare/v0.1.0...v0.1.1) (2025-08-23)
 
 
