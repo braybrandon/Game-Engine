@@ -8,12 +8,14 @@ using GameEngine.Engine;
 using GameEngine.Graphics.Animations;
 using GameEngine.Graphics.Camera;
 using GameEngine.Graphics.Render;
+using GameEngine.IO.Audio;
 using GameEngine.Physics;
 using GameEngine.Physics.CollisionDetection;
 using GameEngine.Physics.CollisionDetection.Models;
 using GameEngine.Physics.Motion;
 using GameEnginePlayground.Systems;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using System.Linq;
 
@@ -22,6 +24,7 @@ namespace GameEnginePlayground.Factories
     public class SceneFactory : IFactory<IScene>
     {
         private readonly IAssetManager _assetManager;
+        private readonly IAudioManager _audioManager;
         private readonly IInputManager _inputManager;
         private readonly GraphicsDevice _graphicsDevice;
         private readonly ITimeManager _timeManager;
@@ -29,8 +32,9 @@ namespace GameEnginePlayground.Factories
         private readonly SpriteBatch _spriteBatch;
         private readonly IEventManager _eventManager;
 
-        public SceneFactory(IAssetManager assetManager, IInputManager inputManager, GraphicsDevice graphicsDevice, ITimeManager timeManager, SpriteBatch spriteBatch, IEventManager eventManager) {
+        public SceneFactory(IAssetManager assetManager, IAudioManager audioManager, IInputManager inputManager, GraphicsDevice graphicsDevice, ITimeManager timeManager, SpriteBatch spriteBatch, IEventManager eventManager) {
             _assetManager = assetManager;
+            _audioManager = audioManager;
             _inputManager = inputManager;
             _graphicsDevice = graphicsDevice;
             _timeManager = timeManager;
@@ -55,7 +59,10 @@ namespace GameEnginePlayground.Factories
             IEntity playerEntity = playerFactory.Create();
             IEntity cameraEntity = CreateCamera(sceneWorld, gameMap.PlayerLayer);
 
-
+            SoundEffect fireballSfx = _assetManager.Load<SoundEffect>("fireball-sound");
+            SoundEffect shovelSfx = _assetManager.Load<SoundEffect>("shovel-sound");
+            _audioManager.RegisterSfx("fireball.shoot", fireballSfx);
+            _audioManager.RegisterSfx("shovel.dig", shovelSfx);
 
             cameraEntity.AddComponent(new CullingComponent { MaxX = 0, MaxY = 0, MinX = 0, MinY = 0 });
             var grassTexture = _assetManager.Load<Texture2D>("tall-grass");
@@ -78,7 +85,7 @@ namespace GameEnginePlayground.Factories
             scene.RegisterUpdateSystem(new CameraUpdateSystem(playerEntity.Id, _inputManager));
 
             scene.RegisterUpdateSystem(new CullingSystem(cameraEntity, gameMap));
-            scene.RegisterUpdateSystem(new MouseEventHandlerSystem(sceneWorld, cameraEntity, gameMap, _eventManager, playerEntity, _assetManager, _inputManager, quadtree));
+            scene.RegisterUpdateSystem(new MouseEventHandlerSystem(sceneWorld, cameraEntity, gameMap, _eventManager, playerEntity, _assetManager, _audioManager, _inputManager, quadtree));
             scene.RegisterUpdateSystem(new ProjectileLiftetimeSystem(_timeManager, quadtree));
 
             var pp = _graphicsDevice.PresentationParameters;

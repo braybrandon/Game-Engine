@@ -1,6 +1,7 @@
 ﻿using Common.Interfaces;
 using GameEngine.Core.Services;
 using GameEngine.IO.Asset;
+using GameEngine.IO.Audio;
 using GameEngine.IO.Controller;
 using GameEnginePlayground;
 using GameEnginePlayground.Factories;
@@ -12,6 +13,7 @@ var services = new ServiceCollection();
 // Register core services
 services.AddSingleton<IEventManager, EventManager>();
 services.AddSingleton<IAssetManager, AssetManager>();
+services.AddSingleton<IAudioManager, AudioManager>();
 services.AddSingleton<IInputManager, InputManager>();
 services.AddSingleton<IKeybindFactory, KeybindFactory>();
 

@@ -26,6 +26,12 @@
 /processorParam:TextureFormat=Color
 /build:Dungeon_Tiles.png
 
+#begin fireball-sound.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:fireball-sound.mp3
+
 #begin fireball.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -334,6 +340,12 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Player/Character_UpRight.png
+
+#begin shovel-sound.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:shovel-sound.mp3
 
 #begin tall-grass.png
 /importer:TextureImporter
