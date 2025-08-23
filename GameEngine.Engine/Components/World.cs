@@ -1,4 +1,5 @@
-﻿using Common.Interfaces;
+﻿
+using Common.Interfaces;
 using GameEngine.Core.Entities;
 
 namespace GameEngine.Core.Components
