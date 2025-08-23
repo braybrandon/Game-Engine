@@ -38,13 +38,29 @@ jobs:
         env:
           NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      # Restore the whole solution (OK if it includes tools; we just won't build them)
       - name: Restore dependencies
         if: ${{ steps.release.outputs.release_created }}
         run: dotnet restore GameEngine.sln
 
-      - name: Build Solution
+      # ✅ Build ONLY the library projects (avoid Windows-targeting apps/tools)
+      - name: Build libraries
         if: ${{ steps.release.outputs.release_created }}
-        run: dotnet build GameEngine.sln --configuration Release --no-restore
+        shell: bash
+        run: |
+          set -e
+          declare -a PROJECTS=(
+            "GameEngine.Common/GameEngine.Common.csproj"
+            "GameEngine.Engine/GameEngine.Engine.csproj"
+            "GameEngine.Graphics/GameEngine.Graphics.csproj"
+            "GameEngine.Physics/GameEngine.Physics.csproj"
+            "GameEngine.IO/GameEngine.IO.csproj"
+          )
+
+          for PROJ in "${PROJECTS[@]}"; do
+            echo "Building $PROJ"
+            dotnet build "$PROJ" -c Release --no-restore
+          done
 
       # 🚫 Do NOT pack the whole solution; only pack libraries explicitly.
       - name: Pack NuGet (libraries only)
