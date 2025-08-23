@@ -1,7 +1,7 @@
 {
-  ".": "0.0.1",
-  "GameEngine.Core": "0.0.1",
-  "GameEngine.Graphics": "0.0.1",
-  "GameEngine.Physics": "0.0.1",
-  "GameEngine.IO": "0.0.1"
+  ".": "0.1.0",
+  "GameEngine.Core": "0.1.0",
+  "GameEngine.Graphics": "0.1.0",
+  "GameEngine.Physics": "0.1.0",
+  "GameEngine.IO": "0.1.0"
 }
