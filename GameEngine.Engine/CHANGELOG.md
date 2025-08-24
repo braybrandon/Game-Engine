@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.0.1](https://github.com/braybrandon/Game-Engine/compare/v0.0.1...v0.0.1) (2025-08-24)
+
+
+### ⚠ BREAKING CHANGES
+
+* **engine:** Some types/namespaces moved and external library references were removed. Consumers may need to update using statements, DI registrations, and project references.
+
+### Code Refactoring
+
+* **engine:** clean up GameEngine.Engine — restructure, docs, decouple ([58f8d48](https://github.com/braybrandon/Game-Engine/commit/58f8d481363d005af60855b5893917e9f35a133b))
+
+
+### Other Changes
+
+* release 0.0.1 ([f3d4a0d](https://github.com/braybrandon/Game-Engine/commit/f3d4a0d80a8d843a5163cf61689ff92794df242e))
+
 ## 0.0.1 (2025-08-24)
 
 
