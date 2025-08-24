@@ -352,15 +352,51 @@ jobs:
 
             // Utility: sort semver-like tags descending for a given component prefix
             function sortBySemverDesc(component, items) {
-              const sv = (t) => t.replace(new RegExp(`^${component}-v`, 'i'), '');
+              const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+              const comp = escapeRegExp(component);
+
+              const tagOf = (it) => (it.tag ?? it.tag_name ?? '');
+              const isIndexTag = (t) => new RegExp(`^${comp}-index$`, 'i').test(t);
+
+              // Extract "X.Y.Z" part from "<component>-vX.Y.Z"
+              const semverStr = (t) => {
+                const m = t.match(new RegExp(`^${comp}-v(.+)$`, 'i'));
+                return m ? m[1] : '';
+              };
+
+              // Parse semver-ish string into number tuple for comparison
+              const parseParts = (sv) =>
+                sv.split(/[.+-]/).map((n) => {
+                  const v = parseInt(n, 10);
+                  return Number.isFinite(v) ? v : 0;
+                });
+
+              const timeOf = (it) => Date.parse(it.published_at || it.created_at || 0) || 0;
+
               return items.sort((a, b) => {
-                const pa = sv(a.tag).split(/[.+-]/).map(n => parseInt(n, 10) || 0);
-                const pb = sv(b.tag).split(/[.+-]/).map(n => parseInt(n, 10) || 0);
-                for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
-                  const da = pa[i] || 0, db = pb[i] || 0;
-                  if (da !== db) return db - da; // desc
+                const ta = tagOf(a);
+                const tb = tagOf(b);
+
+                // 1) Consolidated "-index" releases first
+                const aIsIndex = isIndexTag(ta);
+                const bIsIndex = isIndexTag(tb);
+                if (aIsIndex !== bIsIndex) return aIsIndex ? -1 : 1;
+
+                // If both are index (rare), order by most recently published
+                if (aIsIndex && bIsIndex) return timeOf(b) - timeOf(a);
+
+                // 2) Then semver descending for normal releases
+                const pa = parseParts(semverStr(ta));
+                const pb = parseParts(semverStr(tb));
+                const len = Math.max(pa.length, pb.length);
+                for (let i = 0; i < len; i++) {
+                  const da = pa[i] || 0;
+                  const db = pb[i] || 0;
+                  if (da !== db) return db - da; // DESC
                 }
-                return 0;
+
+                // 3) Tie-break by publish time (newest first) to keep ordering sensible
+                return timeOf(b) - timeOf(a);
               });
             }
 
