@@ -3,5 +3,6 @@
   "GameEngine.Physics": "0.0.2",
   "GameEngine.Graphics": "0.0.2",
   "GameEngine.Gameplay": "0.0.2",
-  "GameEngine.Common": "0.0.2"
+  "GameEngine.Common": "0.0.2",
+  "GameEngine.Engine": "0.0.1"
 }
