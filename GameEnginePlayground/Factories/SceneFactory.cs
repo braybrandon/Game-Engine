@@ -3,10 +3,11 @@ using Common.Config;
 using Common.Interfaces;
 using Common.Physics.Components;
 using Common.Physics.Interfaces;
-using GameEngine.Core.Components;
-using GameEngine.Engine;
+using GameEngine.Engine.Combat.Systems;
+using GameEngine.Engine.Scene;
 using GameEngine.Graphics.Animations;
 using GameEngine.Graphics.Camera;
+using GameEngine.Graphics.Components;
 using GameEngine.Graphics.Render;
 using GameEngine.Physics;
 using GameEngine.Physics.CollisionDetection;
@@ -41,7 +42,7 @@ namespace GameEnginePlayground.Factories
         
         public IScene Create()
         {
-            IScene scene = new TestScene();
+            IScene scene = new Scene();
             AddSystems(scene);
             return scene;
         }

@@ -1,7 +1,6 @@
 ﻿using Common.Interfaces;
-using GameEngine.Core.Components;
+using GameEngine.Engine.Scene;
 using System.Runtime.CompilerServices;
-using static Common.Interfaces.IComponent;
 
 namespace GameEngine.Core.Entities
 {
@@ -34,10 +33,6 @@ namespace GameEngine.Core.Entities
             Id = id;
             _world = world;
         }
-
-        // --- Convenience Methods (Delegating to the World's Public API) ---
-        // These methods make it easier to add, get, check, and remove components directly from an Entity handle.
-        // They now use 'ref' for AddComponent and GetComponent for performance.
 
         /// <summary>
         /// Adds a new component to this entity in its associated World.

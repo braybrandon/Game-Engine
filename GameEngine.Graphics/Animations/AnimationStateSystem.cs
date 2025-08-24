@@ -1,8 +1,8 @@
 ﻿using Common.Enums;
 using Common.Interfaces;
 using Common.IO.Components;
-using GameEngine.Core.Components;
-using Microsoft.Xna.Framework.Input;
+using GameEngine.Graphics.Components;
+using GameEngine.Graphics.Enums;
 
 namespace GameEngine.Graphics.Animations
 {

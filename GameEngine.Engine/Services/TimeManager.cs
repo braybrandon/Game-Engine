@@ -1,5 +1,8 @@
 ﻿using Common.Interfaces;
 using Microsoft.Xna.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace GameEngine.Core.Services
 {
@@ -11,14 +14,20 @@ namespace GameEngine.Core.Services
         private float _scaledDeltaTime;
         private float _unscaledDeltaTime;
         private float _totalGameTime;
-        private float _timeScale = 1.0f; // Default to normal speed
-        private float _fixedDeltaTime = 1.0f / 60.0f; // Default fixed step for 60 FPS
+        private float _timeScale = 1.0f;
+        private float _fixedDeltaTime = 1.0f / 60.0f;
         private readonly List<InternalGameTimer> _activeTimers;
         private readonly List<Guid> _timersToRemove;
-
         private TimeSpan _unscaledElapsed;
         private TimeSpan _fixedStep;
+
+        /// <summary>
+        /// Gets the time elapsed since the last update, unscaled, as a TimeSpan.
+        /// </summary>
         public TimeSpan UnscaledElapsed => _unscaledElapsed;
+        /// <summary>
+        /// Gets the fixed time step as a TimeSpan.
+        /// </summary>
         public TimeSpan FixedStep => _fixedStep;
 
         /// <summary>
@@ -30,40 +39,47 @@ namespace GameEngine.Core.Services
             _timersToRemove = new List<Guid>();
         }
 
+        /// <summary>
+        /// Gets the time elapsed since the last update, scaled by TimeScale.
+        /// </summary>
         public float ScaledDeltaTime => _scaledDeltaTime;
+        /// <summary>
+        /// Gets the time elapsed since the last update, unscaled.
+        /// </summary>
         public float UnscaledDeltaTime => _unscaledDeltaTime;
+        /// <summary>
+        /// Gets the total game time elapsed since the game started, scaled by TimeScale.
+        /// </summary>
         public float TotalGameTime => _totalGameTime;
+        /// <summary>
+        /// Gets the current time scale multiplier.
+        /// </summary>
         public float TimeScale => _timeScale;
+        /// <summary>
+        /// Gets the fixed time step used for physics and fixed-update logic.
+        /// </summary>
         public float FixedDeltaTime => _fixedDeltaTime;
 
         /// <summary>
-        /// Updates the TimeManager's internal state and all active timers.
-        /// This method should be called once per frame from the main game loop.
+        /// Updates the TimeManager's internal state and all active timers. Should be called once per frame from the main game loop.
         /// </summary>
         /// <param name="gameTime">The GameTime object provided by MonoGame.</param>
         public void Update(GameTime gameTime)
         {
             _unscaledDeltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-
             _scaledDeltaTime = _unscaledDeltaTime * _timeScale;
-
             _totalGameTime += _scaledDeltaTime;
-
             _timersToRemove.Clear();
-
             _unscaledElapsed = gameTime.ElapsedGameTime;
             _fixedStep = TimeSpan.FromSeconds(_fixedDeltaTime);
-
             foreach (var timer in _activeTimers)
             {
                 if (!timer.IsPaused)
                 {
                     timer.CurrentTime -= _scaledDeltaTime;
-
                     if (timer.CurrentTime <= 0)
                     {
                         timer.OnCompleted?.Invoke();
-
                         if (timer.IsLooping)
                         {
                             timer.CurrentTime += timer.Duration;
@@ -88,19 +104,14 @@ namespace GameEngine.Core.Services
         /// <param name="scale">The new time scale (e.g., 1.0 for normal, 0.0 for paused).</param>
         public void SetTimeScale(float scale)
         {
-            _timeScale = Math.Max(0.0f, scale); 
+            _timeScale = Math.Max(0.0f, scale);
         }
 
         /// <summary>
-        /// Resets the elapsed time accumulator.
-        /// This is useful after loading a new level or unpausing from a long break
-        /// to prevent a huge delta time from causing a "jump" in physics.
+        /// Resets the elapsed time accumulator. Useful after loading a new level or unpausing from a long break.
         /// </summary>
         public void ResetElapsedTime()
         {
-            // For this simple TimeManager, it mainly affects the next delta time calculation.
-            // In a fixed-timestep system, it might reset an accumulator.
-            // For now, no specific action is needed here beyond what Update handles.
         }
 
         /// <summary>
@@ -210,13 +221,37 @@ namespace GameEngine.Core.Services
         /// </summary>
         private class InternalGameTimer
         {
+            /// <summary>
+            /// Gets the unique identifier for the timer.
+            /// </summary>
             public Guid Id { get; } = Guid.NewGuid();
+            /// <summary>
+            /// Gets the total duration of the timer in seconds.
+            /// </summary>
             public float Duration { get; }
-            public float CurrentTime { get; set; } 
-            public bool IsLooping { get; } 
-            public bool IsPaused { get; set; } 
-            public Action? OnCompleted { get; } 
+            /// <summary>
+            /// Gets or sets the current remaining time for the timer in seconds.
+            /// </summary>
+            public float CurrentTime { get; set; }
+            /// <summary>
+            /// Gets a value indicating whether the timer is looping.
+            /// </summary>
+            public bool IsLooping { get; }
+            /// <summary>
+            /// Gets or sets a value indicating whether the timer is paused.
+            /// </summary>
+            public bool IsPaused { get; set; }
+            /// <summary>
+            /// Gets the action to invoke when the timer completes.
+            /// </summary>
+            public Action? OnCompleted { get; }
 
+            /// <summary>
+            /// Initializes a new instance of the InternalGameTimer class.
+            /// </summary>
+            /// <param name="duration">The duration of the timer in seconds.</param>
+            /// <param name="onCompleted">The action to invoke when the timer completes.</param>
+            /// <param name="isLooping">Indicates whether the timer should loop.</param>
             public InternalGameTimer(float duration, Action onCompleted, bool isLooping)
             {
                 Duration = duration;

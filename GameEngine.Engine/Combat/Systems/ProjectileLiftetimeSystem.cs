@@ -4,12 +4,33 @@ using Common.Physics.Components;
 using Common.Physics.Interfaces;
 using Microsoft.Xna.Framework;
 
-namespace GameEngine.Engine
+namespace GameEngine.Engine.Combat.Systems
 {
-    public class ProjectileLiftetimeSystem(ITimeManager timeManager, IQuadTree quadTree) : IUpdateSystem
+    /// <summary>
+    /// System that manages the lifetime of projectile entities, removing them when they exceed their maximum distance.
+    /// </summary>
+    /// <param name="timeManager">The time manager used for delta time calculations.</param>
+    /// <param name="quadTree">The quadtree used for spatial partitioning and removal.</param>
+    public class ProjectileLiftetimeSystem : IUpdateSystem
     {
-        private readonly ITimeManager _timeManager = timeManager;
-        private IQuadTree _quadTree = quadTree;
+        private readonly ITimeManager _timeManager;
+        private IQuadTree _quadTree;
+
+        /// <summary>
+        /// Initializes a new instance of the ProjectileLiftetimeSystem class.
+        /// </summary>
+        /// <param name="timeManager">The time manager used for delta time calculations.</param>
+        /// <param name="quadTree">The quadtree used for spatial partitioning and removal.</param>
+        public ProjectileLiftetimeSystem(ITimeManager timeManager, IQuadTree quadTree)
+        {
+            _timeManager = timeManager;
+            _quadTree = quadTree;
+        }
+
+        /// <summary>
+        /// Updates the system, checking projectile lifetimes and removing entities that have exceeded their maximum distance.
+        /// </summary>
+        /// <param name="world">The world containing entities and components.</param>
         public void Update(IWorld world)
         {
             foreach (var entity in world.GetEntitiesWith<LifetimeComponent, DirectionComponent, SpeedComponent>())
