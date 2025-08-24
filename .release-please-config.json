@@ -22,7 +22,7 @@
       "release-type": "simple",
       "changelog-path": "CHANGELOG.md"
     },
-    "GameEngine.Engine": {
+    "GameEngine.Gameplay": {
       "path": "GameEngine.Gameplay",
       "component": "gameplay",
       "release-type": "simple",
