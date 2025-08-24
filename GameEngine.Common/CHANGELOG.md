@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.3](https://github.com/braybrandon/Game-Engine/compare/common-v0.0.2...common-v0.0.3) (2025-08-24)
+
+
+### Bug Fixes
+
+* **gameplay:** Update engine to gameplay ([e7d8c7d](https://github.com/braybrandon/Game-Engine/commit/e7d8c7dba6578e3775a6c05c45008eb83aa7c88c))
+
 ## [0.0.2](https://github.com/braybrandon/Game-Engine/compare/common-v0.0.1...common-v0.0.2) (2025-08-24)
 
 
