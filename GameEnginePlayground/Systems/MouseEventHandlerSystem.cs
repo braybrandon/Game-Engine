@@ -1,8 +1,8 @@
-﻿using Common.Components;
-using Common.Events;
-using Common.Interfaces;
-using Common.Physics.Components;
-using Common.Physics.Interfaces;
+﻿using GameEngine.Common.Components;
+using GameEngine.Common.Events;
+using GameEngine.Common.Interfaces;
+using GameEngine.Common.Physics.Components;
+using GameEngine.Common.Physics.Interfaces;
 using GameEngine.Graphics.Camera;
 using GameEngine.Graphics.Components;
 using Microsoft.Xna.Framework;

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 
-namespace Common.Interfaces
+namespace GameEngine.Common.Interfaces
 {
     public interface IDrawSystem
     {

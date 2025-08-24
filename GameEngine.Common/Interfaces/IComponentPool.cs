@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Common.Interfaces
+﻿namespace GameEngine.Common.Interfaces
 {
     /// <summary>
     /// Non-generic interface for component pools, allowing the World to manage them polymorphically.

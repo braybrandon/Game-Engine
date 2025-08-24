@@ -1,4 +1,4 @@
-﻿namespace Common.Enums
+﻿namespace GameEngine.Common.Enums
 {
     public enum InputAction
     {

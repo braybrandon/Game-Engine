@@ -1,7 +1,7 @@
-﻿using Common.Interfaces;
+﻿using GameEngine.Common.Interfaces;
 using Microsoft.Xna.Framework;
 
-namespace Common.Physics.Components
+namespace GameEngine.Common.Physics.Components
 {
     /// <summary>
     /// Represents an entity's transformation in 2D space, including position, rotation, and scale.

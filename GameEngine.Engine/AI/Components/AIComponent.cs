@@ -1,4 +1,4 @@
-﻿using Common.Interfaces;
+﻿using GameEngine.Common.Interfaces;
 
 namespace GameEngine.Engine.AI.Components
 {

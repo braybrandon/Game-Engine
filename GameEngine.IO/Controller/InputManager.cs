@@ -1,6 +1,6 @@
-﻿using Common.Enums;
-using Common.Events;
-using Common.Interfaces;
+﻿using GameEngine.Common.Enums;
+using GameEngine.Common.Events;
+using GameEngine.Common.Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 

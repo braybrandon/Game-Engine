@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace Common.Interfaces
+namespace GameEngine.Common.Interfaces
 {
     /// <summary>
     /// Manages game time, including delta time, total time, time scaling, and game-specific timers.

@@ -1,7 +1,6 @@
-﻿using Common.Interfaces;
-using Microsoft.Xna.Framework;
+﻿using GameEngine.Common.Interfaces;
 
-namespace Common.Events
+namespace GameEngine.Common.Events
 {
     public class FireballPressedEvent: IEvent
     {

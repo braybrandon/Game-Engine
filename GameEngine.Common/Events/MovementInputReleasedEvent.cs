@@ -1,8 +1,7 @@
-﻿using Common.Interfaces;
+﻿using GameEngine.Common.Interfaces;
 using Microsoft.Xna.Framework;
-using System.Xml.Linq;
 
-namespace Common.Events
+namespace GameEngine.Common.Events
 {
     public class MovementInputReleasedEvent(Vector2 direction, string name) : IEvent
     {

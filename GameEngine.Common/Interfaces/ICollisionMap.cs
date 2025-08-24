@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace Common.Interfaces
+namespace GameEngine.Common.Interfaces
 {
     public interface ICollisionMap
     {

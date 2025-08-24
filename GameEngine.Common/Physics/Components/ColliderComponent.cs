@@ -1,7 +1,8 @@
-﻿using Common.Interfaces;
+﻿
+using GameEngine.Common.Interfaces;
 using Microsoft.Xna.Framework;
 
-namespace Common.Physics.Components
+namespace GameEngine.Common.Physics.Components
 {
     /// <summary>
     /// Defines the physical collider properties for an entity, enabling collision detection and response in the physics system.

@@ -1,4 +1,4 @@
-﻿using Common.Interfaces;
+﻿using GameEngine.Common.Interfaces;
 using GameEngine.Core.Entities;
 
 namespace GameEngine.Engine.Scene

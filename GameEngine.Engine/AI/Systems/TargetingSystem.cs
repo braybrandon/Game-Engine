@@ -1,6 +1,6 @@
-﻿using Common.Interfaces;
-using Common.IO.Components;
-using Common.Physics.Components;
+﻿using GameEngine.Common.Interfaces;
+using GameEngine.Common.IO.Components;
+using GameEngine.Common.Physics.Components;
 using GameEngine.Engine.AI.Components;
 using Microsoft.Xna.Framework;
 using System.Linq;

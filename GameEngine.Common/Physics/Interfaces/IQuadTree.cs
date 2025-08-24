@@ -1,12 +1,7 @@
-﻿using Common.Interfaces;
+﻿using GameEngine.Common.Interfaces;
 using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Common.Physics.Interfaces
+namespace GameEngine.Common.Physics.Interfaces
 {
     public interface IQuadTree
     {

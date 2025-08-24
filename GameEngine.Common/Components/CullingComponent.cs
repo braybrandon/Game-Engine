@@ -1,6 +1,6 @@
-﻿using Common.Interfaces;
+﻿using GameEngine.Common.Interfaces;
 
-namespace Common.Components
+namespace GameEngine.Common.Components
 {
     public struct CullingComponent: IComponent
     {

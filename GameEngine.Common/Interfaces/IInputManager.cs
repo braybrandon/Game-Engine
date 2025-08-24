@@ -1,8 +1,8 @@
-﻿using Common.Enums;
+﻿using GameEngine.Common.Enums;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
-namespace Common.Interfaces
+namespace GameEngine.Common.Interfaces
 {
     public interface IInputManager
     {

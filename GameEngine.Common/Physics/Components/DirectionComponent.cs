@@ -1,7 +1,7 @@
-﻿using Common.Interfaces;
+﻿using GameEngine.Common.Interfaces;
 using Microsoft.Xna.Framework;
 
-namespace Common.Physics.Components
+namespace GameEngine.Common.Physics.Components
 {
     /// <summary>
     /// Represents the direction of an entity in the physics system.

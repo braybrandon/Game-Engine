@@ -1,4 +1,4 @@
-﻿namespace Common.Config
+﻿namespace GameEngine.Common.Config
 {
     public static class FileNameConfig
     {

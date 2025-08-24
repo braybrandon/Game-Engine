@@ -1,7 +1,7 @@
-﻿using Common.Components;
-using Common.Interfaces;
-using Common.Physics.Components;
-using Common.Physics.Interfaces;
+﻿using GameEngine.Common.Components;
+using GameEngine.Common.Interfaces;
+using GameEngine.Common.Physics.Components;
+using GameEngine.Common.Physics.Interfaces;
 using Microsoft.Xna.Framework;
 
 namespace GameEngine.Engine.Combat.Systems

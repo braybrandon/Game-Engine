@@ -1,6 +1,6 @@
-﻿using Common.Enums;
-using Common.Interfaces;
-using Common.IO.Components;
+﻿using GameEngine.Common.Enums;
+using GameEngine.Common.Interfaces;
+using GameEngine.Common.IO.Components;
 using GameEngine.Graphics.Components;
 using GameEngine.Graphics.Enums;
 

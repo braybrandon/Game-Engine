@@ -1,11 +1,6 @@
-﻿using Common.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using GameEngine.Common.Interfaces;
 
-namespace Common.Physics.Components
+namespace GameEngine.Common.Physics.Components
 {
     /// <summary>
     /// Represents the speed of an entity in the physics system.

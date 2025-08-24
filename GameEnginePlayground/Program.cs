@@ -1,4 +1,4 @@
-﻿using Common.Interfaces;
+﻿using GameEngine.Common.Interfaces;
 using GameEngine.Core.Services;
 using GameEngine.IO.Asset;
 using GameEngine.IO.Controller;

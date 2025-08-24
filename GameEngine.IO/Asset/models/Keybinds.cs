@@ -1,4 +1,4 @@
-﻿using Common.Enums;
+﻿using GameEngine.Common.Enums;
 using Microsoft.Xna.Framework.Input;
 
 namespace GameEngine.IO.Asset.models

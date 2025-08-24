@@ -1,8 +1,8 @@
-﻿using Common.Config;
-using Common.Interfaces;
-using Common.IO.Components;
-using Common.Physics.Components;
-using Common.Physics.Interfaces;
+﻿using GameEngine.Common.Config;
+using GameEngine.Common.Interfaces;
+using GameEngine.Common.IO.Components;
+using GameEngine.Common.Physics.Components;
+using GameEngine.Common.Physics.Interfaces;
 using GameEngine.Engine.Combat.Components;
 using GameEngine.Graphics.Components;
 using GameEngine.Graphics.Enums;

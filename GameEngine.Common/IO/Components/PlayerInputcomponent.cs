@@ -1,6 +1,6 @@
-﻿using Common.Interfaces;
+﻿using GameEngine.Common.Interfaces;
 
-namespace Common.IO.Components
+namespace GameEngine.Common.IO.Components
 {
     /// <summary>
     /// Serves as a flag to indicate that an entity is controlled by the player.

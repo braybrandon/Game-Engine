@@ -1,5 +1,5 @@
-﻿using Common.Interfaces;
-using Common.Physics.Components;
+﻿using GameEngine.Common.Interfaces;
+using GameEngine.Common.Physics.Components;
 using Microsoft.Xna.Framework;
 
 namespace GameEngine.Physics.Motion

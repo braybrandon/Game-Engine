@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace Common.Interfaces
+﻿namespace GameEngine.Common.Interfaces
 {
     public interface IEntity
     {
