@@ -1,7 +1,7 @@
 ﻿using GameEngine.Common.Interfaces;
 using GameEngine.Core.Entities;
 
-namespace GameEngine.Engine.Scene
+namespace GameEngine.Gameplay.Scene
 {
     /// <summary>
     /// A pool for storing components of a specific type (T), providing efficient storage and direct 'ref' access.

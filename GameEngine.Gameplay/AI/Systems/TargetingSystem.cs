@@ -1,11 +1,11 @@
 ﻿using GameEngine.Common.Interfaces;
 using GameEngine.Common.IO.Components;
 using GameEngine.Common.Physics.Components;
-using GameEngine.Engine.AI.Components;
+using GameEngine.Gameplay.AI.Components;
 using Microsoft.Xna.Framework;
 using System.Linq;
 
-namespace GameEngine.Engine.AI.Systems
+namespace GameEngine.Gameplay.AI.Systems
 {
     /// <summary>
     /// System that assigns player entities as targets to AI entities when within a certain distance.

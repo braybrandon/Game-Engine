@@ -1,7 +1,7 @@
 ﻿using GameEngine.Common.Interfaces;
 using System;
 
-namespace GameEngine.Engine.Combat.Events
+namespace GameEngine.Gameplay.Combat.Events
 {
     /// <summary>
     /// Represents an event triggered when a player dies in the game.

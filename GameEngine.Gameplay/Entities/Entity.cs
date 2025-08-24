@@ -1,5 +1,5 @@
 ﻿using GameEngine.Common.Interfaces;
-using GameEngine.Engine.Scene;
+using GameEngine.Gameplay.Scene;
 using System.Runtime.CompilerServices;
 
 namespace GameEngine.Core.Entities

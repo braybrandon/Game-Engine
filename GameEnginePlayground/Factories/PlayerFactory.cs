@@ -3,7 +3,7 @@ using GameEngine.Common.Interfaces;
 using GameEngine.Common.IO.Components;
 using GameEngine.Common.Physics.Components;
 using GameEngine.Common.Physics.Interfaces;
-using GameEngine.Engine.Combat.Components;
+using GameEngine.Gameplay.Combat.Components;
 using GameEngine.Graphics.Components;
 using GameEngine.Graphics.Enums;
 using GameEngine.Graphics.Models;

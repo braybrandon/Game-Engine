@@ -4,7 +4,7 @@ using GameEngine.Common.Physics.Components;
 using GameEngine.Common.Physics.Interfaces;
 using Microsoft.Xna.Framework;
 
-namespace GameEngine.Engine.Combat.Systems
+namespace GameEngine.Gameplay.Combat.Systems
 {
     /// <summary>
     /// System that manages the lifetime of projectile entities, removing them when they exceed their maximum distance.

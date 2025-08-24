@@ -1,6 +1,6 @@
 ﻿using GameEngine.Common.Interfaces;
 
-namespace GameEngine.Engine.AI.Components
+namespace GameEngine.Gameplay.AI.Components
 {
     /// <summary>
     /// Represents the target entity for an AI-controlled entity.

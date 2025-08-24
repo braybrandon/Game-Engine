@@ -23,8 +23,8 @@
       "changelog-path": "CHANGELOG.md"
     },
     "GameEngine.Engine": {
-      "path": "GameEngine.Engine",
-      "component": "engine",
+      "path": "GameEngine.Gameplay",
+      "component": "gameplay",
       "release-type": "simple",
       "changelog-path": "CHANGELOG.md"
     },

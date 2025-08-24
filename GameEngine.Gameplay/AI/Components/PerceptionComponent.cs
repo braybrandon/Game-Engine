@@ -1,6 +1,6 @@
 ﻿using GameEngine.Common.Interfaces;
 
-namespace GameEngine.Engine.AI.Components
+namespace GameEngine.Gameplay.AI.Components
 {
     /// <summary>
     /// Represents the perception properties of an AI entity, including detection radius, field of view, and targeting mask.

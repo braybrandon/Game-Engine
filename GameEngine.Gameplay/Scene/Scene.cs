@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 
-namespace GameEngine.Engine.Scene
+namespace GameEngine.Gameplay.Scene
 {
     /// <summary>
     /// Represents a game scene, managing its world, update systems, and draw systems.

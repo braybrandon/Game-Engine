@@ -1,5 +1,5 @@
 ﻿using GameEngine.Common.Interfaces;
-namespace GameEngine.Engine.Combat.Components
+namespace GameEngine.Gameplay.Combat.Components
 {
     /// <summary>
     /// Represents the health state of an entity, including current and maximum health values.

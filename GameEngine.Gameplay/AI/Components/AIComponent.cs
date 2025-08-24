@@ -1,6 +1,6 @@
 ﻿using GameEngine.Common.Interfaces;
 
-namespace GameEngine.Engine.AI.Components
+namespace GameEngine.Gameplay.AI.Components
 {
     /// <summary>
     /// Serves as a flag to indicate that an entity is controlled by AI logic.

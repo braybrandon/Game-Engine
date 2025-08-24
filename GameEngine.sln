@@ -5,7 +5,7 @@ VisualStudioVersion = 17.14.36310.24
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameEngine.Physics", "GameEngine.Physics\GameEngine.Physics.csproj", "{9FAAF9F1-7969-49BF-9DCF-B65AA185E6ED}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameEngine.Engine", "GameEngine.Engine\GameEngine.Engine.csproj", "{7D510E3B-94F5-47F1-8611-A5F64563CF28}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameEngine.Gameplay", "GameEngine.Gameplay\GameEngine.Gameplay.csproj", "{7D510E3B-94F5-47F1-8611-A5F64563CF28}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameEngine.Graphics", "GameEngine.Graphics\GameEngine.Graphics.csproj", "{BC2B770B-024B-4ABF-9FB5-A9B46B44F9B9}"
 EndProject
