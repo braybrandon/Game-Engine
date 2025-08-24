@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.2](https://github.com/braybrandon/Game-Engine/compare/graphics-v0.0.1...graphics-v0.0.2) (2025-08-24)
+
+
+### Bug Fixes
+
+* **common:** Refactor common ([7553aa7](https://github.com/braybrandon/Game-Engine/commit/7553aa7dc44d6d6ef296e0e16c4b3de5b0ed4223))
+
 ## [0.0.1](https://github.com/braybrandon/Game-Engine/compare/graphics-v0.0.1...graphics-v0.0.1) (2025-08-24)
 
 
