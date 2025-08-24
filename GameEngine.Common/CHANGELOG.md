@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.0.0](https://github.com/braybrandon/Game-Engine/compare/v0.1.3...v1.0.0) (2025-08-24)
+## [0.0.1](https://github.com/braybrandon/Game-Engine/compare/v0.1.3...v1.0.0) (2025-08-24)
 
 
 ### ⚠ BREAKING CHANGES
