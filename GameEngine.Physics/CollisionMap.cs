@@ -1,4 +1,5 @@
 ﻿using GameEngine.Common.Interfaces;
+using GameEngine.Common.IO.Interface;
 using Microsoft.Xna.Framework;
 
 namespace GameEngine.Physics

@@ -1,4 +1,4 @@
-﻿using GameEngine.Common.Interfaces;
+﻿using GameEngine.Common.IO.Interface;
 
 namespace GameEngine.IO.Asset.models
 {

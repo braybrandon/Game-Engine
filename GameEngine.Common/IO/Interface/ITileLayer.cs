@@ -1,4 +1,4 @@
-﻿namespace GameEngine.Common.Interfaces
+﻿namespace GameEngine.Common.IO.Interface
 {
     public interface ITileLayer
     {
