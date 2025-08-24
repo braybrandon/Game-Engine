@@ -1,12 +1,13 @@
-﻿using Common.Components;
-using Common.Config;
-using Common.Interfaces;
-using Common.Physics.Components;
-using Common.Physics.Interfaces;
-using GameEngine.Core.Components;
-using GameEngine.Engine;
+﻿using GameEngine.Common.Components;
+using GameEngine.Common.Config;
+using GameEngine.Common.Interfaces;
+using GameEngine.Common.Physics.Components;
+using GameEngine.Common.Physics.Interfaces;
+using GameEngine.Gameplay.Combat.Systems;
+using GameEngine.Gameplay.Scene;
 using GameEngine.Graphics.Animations;
 using GameEngine.Graphics.Camera;
+using GameEngine.Graphics.Components;
 using GameEngine.Graphics.Render;
 using GameEngine.IO.Audio;
 using GameEngine.Physics;
@@ -45,7 +46,7 @@ namespace GameEnginePlayground.Factories
         
         public IScene Create()
         {
-            IScene scene = new TestScene();
+            IScene scene = new Scene();
             AddSystems(scene);
             return scene;
         }
@@ -78,12 +79,11 @@ namespace GameEnginePlayground.Factories
             // 3. Register EngineSystems with the GameLoop
             // Order matters for systems that depend on each other's output!
             scene.RegisterUpdateSystem(new PlayerMovementInputSystem(_inputManager));
-            scene.RegisterUpdateSystem(new MovementSystem(_timeManager, gameMap));
+            scene.RegisterUpdateSystem(new MovementSystem(_timeManager));
             scene.RegisterUpdateSystem(new CollisionSystem(collisionMap, quadtree));
             scene.RegisterUpdateSystem(new AnimationStateSystem(_inputManager));
             scene.RegisterUpdateSystem(new AnimationSystem(_timeManager));
             scene.RegisterUpdateSystem(new CameraUpdateSystem(playerEntity.Id, _inputManager));
-
             scene.RegisterUpdateSystem(new CullingSystem(cameraEntity, gameMap));
             scene.RegisterUpdateSystem(new MouseEventHandlerSystem(sceneWorld, cameraEntity, gameMap, _eventManager, playerEntity, _assetManager, _audioManager, _inputManager, quadtree));
             scene.RegisterUpdateSystem(new ProjectileLiftetimeSystem(_timeManager, quadtree));

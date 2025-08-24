@@ -1,10 +1,7 @@
-﻿using Common.Interfaces;
-using Common.IO.Components;
-using Common.Physics.Components;
-using GameEngine.Core.Components;
-using GameEngine.Core.Entities;
+﻿using GameEngine.Common.Interfaces;
+using GameEngine.Common.IO.Components;
+using GameEngine.Common.Physics.Components;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 
 namespace GameEngine.Graphics.Camera
 {

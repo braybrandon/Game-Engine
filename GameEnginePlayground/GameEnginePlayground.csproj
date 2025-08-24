@@ -30,7 +30,8 @@
     <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.4" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GameEngine.Core\GameEngine.Engine.csproj" />
+    <ProjectReference Include="..\GameEngine.Common\GameEngine.Common.csproj" />
+    <ProjectReference Include="..\GameEngine.Gameplay\GameEngine.Gameplay.csproj" />
     <ProjectReference Include="..\GameEngine.IO\GameEngine.IO.csproj" />
     <ProjectReference Include="..\GameEngine.Physics\GameEngine.Physics.csproj" />
     <ProjectReference Include="..\GameEngine.Graphics\GameEngine.Graphics.csproj" />

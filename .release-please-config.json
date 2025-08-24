@@ -2,6 +2,9 @@
 {
   "$schema": "https://raw.githubusercontent.com/googleapis/release-please-action/main/schemas/config.json",
   "release-type": "simple",
+  "include-component-in-tag": true,
+  "separate-pull-requests": true,
+  "pull-request-title-pattern": "chore${scope}: release ${component} ${version}",
   "changelog-sections": [
     {"type": "feat", "section": "Features"},
     {"type": "fix", "section": "Bug Fixes"},
@@ -13,42 +16,35 @@
     {"type": "chore", "section": "Other Changes", "hidden": true}
   ],
   "packages": {
-    ".": {
+    "GameEngine.Common": {
+      "path": "GameEngine.Common",
+       "component": "common",
       "release-type": "simple",
-      "changelog-path": "CHANGELOG.md",
-      "changelog-sections": [
-        {"type": "feat", "section": "Features"},
-        {"type": "fix", "section": "Bug Fixes"},
-        {"type": "docs", "section": "Documentation"},
-        {"type": "style", "section": "Styles"},
-        {"type": "refactor", "section": "Code Refactoring"},
-        {"type": "perf", "section": "Performance Improvements"},
-        {"type": "test", "section": "Tests"},
-        {"type": "chore", "section": "Other Changes", "hidden": true}
-      ],
-      "extra-files": [
-        "Directory.Build.props" 
-      ]
+      "changelog-path": "CHANGELOG.md"
     },
-    "GameEngine.Core": {
-      "path": "GameEngine.Core",
+    "GameEngine.Gameplay": {
+      "path": "GameEngine.Gameplay",
+      "component": "gameplay",
       "release-type": "simple",
-      "changelog-path": "GameEngine.Core/CHANGELOG.md"
+      "changelog-path": "CHANGELOG.md"
     },
     "GameEngine.Graphics": {
       "path": "GameEngine.Graphics",
+       "component": "graphics",
       "release-type": "simple",
-      "changelog-path": "GameEngine.Graphics/CHANGELOG.md"
+      "changelog-path": "CHANGELOG.md"
     },
     "GameEngine.Physics": {
       "path": "GameEngine.Physics",
+       "component": "physics",
       "release-type": "simple",
-      "changelog-path": "GameEngine.Physics/CHANGELOG.md"
+      "changelog-path": "CHANGELOG.md"
     },
     "GameEngine.IO": {
       "path": "GameEngine.IO",
+       "component": "io",
       "release-type": "simple",
-      "changelog-path": "GameEngine.IO/CHANGELOG.md"
+      "changelog-path": "CHANGELOG.md"
     }
   }
 }

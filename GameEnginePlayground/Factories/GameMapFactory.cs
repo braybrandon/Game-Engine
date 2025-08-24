@@ -1,5 +1,5 @@
-﻿using Common.Config;
-using Common.Interfaces;
+﻿using GameEngine.Common.Config;
+using GameEngine.Common.Interfaces;
 using GameEngine.IO.Asset.models;
 
 namespace GameEnginePlayground.Factories

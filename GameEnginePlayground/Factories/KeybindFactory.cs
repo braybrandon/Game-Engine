@@ -1,7 +1,7 @@
-﻿using Common.Config;
-using Common.Enums;
-using Common.Events;
-using Common.Interfaces;
+﻿using GameEngine.Common.Config;
+using GameEngine.Common.Enums;
+using GameEngine.Common.Events;
+using GameEngine.Common.Interfaces;
 using GameEngine.IO.Asset.models;
 using System;
 using System.Collections.Generic;

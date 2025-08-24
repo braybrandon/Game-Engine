@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GameEngine.Core\GameEngine.Engine.csproj" />
+    <ProjectReference Include="..\GameEngine.Common\GameEngine.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>

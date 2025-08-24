@@ -5,7 +5,7 @@ VisualStudioVersion = 17.14.36310.24
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameEngine.Physics", "GameEngine.Physics\GameEngine.Physics.csproj", "{9FAAF9F1-7969-49BF-9DCF-B65AA185E6ED}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameEngine.Engine", "GameEngine.Core\GameEngine.Engine.csproj", "{7D510E3B-94F5-47F1-8611-A5F64563CF28}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameEngine.Gameplay", "GameEngine.Gameplay\GameEngine.Gameplay.csproj", "{7D510E3B-94F5-47F1-8611-A5F64563CF28}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameEngine.Graphics", "GameEngine.Graphics\GameEngine.Graphics.csproj", "{BC2B770B-024B-4ABF-9FB5-A9B46B44F9B9}"
 EndProject
@@ -13,9 +13,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameEngine.IO", "GameEngine
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameEnginePlayground", "GameEnginePlayground\GameEnginePlayground.csproj", "{1B434E5E-12CC-48DF-B0A1-99A06D46FB43}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{2D73D0B3-B2E8-483C-BDC8-12AF6D9CC799}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameEngine.Common", "GameEngine.Common\GameEngine.Common.csproj", "{2D73D0B3-B2E8-483C-BDC8-12AF6D9CC799}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameEngine.ContentPipeline", "GameEngine.ContentPipeline\GameEngine.ContentPipeline.csproj", "{3C6D5B1E-1700-4083-BC4B-967BD9D93F0D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameEngine.Tools", "GameEngine.Tools\GameEngine.Tools.csproj", "{20F8036B-025D-4697-AD12-10D62B01B928}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,10 @@ Global
 		{3C6D5B1E-1700-4083-BC4B-967BD9D93F0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3C6D5B1E-1700-4083-BC4B-967BD9D93F0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3C6D5B1E-1700-4083-BC4B-967BD9D93F0D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20F8036B-025D-4697-AD12-10D62B01B928}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20F8036B-025D-4697-AD12-10D62B01B928}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20F8036B-025D-4697-AD12-10D62B01B928}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20F8036B-025D-4697-AD12-10D62B01B928}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

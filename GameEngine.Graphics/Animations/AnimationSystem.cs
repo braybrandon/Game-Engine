@@ -1,5 +1,6 @@
-﻿using Common.Interfaces;
-using GameEngine.Core.Components;
+﻿using GameEngine.Common.Interfaces;
+using GameEngine.Graphics.Components;
+using GameEngine.Graphics.Models;
 using Microsoft.Xna.Framework;
 
 namespace GameEngine.Graphics.Animations

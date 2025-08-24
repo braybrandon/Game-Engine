@@ -17,101 +17,304 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Run Release Please
-        uses: googleapis/release-please-action@v4.2.0
+      - name: Release Please
         id: release
+        uses: googleapis/release-please-action@v4.2.0
         with:
           config-file: .release-please-config.json
           manifest-file: .release-please-manifest.json
+          include-component-in-tag: true
 
+      # Quick visibility into what fired
+      - name: Debug release outputs
+        run: |
+          echo "Common released?      ${{ steps.release.outputs['GameEngine.Common--release_created'] }}"
+          echo "Gameplay released?    ${{ steps.release.outputs['GameEngine.Gameplay--release_created'] }}"
+          echo "Graphics released?    ${{ steps.release.outputs['GameEngine.Graphics--release_created'] }}"
+          echo "Physics released?     ${{ steps.release.outputs['GameEngine.Physics--release_created'] }}"
+          echo "IO released?          ${{ steps.release.outputs['GameEngine.IO--release_created'] }}"
+
+      # Set up .NET only if at least one package was released
       - name: Setup .NET SDK
-        if: ${{ steps.release.outputs.release_created }}
+        if: ${{ steps.release.outputs['GameEngine.Common--release_created'] == 'true'
+              || steps.release.outputs['GameEngine.Gameplay--release_created'] == 'true'
+              || steps.release.outputs['GameEngine.Graphics--release_created'] == 'true'
+              || steps.release.outputs['GameEngine.Physics--release_created'] == 'true'
+              || steps.release.outputs['GameEngine.IO--release_created'] == 'true' }}
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
+          # Auth for GitHub Packages (nuget.pkg.github.com)
           source-url: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
         env:
           NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Restore dependencies
-        if: ${{ steps.release.outputs.release_created }}
-        run: dotnet restore GameEngine.sln
+      # ---------------------------
+      # GameEngine.Common
+      # ---------------------------
+      - name: Restore Common
+        if: ${{ steps.release.outputs['GameEngine.Common--release_created'] == 'true' }}
+        run: dotnet restore GameEngine.Common/GameEngine.Common.csproj
 
-      - name: Build Solution
-        if: ${{ steps.release.outputs.release_created }}
-        run: dotnet build GameEngine.sln --configuration Release --no-restore
+      - name: Build Common
+        if: ${{ steps.release.outputs['GameEngine.Common--release_created'] == 'true' }}
+        run: dotnet build GameEngine.Common/GameEngine.Common.csproj -c Release --no-restore
 
-      - name: Pack All NuGet packages with Release Version
-        if: ${{ steps.release.outputs.release_created }}
+      - name: Pack Common
+        if: ${{ steps.release.outputs['GameEngine.Common--release_created'] == 'true' }}
         run: |
-          RELEASE_VERSION="${{ steps.release.outputs.version }}"
-          echo "Packing NuGet packages with version: $RELEASE_VERSION"
-          dotnet pack GameEngine.sln --configuration Release --output .nupkg /p:Version=$RELEASE_VERSION --no-build
+          VER="${{ steps.release.outputs['GameEngine.Common--version'] }}"
+          mkdir -p .nupkg
+          dotnet pack GameEngine.Common/GameEngine.Common.csproj -c Release -o .nupkg /p:Version="$VER" --no-build
 
-      - name: Push All NuGet packages to GitHub Packages
-        if: ${{ steps.release.outputs.release_created }}
+      - name: Push Common to GitHub Packages
+        if: ${{ steps.release.outputs['GameEngine.Common--release_created'] == 'true' }}
         run: dotnet nuget push .nupkg/*.nupkg --api-key "$GITHUB_TOKEN" --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json --skip-duplicate
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Update GitHub Release Description with Links
-        if: ${{ steps.release.outputs.release_created }}
+      - name: Update Common release body with links
+        if: ${{ steps.release.outputs['GameEngine.Common--release_created'] == 'true' }}
         uses: actions/github-script@v7
-        env:
-          RELEASE_BODY: ${{ toJson(steps.release.outputs.body) }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const releaseId = "${{ steps.release.outputs.id }}";
-            const releaseHtmlUrl = "${{ steps.release.outputs.html_url }}";
-            const currentBody = JSON.parse(process.env.RELEASE_BODY || '""');
-
-            const REPO_OWNER = context.repo.owner;
-            const REPO_NAME = context.repo.repo;
-
-            const footerLines = [
+            const owner = context.repo.owner;
+            const repo  = context.repo.repo;
+            const release_id  = "${{ steps.release.outputs['GameEngine.Common--id'] }}";
+            const release_url = "${{ steps.release.outputs['GameEngine.Common--html_url'] }}";
+            const body        = `${{ toJson(steps.release.outputs['GameEngine.Common--body']) }}` || "";
+            const pkgName = "GameEngine.Common";
+            const pkgUrl  = `https://github.com/${owner}/${repo}/pkgs/nuget/${pkgName}`;
+            const lines = [
               "## Package Links",
               "",
               "**GitHub Packages:**",
               "",
-              "- [GameEngine.AI](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/pkgs/nuget/GameEngine.AI)",
-              "- [GameEngine.Animation](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/pkgs/nuget/GameEngine.Animation)",
-              "- [GameEngine.Assets](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/pkgs/nuget/GameEngine.Assets)",
-              "- [GameEngine.Audio](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/pkgs/nuget/GameEngine.Audio)",
-              "- [GameEngine.Core](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/pkgs/nuget/GameEngine.Core)",
-              "- [GameEngine.Input](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/pkgs/nuget/GameEngine.Input)",
-              "- [GameEngine.Particles](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/pkgs/nuget/GameEngine.Particles)",
-              "- [GameEngine.Physics](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/pkgs/nuget/GameEngine.Physics)",
-              "- [GameEngine.Rendering](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/pkgs/nuget/GameEngine.Rendering)",
-              "- [GameEngine.SaveLoad](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/pkgs/nuget/GameEngine.SaveLoad)",
-              "- [GameEngine.Scene](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/pkgs/nuget/GameEngine.Scene)",
-              "- [GameEngine.State](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/pkgs/nuget/GameEngine.State)",
-              "- [GameEngine.Tiles](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/pkgs/nuget/GameEngine.Tiles)",
-              "- [GameEngine.UI](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/pkgs/nuget/GameEngine.UI)",
-              "- [GameEnginePlayground](https://github.com/" + REPO_OWNER + "/" + REPO_NAME + "/pkgs/nuget/GameEnginePlayground)",
+              `- [${pkgName}](${pkgUrl})`,
               "",
               "**Direct Downloads (Release Assets):**",
               "",
-              "- [View Source Code Assets for this Release](" + releaseHtmlUrl + "#assets)"
+              `- [View Source Code Assets for this Release](${release_url}#assets)`
             ];
+            await github.rest.repos.updateRelease({
+              owner, repo, release_id,
+              body: (body ? body + "\n\n" : "") + lines.join("\n")
+            });
 
-            const footerContent = footerLines.join('\n');
-            const newBody = currentBody + '\n\n' + footerContent;
+      # ---------------------------
+      # GameEngine.Gameplay
+      # ---------------------------
+      - name: Restore Gameplay
+        if: ${{ steps.release.outputs['GameEngine.Gameplay--release_created'] == 'true' }}
+        run: dotnet restore GameEngine.Gameplay/GameEngine.Gameplay.csproj
 
-            console.log("Updating release with new body...");
-            try {
-              await github.rest.repos.updateRelease({
-                owner: REPO_OWNER,
-                repo: REPO_NAME,
-                release_id: releaseId,
-                body: newBody
-              });
-              console.log(`Successfully updated release ${releaseId}.`);
-            } catch (error) {
-              core.setFailed(`Failed to update release: ${error.message}`);
-            }
+      - name: Build Gameplay
+        if: ${{ steps.release.outputs['GameEngine.Gameplay--release_created'] == 'true' }}
+        run: dotnet build GameEngine.Gameplay/GameEngine.Gameplay.csproj -c Release --no-restore
+
+      - name: Pack Gameplay
+        if: ${{ steps.release.outputs['GameEngine.Gameplay--release_created'] == 'true' }}
+        run: |
+          VER="${{ steps.release.outputs['GameEngine.Gameplay--version'] }}"
+          mkdir -p .nupkg
+          dotnet pack GameEngine.Gameplay/GameEngine.Gameplay.csproj -c Release -o .nupkg /p:Version="$VER" --no-build
+
+      - name: Push Gameplay to GitHub Packages
+        if: ${{ steps.release.outputs['GameEngine.Gameplay--release_created'] == 'true' }}
+        run: dotnet nuget push .nupkg/*.nupkg --api-key "$GITHUB_TOKEN" --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json --skip-duplicate
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update Gameplay release body with links
+        if: ${{ steps.release.outputs['GameEngine.Gameplay--release_created'] == 'true' }}
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const owner = context.repo.owner;
+            const repo  = context.repo.repo;
+            const release_id  = "${{ steps.release.outputs['GameEngine.Gameplay--id'] }}";
+            const release_url = "${{ steps.release.outputs['GameEngine.Gameplay--html_url'] }}";
+            const body        = `${{ toJson(steps.release.outputs['GameEngine.Gameplay--body']) }}` || "";
+            const pkgName = "GameEngine.Gameplay";
+            const pkgUrl  = `https://github.com/${owner}/${repo}/pkgs/nuget/${pkgName}`;
+            const lines = [
+              "## Package Links",
+              "",
+              "**GitHub Packages:**",
+              "",
+              `- [${pkgName}](${pkgUrl})`,
+              "",
+              "**Direct Downloads (Release Assets):**",
+              "",
+              `- [View Source Code Assets for this Release](${release_url}#assets)`
+            ];
+            await github.rest.repos.updateRelease({
+              owner, repo, release_id,
+              body: (body ? body + "\n\n" : "") + lines.join("\n")
+            });
+
+      # ---------------------------
+      # GameEngine.Graphics
+      # ---------------------------
+      - name: Restore Graphics
+        if: ${{ steps.release.outputs['GameEngine.Graphics--release_created'] == 'true' }}
+        run: dotnet restore GameEngine.Graphics/GameEngine.Graphics.csproj
+
+      - name: Build Graphics
+        if: ${{ steps.release.outputs['GameEngine.Graphics--release_created'] == 'true' }}
+        run: dotnet build GameEngine.Graphics/GameEngine.Graphics.csproj -c Release --no-restore
+
+      - name: Pack Graphics
+        if: ${{ steps.release.outputs['GameEngine.Graphics--release_created'] == 'true' }}
+        run: |
+          VER="${{ steps.release.outputs['GameEngine.Graphics--version'] }}"
+          mkdir -p .nupkg
+          dotnet pack GameEngine.Graphics/GameEngine.Graphics.csproj -c Release -o .nupkg /p:Version="$VER" --no-build
+
+      - name: Push Graphics to GitHub Packages
+        if: ${{ steps.release.outputs['GameEngine.Graphics--release_created'] == 'true' }}
+        run: dotnet nuget push .nupkg/*.nupkg --api-key "$GITHUB_TOKEN" --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json --skip-duplicate
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update Graphics release body with links
+        if: ${{ steps.release.outputs['GameEngine.Graphics--release_created'] == 'true' }}
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const owner = context.repo.owner;
+            const repo  = context.repo.repo;
+            const release_id  = "${{ steps.release.outputs['GameEngine.Graphics--id'] }}";
+            const release_url = "${{ steps.release.outputs['GameEngine.Graphics--html_url'] }}";
+            const body        = `${{ toJson(steps.release.outputs['GameEngine.Graphics--body']) }}` || "";
+            const pkgName = "GameEngine.Graphics";
+            const pkgUrl  = `https://github.com/${owner}/${repo}/pkgs/nuget/${pkgName}`;
+            const lines = [
+              "## Package Links",
+              "",
+              "**GitHub Packages:**",
+              "",
+              `- [${pkgName}](${pkgUrl})`,
+              "",
+              "**Direct Downloads (Release Assets):**",
+              "",
+              `- [View Source Code Assets for this Release](${release_url}#assets)`
+            ];
+            await github.rest.repos.updateRelease({
+              owner, repo, release_id,
+              body: (body ? body + "\n\n" : "") + lines.join("\n")
+            });
+
+      # ---------------------------
+      # GameEngine.Physics
+      # ---------------------------
+      - name: Restore Physics
+        if: ${{ steps.release.outputs['GameEngine.Physics--release_created'] == 'true' }}
+        run: dotnet restore GameEngine.Physics/GameEngine.Physics.csproj
+
+      - name: Build Physics
+        if: ${{ steps.release.outputs['GameEngine.Physics--release_created'] == 'true' }}
+        run: dotnet build GameEngine.Physics/GameEngine.Physics.csproj -c Release --no-restore
+
+      - name: Pack Physics
+        if: ${{ steps.release.outputs['GameEngine.Physics--release_created'] == 'true' }}
+        run: |
+          VER="${{ steps.release.outputs['GameEngine.Physics--version'] }}"
+          mkdir -p .nupkg
+          dotnet pack GameEngine.Physics/GameEngine.Physics.csproj -c Release -o .nupkg /p:Version="$VER" --no-build
+
+      - name: Push Physics to GitHub Packages
+        if: ${{ steps.release.outputs['GameEngine.Physics--release_created'] == 'true' }}
+        run: dotnet nuget push .nupkg/*.nupkg --api-key "$GITHUB_TOKEN" --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json --skip-duplicate
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update Physics release body with links
+        if: ${{ steps.release.outputs['GameEngine.Physics--release_created'] == 'true' }}
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const owner = context.repo.owner;
+            const repo  = context.repo.repo;
+            const release_id  = "${{ steps.release.outputs['GameEngine.Physics--id'] }}";
+            const release_url = "${{ steps.release.outputs['GameEngine.Physics--html_url'] }}";
+            const body        = `${{ toJson(steps.release.outputs['GameEngine.Physics--body']) }}` || "";
+            const pkgName = "GameEngine.Physics";
+            const pkgUrl  = `https://github.com/${owner}/${repo}/pkgs/nuget/${pkgName}`;
+            const lines = [
+              "## Package Links",
+              "",
+              "**GitHub Packages:**",
+              "",
+              `- [${pkgName}](${pkgUrl})`,
+              "",
+              "**Direct Downloads (Release Assets):**",
+              "",
+              `- [View Source Code Assets for this Release](${release_url}#assets)`
+            ];
+            await github.rest.repos.updateRelease({
+              owner, repo, release_id,
+              body: (body ? body + "\n\n" : "") + lines.join("\n")
+            });
+
+      # ---------------------------
+      # GameEngine.IO
+      # ---------------------------
+      - name: Restore IO
+        if: ${{ steps.release.outputs['GameEngine.IO--release_created'] == 'true' }}
+        run: dotnet restore GameEngine.IO/GameEngine.IO.csproj
+
+      - name: Build IO
+        if: ${{ steps.release.outputs['GameEngine.IO--release_created'] == 'true' }}
+        run: dotnet build GameEngine.IO/GameEngine.IO.csproj -c Release --no-restore
+
+      - name: Pack IO
+        if: ${{ steps.release.outputs['GameEngine.IO--release_created'] == 'true' }}
+        run: |
+          VER="${{ steps.release.outputs['GameEngine.IO--version'] }}"
+          mkdir -p .nupkg
+          dotnet pack GameEngine.IO/GameEngine.IO.csproj -c Release -o .nupkg /p:Version="$VER" --no-build
+
+      - name: Push IO to GitHub Packages
+        if: ${{ steps.release.outputs['GameEngine.IO--release_created'] == 'true' }}
+        run: dotnet nuget push .nupkg/*.nupkg --api-key "$GITHUB_TOKEN" --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json --skip-duplicate
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update IO release body with links
+        if: ${{ steps.release.outputs['GameEngine.IO--release_created'] == 'true' }}
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const owner = context.repo.owner;
+            const repo  = context.repo.repo;
+            const release_id  = "${{ steps.release.outputs['GameEngine.IO--id'] }}";
+            const release_url = "${{ steps.release.outputs['GameEngine.IO--html_url'] }}";
+            const body        = `${{ toJson(steps.release.outputs['GameEngine.IO--body']) }}` || "";
+            const pkgName = "GameEngine.IO";
+            const pkgUrl  = `https://github.com/${owner}/${repo}/pkgs/nuget/${pkgName}`;
+            const lines = [
+              "## Package Links",
+              "",
+              "**GitHub Packages:**",
+              "",
+              `- [${pkgName}](${pkgUrl})`,
+              "",
+              "**Direct Downloads (Release Assets):**",
+              "",
+              `- [View Source Code Assets for this Release](${release_url}#assets)`
+            ];
+            await github.rest.repos.updateRelease({
+              owner, repo, release_id,
+              body: (body ? body + "\n\n" : "") + lines.join("\n")
+            })
