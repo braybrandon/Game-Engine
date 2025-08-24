@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.0.3](https://github.com/braybrandon/Game-Engine/compare/io-v0.0.2...io-v0.0.3) (2025-08-24)
+
+
+### Bug Fixes
+
+* **gameplay:** Update engine to gameplay ([e7d8c7d](https://github.com/braybrandon/Game-Engine/commit/e7d8c7dba6578e3775a6c05c45008eb83aa7c88c))
+* **io:** Fix manifest file for 0.0.2 release ([29ebf49](https://github.com/braybrandon/Game-Engine/commit/29ebf4915ed4b419da9fa19d30d07728506e8041))
+
 ## [0.0.2](https://github.com/braybrandon/Game-Engine/compare/io-v0.0.1...io-v0.0.2) (2025-08-24)
 
 
