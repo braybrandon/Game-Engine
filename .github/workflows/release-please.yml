@@ -321,8 +321,8 @@ jobs:
 
       # ---------------------------
       # Consolidated "index" releases per component
-      # Builds/updates a stable <component>-index release that points to the latest version
-      # and lists a short history of that component's releases.
+      # Recreate (delete + create) each <component>-index at the very end so
+      # all consolidated releases appear first on the Releases page.
       # ---------------------------
       - name: Build consolidated component index releases
         uses: actions/github-script@v7
@@ -332,7 +332,7 @@ jobs:
             const owner = context.repo.owner;
             const repo  = context.repo.repo;
 
-            // Map the component key (tag prefix) to NuGet package name
+            // Component key (tag prefix) -> NuGet package name
             const pkgNameMap = {
               common:   "GameEngine.Common",
               gameplay: "GameEngine.Gameplay",
@@ -341,40 +341,18 @@ jobs:
               io:       "GameEngine.IO"
             };
 
-            // Get default branch for target_commitish
-            const { data: repoData } = await github.rest.repos.get({ owner, repo });
-            const defaultBranch = repoData.default_branch || "master";
-
             // Fetch all releases once
             const allReleases = await github.paginate(github.rest.repos.listReleases, {
               owner, repo, per_page: 100
             });
 
-            // Utility: sort semver-like tags descending for a given component prefix
-            function sortBySemverDesc(component, items) {
-              // Only prioritize "<component>-index" first; keep everything else in original order.
-              const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-              const comp = escapeRegExp(component);
-              const tagOf = (it) => it.tag ?? it.tag_name ?? '';
-              const isIndex = (t) => new RegExp(`^${comp}-index$`, 'i').test(t);
-
-              // Capture original index to force stable behavior even if engine sort isn't stable.
-              return items
-                .map((it, i) => ({ it, i }))
-                .sort((a, b) => {
-                  const ai = isIndex(tagOf(a.it));
-                  const bi = isIndex(tagOf(b.it));
-                  if (ai !== bi) return ai ? -1 : 1;  // consolidated first
-                  return a.i - b.i;                   // preserve original order for the rest
-                })
-                .map(({ it }) => it);
-            }
-
             const components = Object.keys(pkgNameMap);
 
             for (const component of components) {
               const prefix = `${component}-v`;
+              const indexTag = `${component}-index`;
 
+              // Grab all versioned releases for this component
               const compReleases = allReleases
                 .filter(r => r.tag_name && r.tag_name.startsWith(prefix))
                 .map(r => ({
@@ -386,16 +364,19 @@ jobs:
                 }));
 
               if (compReleases.length === 0) {
-                core.info(`No releases found for '${component}', skipping index.`);
+                core.info(`No versioned releases found for '${component}', skipping index.`);
                 continue;
               }
 
-              sortBySemverDesc(component, compReleases);
+              // Latest by time (no need for semver parsing here)
+              compReleases.sort((a, b) =>
+                (Date.parse(b.published_at || 0) || 0) -
+                (Date.parse(a.published_at || 0) || 0)
+              );
               const latest = compReleases[0];
 
               const pkgName = pkgNameMap[component];
               const pkgUrl  = `https://github.com/${owner}/${repo}/pkgs/nuget/${pkgName}`;
-              const indexTag = `${component}-index`;
               const iso = (d) => (d ? new Date(d).toISOString().slice(0,10) : "");
               const EXCERPT_LINES = 20;
 
@@ -410,29 +391,41 @@ jobs:
                 body += `### [${r.tag}](${r.html_url}) — ${iso(r.published_at)}\n${excerpt}\n\n`;
               }
 
+              // Always (re)create the index release at the end to bump it to the top.
+              // If an index release exists, delete it first (tags remain intact).
               const existing = allReleases.find(r => r.tag_name === indexTag);
               if (existing) {
-                core.info(`Updating index release '${indexTag}' (${existing.id})`);
-                await github.rest.repos.updateRelease({
-                  owner, repo,
-                  release_id: existing.id,
-                  tag_name: indexTag,
-                  name: `${component}: consolidated releases (latest ${latest.tag})`,
-                  body,
-                  make_latest: "false",
-                  target_commitish: defaultBranch
-                });
-              } else {
-                core.info(`Creating index release '${indexTag}'`);
-                await github.rest.repos.createRelease({
-                  owner, repo,
-                  tag_name: indexTag,
-                  name: `${component}: consolidated releases (latest ${latest.tag})`,
-                  body,
-                  draft: false,
-                  prerelease: false,
-                  make_latest: "false",
-                  target_commitish: defaultBranch
-                });
+                core.info(`Deleting existing index release '${indexTag}' (id: ${existing.id}) to bump ordering...`);
+                try {
+                  await github.rest.repos.deleteRelease({ owner, repo, release_id: existing.id });
+                } catch (err) {
+                  core.warning(`Failed to delete existing '${indexTag}' (continuing with update): ${err.message}`);
+                  // Fall back to update if delete fails
+                  try {
+                    await github.rest.repos.updateRelease({
+                      owner, repo,
+                      release_id: existing.id,
+                      tag_name: indexTag,
+                      name: `${component}: consolidated releases (latest ${latest.tag})`,
+                      body,
+                      make_latest: "false"
+                    });
+                    continue;
+                  } catch (e2) {
+                    core.warning(`Fallback update failed for '${indexTag}': ${e2.message}`);
+                  }
+                }
               }
+
+              // Create (or recreate) the index release with current timestamp -> shows first
+              core.info(`Creating index release '${indexTag}' at top...`);
+              await github.rest.repos.createRelease({
+                owner, repo,
+                tag_name: indexTag,
+                name: `${component}: consolidated releases (latest ${latest.tag})`,
+                body,
+                draft: false,
+                prerelease: false,
+                make_latest: "false"
+              });
             }
