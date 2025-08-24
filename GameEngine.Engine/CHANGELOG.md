@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.0](https://github.com/braybrandon/Game-Engine/compare/v0.0.1...v0.1.0) (2025-08-24)
+
+
+### Features
+
+* **ai:** add TargetingSystem and core AI components ([559dae4](https://github.com/braybrandon/Game-Engine/commit/559dae4620f8dc5bf9838e1742cb2fed7248ca65))
+
 ## [0.0.1](https://github.com/braybrandon/Game-Engine/compare/v0.0.1...v0.0.1) (2025-08-24)
 
 
