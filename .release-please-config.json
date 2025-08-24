@@ -13,47 +13,30 @@
     {"type": "chore", "section": "Other Changes", "hidden": true}
   ],
   "packages": {
-    ".": {
-      "release-type": "simple",
-      "changelog-path": "CHANGELOG.md",
-      "changelog-sections": [
-        {"type": "feat", "section": "Features"},
-        {"type": "fix", "section": "Bug Fixes"},
-        {"type": "docs", "section": "Documentation"},
-        {"type": "style", "section": "Styles"},
-        {"type": "refactor", "section": "Code Refactoring"},
-        {"type": "perf", "section": "Performance Improvements"},
-        {"type": "test", "section": "Tests"},
-        {"type": "chore", "section": "Other Changes", "hidden": true}
-      ],
-      "extra-files": [
-        "Directory.Build.props" 
-      ]
-    },
     "GameEngine.Common": {
       "path": "GameEngine.Common",
       "release-type": "simple",
-      "changelog-path": "GameEngine.Common/CHANGELOG.md"
+      "changelog-path": "CHANGELOG.md"
     },
     "GameEngine.Core": {
       "path": "GameEngine.Engine",
       "release-type": "simple",
-      "changelog-path": "GameEngine.Engine/CHANGELOG.md"
+      "changelog-path": "CHANGELOG.md"
     },
     "GameEngine.Graphics": {
       "path": "GameEngine.Graphics",
       "release-type": "simple",
-      "changelog-path": "GameEngine.Graphics/CHANGELOG.md"
+      "changelog-path": "CHANGELOG.md"
     },
     "GameEngine.Physics": {
       "path": "GameEngine.Physics",
       "release-type": "simple",
-      "changelog-path": "GameEngine.Physics/CHANGELOG.md"
+      "changelog-path": "CHANGELOG.md"
     },
     "GameEngine.IO": {
       "path": "GameEngine.IO",
       "release-type": "simple",
-      "changelog-path": "GameEngine.IO/CHANGELOG.md"
+      "changelog-path": "CHANGELOG.md"
     }
   }
 }
