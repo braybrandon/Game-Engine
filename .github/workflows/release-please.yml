@@ -30,22 +30,26 @@ jobs:
           manifest-file: .release-please-manifest.json
           include-component-in-tag: true
 
-      # Optional: quick visibility into what fired
+      # Quick visibility into what fired
       - name: Debug release outputs
         run: |
-          echo "Common released?    ${{ steps.release.outputs['GameEngine.Common--release_created'] }}"
-          echo "Gameplay released?  ${{ steps.release.outputs['GameEngine.Gameplay--release_created'] }}"
-          echo "Graphics released?  ${{ steps.release.outputs['GameEngine.Graphics--release_created'] }}"
-          echo "Physics released?   ${{ steps.release.outputs['GameEngine.Physics--release_created'] }}"
-          echo "IO released?        ${{ steps.release.outputs['GameEngine.IO--release_created'] }}"
+          echo "Common released?      ${{ steps.release.outputs['GameEngine.Common--release_created'] }}"
+          echo "Gameplay released?    ${{ steps.release.outputs['GameEngine.Gameplay--release_created'] }}"
+          echo "Graphics released?    ${{ steps.release.outputs['GameEngine.Graphics--release_created'] }}"
+          echo "Physics released?     ${{ steps.release.outputs['GameEngine.Physics--release_created'] }}"
+          echo "IO released?          ${{ steps.release.outputs['GameEngine.IO--release_created'] }}"
 
       # Set up .NET only if at least one package was released
       - name: Setup .NET SDK
-        if: ${{ steps.release.outputs['GameEngine.Common--release_created'] == 'true' || steps.release.outputs['GameEngine.Gameplay--release_created'] == 'true' || steps.release.outputs['GameEngine.Graphics--release_created'] == 'true' || steps.release.outputs['GameEngine.Physics--release_created'] == 'true' || steps.release.outputs['GameEngine.IO--release_created'] == 'true' }}
+        if: ${{ steps.release.outputs['GameEngine.Common--release_created'] == 'true'
+              || steps.release.outputs['GameEngine.Gameplay--release_created'] == 'true'
+              || steps.release.outputs['GameEngine.Graphics--release_created'] == 'true'
+              || steps.release.outputs['GameEngine.Physics--release_created'] == 'true'
+              || steps.release.outputs['GameEngine.IO--release_created'] == 'true' }}
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
-          # Configure auth for GitHub Packages (nuget.pkg.github.com)
+          # Auth for GitHub Packages (nuget.pkg.github.com)
           source-url: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
         env:
           NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -82,15 +86,11 @@ jobs:
           script: |
             const owner = context.repo.owner;
             const repo  = context.repo.repo;
-
             const release_id  = "${{ steps.release.outputs['GameEngine.Common--id'] }}";
             const release_url = "${{ steps.release.outputs['GameEngine.Common--html_url'] }}";
             const body        = `${{ toJson(steps.release.outputs['GameEngine.Common--body']) }}` || "";
-
             const pkgName = "GameEngine.Common";
             const pkgUrl  = `https://github.com/${owner}/${repo}/pkgs/nuget/${pkgName}`;
-            const assetsUrl = `${release_url}#assets`;
-
             const lines = [
               "## Package Links",
               "",
@@ -100,12 +100,10 @@ jobs:
               "",
               "**Direct Downloads (Release Assets):**",
               "",
-              `- [View Source Code Assets for this Release](${assetsUrl})`
+              `- [View Source Code Assets for this Release](${release_url}#assets)`
             ];
-
             await github.rest.repos.updateRelease({
-              owner, repo,
-              release_id,
+              owner, repo, release_id,
               body: (body ? body + "\n\n" : "") + lines.join("\n")
             });
 
@@ -141,15 +139,11 @@ jobs:
           script: |
             const owner = context.repo.owner;
             const repo  = context.repo.repo;
-
             const release_id  = "${{ steps.release.outputs['GameEngine.Gameplay--id'] }}";
             const release_url = "${{ steps.release.outputs['GameEngine.Gameplay--html_url'] }}";
             const body        = `${{ toJson(steps.release.outputs['GameEngine.Gameplay--body']) }}` || "";
-
             const pkgName = "GameEngine.Gameplay";
             const pkgUrl  = `https://github.com/${owner}/${repo}/pkgs/nuget/${pkgName}`;
-            const assetsUrl = `${release_url}#assets`;
-
             const lines = [
               "## Package Links",
               "",
@@ -159,12 +153,10 @@ jobs:
               "",
               "**Direct Downloads (Release Assets):**",
               "",
-              `- [View Source Code Assets for this Release](${assetsUrl})`
+              `- [View Source Code Assets for this Release](${release_url}#assets)`
             ];
-
             await github.rest.repos.updateRelease({
-              owner, repo,
-              release_id,
+              owner, repo, release_id,
               body: (body ? body + "\n\n" : "") + lines.join("\n")
             });
 
@@ -200,15 +192,11 @@ jobs:
           script: |
             const owner = context.repo.owner;
             const repo  = context.repo.repo;
-
             const release_id  = "${{ steps.release.outputs['GameEngine.Graphics--id'] }}";
             const release_url = "${{ steps.release.outputs['GameEngine.Graphics--html_url'] }}";
             const body        = `${{ toJson(steps.release.outputs['GameEngine.Graphics--body']) }}` || "";
-
             const pkgName = "GameEngine.Graphics";
             const pkgUrl  = `https://github.com/${owner}/${repo}/pkgs/nuget/${pkgName}`;
-            const assetsUrl = `${release_url}#assets`;
-
             const lines = [
               "## Package Links",
               "",
@@ -218,12 +206,10 @@ jobs:
               "",
               "**Direct Downloads (Release Assets):**",
               "",
-              `- [View Source Code Assets for this Release](${assetsUrl})`
+              `- [View Source Code Assets for this Release](${release_url}#assets)`
             ];
-
             await github.rest.repos.updateRelease({
-              owner, repo,
-              release_id,
+              owner, repo, release_id,
               body: (body ? body + "\n\n" : "") + lines.join("\n")
             });
 
@@ -259,15 +245,11 @@ jobs:
           script: |
             const owner = context.repo.owner;
             const repo  = context.repo.repo;
-
             const release_id  = "${{ steps.release.outputs['GameEngine.Physics--id'] }}";
             const release_url = "${{ steps.release.outputs['GameEngine.Physics--html_url'] }}";
             const body        = `${{ toJson(steps.release.outputs['GameEngine.Physics--body']) }}` || "";
-
             const pkgName = "GameEngine.Physics";
             const pkgUrl  = `https://github.com/${owner}/${repo}/pkgs/nuget/${pkgName}`;
-            const assetsUrl = `${release_url}#assets`;
-
             const lines = [
               "## Package Links",
               "",
@@ -277,12 +259,10 @@ jobs:
               "",
               "**Direct Downloads (Release Assets):**",
               "",
-              `- [View Source Code Assets for this Release](${assetsUrl})`
+              `- [View Source Code Assets for this Release](${release_url}#assets)`
             ];
-
             await github.rest.repos.updateRelease({
-              owner, repo,
-              release_id,
+              owner, repo, release_id,
               body: (body ? body + "\n\n" : "") + lines.join("\n")
             });
 
@@ -318,15 +298,11 @@ jobs:
           script: |
             const owner = context.repo.owner;
             const repo  = context.repo.repo;
-
             const release_id  = "${{ steps.release.outputs['GameEngine.IO--id'] }}";
             const release_url = "${{ steps.release.outputs['GameEngine.IO--html_url'] }}";
             const body        = `${{ toJson(steps.release.outputs['GameEngine.IO--body']) }}` || "";
-
             const pkgName = "GameEngine.IO";
             const pkgUrl  = `https://github.com/${owner}/${repo}/pkgs/nuget/${pkgName}`;
-            const assetsUrl = `${release_url}#assets`;
-
             const lines = [
               "## Package Links",
               "",
@@ -336,11 +312,9 @@ jobs:
               "",
               "**Direct Downloads (Release Assets):**",
               "",
-              `- [View Source Code Assets for this Release](${assetsUrl})`
+              `- [View Source Code Assets for this Release](${release_url}#assets)`
             ];
-
             await github.rest.repos.updateRelease({
-              owner, repo,
-              release_id,
+              owner, repo, release_id,
               body: (body ? body + "\n\n" : "") + lines.join("\n")
             })
