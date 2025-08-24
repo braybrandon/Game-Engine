@@ -1,5 +1,5 @@
 {
-  "GameEngine.Engine": "0.0.1",
+  "GameEngine.Engine": "0.0.2",
   "GameEngine.Common": "0.0.1",
   "GameEngine.Graphics": "0.0.1",
   "GameEngine.Physics": "0.0.1",
