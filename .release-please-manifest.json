@@ -3,5 +3,5 @@
   "GameEngine.Common": "0.0.1",
   "GameEngine.Graphics": "0.0.1",
   "GameEngine.Physics": "0.0.1",
-  "GameEngine.IO": "0.0.1"
+  "GameEngine.IO": "0.0.2"
 }
