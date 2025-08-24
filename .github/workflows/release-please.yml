@@ -324,108 +324,106 @@ jobs:
       # Recreate (delete + create) each <component>-index at the very end so
       # all consolidated releases appear first on the Releases page.
       # ---------------------------
-      - name: Build consolidated component index releases
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const owner = context.repo.owner;
-            const repo  = context.repo.repo;
+    # .github/workflows/release-index.yml
+    name: Build Consolidated Release Indexes
 
-            // Component key (tag prefix) -> NuGet package name
-            const pkgNameMap = {
-              common:   "GameEngine.Common",
-              gameplay: "GameEngine.Gameplay",
-              graphics: "GameEngine.Graphics",
-              physics:  "GameEngine.Physics",
-              io:       "GameEngine.IO"
-            };
+    on:
+      workflow_run:
+        workflows: ["Release Please"]
+        types: [completed]
 
-            // Fetch all releases once
-            const allReleases = await github.paginate(github.rest.repos.listReleases, {
-              owner, repo, per_page: 100
-            });
+    permissions:
+      contents: write
 
-            const components = Object.keys(pkgNameMap);
+    concurrency:
+      group: release-index-${{ github.ref }}
+      cancel-in-progress: false
 
-            for (const component of components) {
-              const prefix = `${component}-v`;
-              const indexTag = `${component}-index`;
+    jobs:
+      build-index:
+        if: ${{ github.event.workflow_run.conclusion == 'success' }}
+        runs-on: ubuntu-latest
+        steps:
+          - name: Checkout (shallow is fine)
+            uses: actions/checkout@v4
+            with:
+              fetch-depth: 1
 
-              // Grab all versioned releases for this component
-              const compReleases = allReleases
-                .filter(r => r.tag_name && r.tag_name.startsWith(prefix))
-                .map(r => ({
-                  tag: r.tag_name,
-                  name: r.name || r.tag_name,
-                  html_url: r.html_url,
-                  published_at: r.published_at || r.created_at,
-                  body: r.body || ""
-                }));
+          - name: Create/refresh consolidated releases
+            uses: actions/github-script@v7
+            with:
+              github-token: ${{ secrets.GITHUB_TOKEN }}
+              script: |
+                const owner = context.repo.owner;
+                const repo  = context.repo.repo;
 
-              if (compReleases.length === 0) {
-                core.info(`No versioned releases found for '${component}', skipping index.`);
-                continue;
-              }
+                const components = {
+                  common:   "GameEngine.Common",
+                  gameplay: "GameEngine.Gameplay",
+                  graphics: "GameEngine.Graphics",
+                  physics:  "GameEngine.Physics",
+                  io:       "GameEngine.IO"
+                };
 
-              // Latest by time (no need for semver parsing here)
-              compReleases.sort((a, b) =>
-                (Date.parse(b.published_at || 0) || 0) -
-                (Date.parse(a.published_at || 0) || 0)
-              );
-              const latest = compReleases[0];
+                const { data: repoData } = await github.rest.repos.get({ owner, repo });
+                const defaultBranch = repoData.default_branch || "master";
 
-              const pkgName = pkgNameMap[component];
-              const pkgUrl  = `https://github.com/${owner}/${repo}/pkgs/nuget/${pkgName}`;
-              const iso = (d) => (d ? new Date(d).toISOString().slice(0,10) : "");
-              const EXCERPT_LINES = 20;
+                const releases = await github.paginate(github.rest.repos.listReleases, {
+                  owner, repo, per_page: 100
+                });
 
-              let body = `# ${component} — consolidated releases\n\n`;
-              body += `**Latest:** [${latest.tag}](${latest.html_url}) · ${iso(latest.published_at)}\n\n`;
-              body += `**Package:** [${pkgName}](${pkgUrl})\n\n`;
-              body += `---\n\n`;
-              body += `## History\n`;
-
-              for (const r of compReleases) {
-                const excerpt = (r.body || "").split('\n').slice(0, EXCERPT_LINES).join('\n');
-                body += `### [${r.tag}](${r.html_url}) — ${iso(r.published_at)}\n${excerpt}\n\n`;
-              }
-
-              // Always (re)create the index release at the end to bump it to the top.
-              // If an index release exists, delete it first (tags remain intact).
-              const existing = allReleases.find(r => r.tag_name === indexTag);
-              if (existing) {
-                core.info(`Deleting existing index release '${indexTag}' (id: ${existing.id}) to bump ordering...`);
-                try {
-                  await github.rest.repos.deleteRelease({ owner, repo, release_id: existing.id });
-                } catch (err) {
-                  core.warning(`Failed to delete existing '${indexTag}' (continuing with update): ${err.message}`);
-                  // Fall back to update if delete fails
-                  try {
-                    await github.rest.repos.updateRelease({
-                      owner, repo,
-                      release_id: existing.id,
-                      tag_name: indexTag,
-                      name: `${component}: consolidated releases (latest ${latest.tag})`,
-                      body,
-                      make_latest: "false"
-                    });
-                    continue;
-                  } catch (e2) {
-                    core.warning(`Fallback update failed for '${indexTag}': ${e2.message}`);
-                  }
+                function byTimeDesc(a, b) {
+                  const ta = new Date(a.published_at || a.created_at || 0).getTime();
+                  const tb = new Date(b.published_at || b.created_at || 0).getTime();
+                  return tb - ta;
                 }
-              }
 
-              // Create (or recreate) the index release with current timestamp -> shows first
-              core.info(`Creating index release '${indexTag}' at top...`);
-              await github.rest.repos.createRelease({
-                owner, repo,
-                tag_name: indexTag,
-                name: `${component}: consolidated releases (latest ${latest.tag})`,
-                body,
-                draft: false,
-                prerelease: false,
-                make_latest: "false"
-              });
-            }
+                for (const [component, pkgName] of Object.entries(components)) {
+                  const verPrefix = `${component}-v`;
+                  const indexTag  = `${component}-index`;
+
+                  const compReleases = releases
+                    .filter(r => r.tag_name?.startsWith(verPrefix))
+                    .sort(byTimeDesc);
+
+                  if (compReleases.length === 0) continue;
+
+                  const latest = compReleases[0];
+                  const pkgUrl = `https://github.com/${owner}/${repo}/pkgs/nuget/${pkgName}`;
+                  const iso = (d) => (d ? new Date(d).toISOString().slice(0,10) : "");
+                  const EXCERPT_LINES = 20;
+
+                  let body = `${component} — consolidated releases\n\n`;
+                  body += `**Latest:** [${latest.tag_name}](${latest.html_url}) · ${iso(latest.published_at)}\n\n`;
+                  body += `**Package:** [${pkgName}](${pkgUrl})\n\n`;
+                  body += `---\n\n## History\n`;
+                  for (const r of compReleases) {
+                    const excerpt = (r.body || "").split('\n').slice(0, EXCERPT_LINES).join('\n');
+                    body += `### [${r.tag_name}](${r.html_url}) — ${iso(r.published_at)}\n${excerpt}\n\n`;
+                  }
+
+                  // Delete old index release (if any)
+                  const existing = releases.find(r => r.tag_name === indexTag);
+                  if (existing) {
+                    try {
+                      await github.rest.repos.deleteRelease({ owner, repo, release_id: existing.id });
+                    } catch { /* ignore */ }
+                  }
+
+                  // Delete old tag (if any) so the new tag timestamp is newest
+                  try {
+                    await github.rest.git.deleteRef({ owner, repo, ref: `tags/${indexTag}` });
+                  } catch { /* ignore if not found */ }
+
+                  // Recreate tag at default branch HEAD by creating the release with target_commitish
+                  await github.rest.repos.createRelease({
+                    owner, repo,
+                    tag_name: indexTag,
+                    name: `${component}: consolidated releases (latest ${latest.tag_name})`,
+                    body,
+                    target_commitish: defaultBranch,
+                    draft: false,
+                    prerelease: false,
+                    make_latest: "false"   // don't steal the global "Latest" badge
+                  });
+                }
