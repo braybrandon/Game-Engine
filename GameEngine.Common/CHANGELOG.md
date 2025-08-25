@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.4](https://github.com/braybrandon/Game-Engine/compare/common-v0.0.3...common-v0.0.4) (2025-08-25)
+
+
+### Bug Fixes
+
+* **common:** Add documentation to Keybind Factory interface ([9915838](https://github.com/braybrandon/Game-Engine/commit/9915838043f3074d904004ec20bbcee5046d515c))
+
 ## [0.0.3](https://github.com/braybrandon/Game-Engine/compare/common-v0.0.2...common-v0.0.3) (2025-08-25)
 
 
