@@ -5,14 +5,16 @@ using GameEngine.Common.IO.Interface;
 using GameEngine.Common.Physics.Components;
 using GameEngine.Common.Physics.Interfaces;
 using GameEngine.Graphics.Camera;
-using GameEngine.IO.Audio;
 using GameEngine.Graphics.Components;
+using GameEngine.IO.Audio;
+using GameEngine.IO.Audio.Components;
+using GameEngine.IO.Audio.Event;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System;
 
 namespace GameEnginePlayground.Systems
 {
@@ -24,11 +26,10 @@ namespace GameEnginePlayground.Systems
         private readonly ITileMap _gameMap;
         private readonly IEntity _playerEntity;
         private readonly IAssetManager _assetManager;
-        private readonly IAudioManager _audioManager;
         private readonly IInputManager _inputManager;
         private readonly IQuadTree _quadTree;
 
-        public MouseEventHandlerSystem(IWorld world, IEntity camera, ITileMap gameMap, IEventManager eventManager, IEntity playerEntity, IAssetManager assetManager, IAudioManager audioManager, IInputManager inputManager, IQuadTree quadTree)
+        public MouseEventHandlerSystem(IWorld world, IEntity camera, ITileMap gameMap, IEventManager eventManager, IEntity playerEntity, IAssetManager assetManager, IInputManager inputManager, IQuadTree quadTree)
         {
              _world = world;
              _camera = camera;
@@ -38,15 +39,8 @@ namespace GameEnginePlayground.Systems
             _eventManager.AddListener<FireballPressedEvent>(handleFireballEvent);
             _assetManager = assetManager;
             _playerEntity = playerEntity;
-            _audioManager = audioManager;
             _inputManager = inputManager;
             _quadTree = quadTree;
-        }
-
-        float Jitter(float range = 0.05f) // ~±0.6 semitone at 0.05
-        {
-            Random random = new Random();
-            return ((float)random.NextDouble() * 2f - 1f) * range;
         }
 
         private void handleFireballEvent(FireballPressedEvent fireballPressed)
@@ -64,12 +58,7 @@ namespace GameEnginePlayground.Systems
 
             //Load in fireball sfx and provide pitch/pan values
             Texture2D _fireballtexture = _assetManager.LoadTexture("fireball");
-            float PanFromDir(Vector2 dir) => Math.Clamp(dir.X * .8f, -.2f, .2f);
-            float PitchFromDir(Vector2 dir) => Math.Clamp(Jitter(0.05f) + dir.X * 0.02f, -0.2f, 0.2f);
-            var pan = PanFromDir(direction);
-            var pitch = PitchFromDir(direction);
-            _audioManager.PlaySfx("fireball.shoot", 1f, pitch, pan);
-
+            fireball.AddComponent(new SoundFxComponent { SoundFile = "fireball.shoot", Volume = 1f, Pan = 0, Pitch = 0 });
             fireball.AddComponent(new TransformComponent { Position = new Vector2(transformComponent.Position.X, transformComponent.Position.Y), Rotation = 0f, Scale = Vector2.One });
             fireball.AddComponent(new DirectionComponent { Value = direction });
             fireball.AddComponent(new SpeedComponent { Value = projectileSpeed });
@@ -107,7 +96,7 @@ namespace GameEnginePlayground.Systems
             float distance = Vector2.Distance(transformComponent.Position, worldPosition);
             if (sourceRect.Contains(worldPosition))
             {
-                _audioManager.PlaySfx("shovel.dig", 1f, 0f, 0f);
+              _eventManager.Publish(new PlaySoundFxEvent("shovel.dig", transformComponent.Position, 1f));
               UpdateTile((int)worldPosition.X / 16, (int)worldPosition.Y / 16);
             }
         }

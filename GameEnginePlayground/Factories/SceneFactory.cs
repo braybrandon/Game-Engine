@@ -14,6 +14,7 @@ using GameEngine.Graphics.Camera;
 using GameEngine.Graphics.Components;
 using GameEngine.Graphics.Render;
 using GameEngine.IO.Audio;
+using GameEngine.IO.Audio.Systems;
 using GameEngine.Physics;
 using GameEngine.Physics.CollisionDetection;
 using GameEngine.Physics.CollisionDetection.Models;
@@ -89,10 +90,11 @@ namespace GameEnginePlayground.Factories
             scene.RegisterUpdateSystem(new AnimationSystem(_timeManager));
             scene.RegisterUpdateSystem(new CameraUpdateSystem(playerEntity.Id, _inputManager));
             scene.RegisterUpdateSystem(new CullingSystem(cameraEntity, gameMap));
-            scene.RegisterUpdateSystem(new MouseEventHandlerSystem(sceneWorld, cameraEntity, gameMap, _eventManager, playerEntity, _assetManager, _audioManager, _inputManager, quadtree));
+            scene.RegisterUpdateSystem(new MouseEventHandlerSystem(sceneWorld, cameraEntity, gameMap, _eventManager, playerEntity, _assetManager, _inputManager, quadtree));
             scene.RegisterUpdateSystem(new ProjectileLiftetimeSystem(_timeManager, quadtree));
             scene.RegisterUpdateSystem(new TargetingSystem());
             scene.RegisterUpdateSystem(new BehaviorTreeSystem());
+            scene.RegisterUpdateSystem(new SoundFxSystem(_audioManager, _eventManager));
 
             var pp = _graphicsDevice.PresentationParameters;
             var mainTarget = new RenderTarget2D(_graphicsDevice, pp.BackBufferWidth, pp.BackBufferHeight);
