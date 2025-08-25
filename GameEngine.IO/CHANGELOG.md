@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.0](https://github.com/braybrandon/Game-Engine/compare/io-v0.0.2...io-v0.1.0) (2025-08-25)
+
+
+### Features
+
+* Add AudioManager & Sound Effect Handling ([#159](https://github.com/braybrandon/Game-Engine/issues/159)) ([82b2afa](https://github.com/braybrandon/Game-Engine/commit/82b2afa33714690ffdb32b34a381adc5ae5158d6))
+
 ## [0.0.2](https://github.com/braybrandon/Game-Engine/compare/io-v0.0.1...io-v0.0.2) (2025-08-24)
 
 
