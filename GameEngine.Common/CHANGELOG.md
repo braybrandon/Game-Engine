@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.3](https://github.com/braybrandon/Game-Engine/compare/common-v0.0.2...common-v0.0.3) (2025-08-25)
+
+
+### Bug Fixes
+
+* **common:** documentation for service locator ([fe4209e](https://github.com/braybrandon/Game-Engine/commit/fe4209eeaa4a0673343e1165eff10271656acb4e))
+
 ## [0.0.2](https://github.com/braybrandon/Game-Engine/compare/common-v0.0.1...common-v0.0.2) (2025-08-24)
 
 
