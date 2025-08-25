@@ -28,7 +28,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Audio\" />
     <Folder Include="SaveLoad\" />
   </ItemGroup>
 

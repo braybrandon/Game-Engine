@@ -6,8 +6,13 @@ using GameEngine.Common.Physics.Components;
 using GameEngine.Common.Physics.Interfaces;
 using GameEngine.Graphics.Camera;
 using GameEngine.Graphics.Components;
+using GameEngine.IO.Audio;
+using GameEngine.IO.Audio.Components;
+using GameEngine.IO.Audio.Event;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -50,7 +55,10 @@ namespace GameEnginePlayground.Systems
             var direction = worldPosition - transformComponent.Position;
             direction.Normalize();
             float projectileSpeed = 200f;
+
+            //Load in fireball sfx and provide pitch/pan values
             Texture2D _fireballtexture = _assetManager.LoadTexture("fireball");
+            fireball.AddComponent(new SoundFxComponent { SoundFile = "fireball.shoot", Volume = 1f, Pan = 0, Pitch = 0 });
             fireball.AddComponent(new TransformComponent { Position = new Vector2(transformComponent.Position.X, transformComponent.Position.Y), Rotation = 0f, Scale = Vector2.One });
             fireball.AddComponent(new DirectionComponent { Value = direction });
             fireball.AddComponent(new SpeedComponent { Value = projectileSpeed });
@@ -88,6 +96,7 @@ namespace GameEnginePlayground.Systems
             float distance = Vector2.Distance(transformComponent.Position, worldPosition);
             if (sourceRect.Contains(worldPosition))
             {
+              _eventManager.Publish(new PlaySoundFxEvent("shovel.dig", transformComponent.Position, 1f));
               UpdateTile((int)worldPosition.X / 16, (int)worldPosition.Y / 16);
             }
         }
