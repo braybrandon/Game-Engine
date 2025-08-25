@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.0](https://github.com/braybrandon/Game-Engine/compare/gameplay-v0.0.3...gameplay-v0.1.0) (2025-08-24)
+
+
+### Features
+
+* **gameplay:** : add behavior tree framework and runtime ([7e88bf3](https://github.com/braybrandon/Game-Engine/commit/7e88bf33764b69a832fef6a7d14993f6f0abb748))
+
 ## [0.0.3](https://github.com/braybrandon/Game-Engine/compare/gameplay-v0.0.2...gameplay-v0.0.3) (2025-08-24)
 
 

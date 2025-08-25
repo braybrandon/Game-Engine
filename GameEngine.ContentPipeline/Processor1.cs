@@ -1,4 +1,4 @@
-﻿using GameEngine.Common.Interfaces;
+﻿using GameEngine.Common.IO.Interface;
 using GameEngine.ContentPipeline;
 using GameEngine.IO.Asset.models;
 using Microsoft.Xna.Framework.Content.Pipeline;

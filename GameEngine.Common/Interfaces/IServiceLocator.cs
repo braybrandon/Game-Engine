@@ -1,15 +1,40 @@
 ﻿namespace GameEngine.Common.Interfaces
 {
+    /// <summary>
+    /// Provides an interface for a service locator, enabling registration, retrieval, and management of services by type.
+    /// </summary>
     public interface IServiceLocator
     {
-        public void Register<TInterface>(TInterface service);
+        /// <summary>
+        /// Registers a service instance for the specified interface type.
+        /// </summary>
+        /// <typeparam name="TInterface">The interface type of the service.</typeparam>
+        /// <param name="service">The service instance to register.</param>
+        void Register<TInterface>(TInterface service);
 
-        public bool HasService<TInterface>();
+        /// <summary>
+        /// Checks if a service of the specified interface type is registered.
+        /// </summary>
+        /// <typeparam name="TInterface">The interface type to check.</typeparam>
+        /// <returns>True if the service is registered; otherwise, false.</returns>
+        bool HasService<TInterface>();
 
-        public void UnregisterService<TInterface>();
+        /// <summary>
+        /// Unregisters the service of the specified interface type.
+        /// </summary>
+        /// <typeparam name="TInterface">The interface type of the service to unregister.</typeparam>
+        void UnregisterService<TInterface>();
 
-        public TInterface GetService<TInterface>() where TInterface : class;
+        /// <summary>
+        /// Retrieves the registered service instance for the specified interface type.
+        /// </summary>
+        /// <typeparam name="TInterface">The interface type of the service.</typeparam>
+        /// <returns>The registered service instance.</returns>
+        TInterface GetService<TInterface>() where TInterface : class;
 
-        public void Clear();
+        /// <summary>
+        /// Clears all registered services from the service locator.
+        /// </summary>
+        void Clear();
     }
 }

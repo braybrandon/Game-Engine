@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GameEngine.Common.Interfaces
+namespace GameEngine.Common.IO.Interface
 {
     public interface ITileset
     {

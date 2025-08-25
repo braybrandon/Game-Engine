@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.0.4](https://github.com/braybrandon/Game-Engine/compare/common-v0.0.3...common-v0.0.4) (2025-08-25)
+
+
+### Bug Fixes
+
+* **common:** Add documentation to Keybind Factory interface ([9915838](https://github.com/braybrandon/Game-Engine/commit/9915838043f3074d904004ec20bbcee5046d515c))
+
+## [0.0.3](https://github.com/braybrandon/Game-Engine/compare/common-v0.0.2...common-v0.0.3) (2025-08-25)
+
+
+### Bug Fixes
+
+* **common:** documentation for service locator ([fe4209e](https://github.com/braybrandon/Game-Engine/commit/fe4209eeaa4a0673343e1165eff10271656acb4e))
+
+## [0.0.2](https://github.com/braybrandon/Game-Engine/compare/common-v0.0.1...common-v0.0.2) (2025-08-24)
+
+
+### Bug Fixes
+
+* **common:** Move TileMap interfaces ([b50e0a5](https://github.com/braybrandon/Game-Engine/commit/b50e0a521d2b53064f93911baa53c6259842d8f6))
+
 ## [0.0.1](https://github.com/braybrandon/Game-Engine/compare/common-v0.0.2...common-v0.0.1) (2025-08-24)
 
 

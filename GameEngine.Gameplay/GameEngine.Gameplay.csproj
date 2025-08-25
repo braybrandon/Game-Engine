@@ -23,7 +23,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="AI\" />
 	  <Folder Include="State\" />
 	</ItemGroup>
 

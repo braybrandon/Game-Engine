@@ -1,4 +1,4 @@
-﻿using GameEngine.Common.Interfaces;
+﻿using GameEngine.Common.IO.Interface;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 

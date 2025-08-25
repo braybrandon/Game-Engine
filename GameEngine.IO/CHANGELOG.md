@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.2](https://github.com/braybrandon/Game-Engine/compare/io-v0.0.1...io-v0.0.2) (2025-08-24)
+
+
+### Bug Fixes
+
+* **common:** Move TileMap interfaces ([b50e0a5](https://github.com/braybrandon/Game-Engine/commit/b50e0a521d2b53064f93911baa53c6259842d8f6))
+
 ## [0.0.1](https://github.com/braybrandon/Game-Engine/compare/io-v0.0.2...io-v0.0.1) (2025-08-24)
 
 
