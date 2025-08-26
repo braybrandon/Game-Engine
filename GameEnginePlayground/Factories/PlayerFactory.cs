@@ -8,6 +8,8 @@ using GameEngine.Gameplay.Combat.Components;
 using GameEngine.Graphics.Components;
 using GameEngine.Graphics.Enums;
 using GameEngine.Graphics.Models;
+using GameEngine.IO.Asset.models;
+using GameEnginePlayground.Factories.DataObjects;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -16,26 +18,47 @@ using System.Linq;
 
 namespace GameEnginePlayground.Factories
 {
-    public class PlayerFactory: IFactory<IEntity>
+    /// <summary>
+    /// Factory for creating player entities with all required components, including transform, input, animation, and collision.
+    /// Uses asset manager, event manager, and other dependencies to fully configure the player entity.
+    /// </summary>
+    public class PlayerFactory : IFactory<IEntity, PlayerData>
     {
         private readonly GraphicsDevice _graphicsDevice;
         private readonly IAssetManager _assetManager;
-
+        private readonly IEventManager _eventManager;
         private const int SPRITE_WIDTH = 32;
         private const int SPRITE_HEIGHT = 32;
         private IWorld _world;
         private ITileLayer _playerLayer;
         IQuadTree _quadTree;
 
-        public PlayerFactory(GraphicsDevice graphicsDevice, IAssetManager assetManager, IWorld world, ITileLayer playerLayer, IQuadTree quadTree)
+        /// <summary>
+        /// Initializes a new instance of the PlayerFactory with required dependencies.
+        /// </summary>
+        /// <param name="graphicsDevice">The graphics device for texture creation.</param>
+        /// <param name="assetManager">The asset manager for loading textures and keybinds.</param>
+        /// <param name="eventManager">The event manager for input actions.</param>
+        /// <param name="world">The world to create the entity in.</param>
+        /// <param name="playerLayer">The tile layer containing player spawn information.</param>
+        /// <param name="quadTree">The quadtree for spatial partitioning and collision.</param>
+        public PlayerFactory(GraphicsDevice graphicsDevice, IAssetManager assetManager, IEventManager eventManager, IWorld world, ITileLayer playerLayer, IQuadTree quadTree)
         {
             _graphicsDevice = graphicsDevice;
             _assetManager = assetManager;
             _world = world;
             _playerLayer = playerLayer;
             _quadTree = quadTree;
+            _eventManager = eventManager;
         }
-        public IEntity Create()
+
+        /// <summary>
+        /// Creates a player entity with all required components, including transform, input, animation, and collision.
+        /// Loads textures and keybinds, sets up animation clips, and inserts the entity into the quadtree.
+        /// </summary>
+        /// <param name="data">The player data used for configuration (extend PlayerData for more options).</param>
+        /// <returns>The fully configured player entity.</returns>
+        public IEntity Create(PlayerData data)
         {
             var positionObject = _playerLayer.Objects.FirstOrDefault(o => o.Name == "PlayerSpawn");
             var position = new Vector2(400, 240);
@@ -45,12 +68,13 @@ namespace GameEnginePlayground.Factories
                 position.Y = (int)positionObject.Y;
             }
             var playerEntity = _world.CreateEntity();
+            var keybindFactory = new KeybindFactory(playerEntity, _eventManager);
             playerEntity.AddComponent(new TransformComponent { Position = position, Rotation = 0f, Scale = Vector2.One });
             playerEntity.AddComponent(new ProposedPositionComponent { Value = position });
             playerEntity.AddComponent(new SpeedComponent() { Value = 100f });
             playerEntity.AddComponent(new DirectionComponent { Value = Vector2.Zero });
             playerEntity.AddComponent(new HealthComponent { CurrentHealth = 100, MaxHealth = 100 });
-            playerEntity.AddComponent(new PlayerInputComponent());
+            playerEntity.AddComponent((PlayerInputComponent)keybindFactory.Create(_assetManager.Load<Keybinds>(FileNameConfig.Keybinds)));
             playerEntity.AddComponent(new AnimationComponent { Clips = new Dictionary<AnimationType, AnimationClip>(), CurrentClipName = AnimationType.Idle });
 
             Texture2D _playerTexture = _assetManager.LoadTexture(FileNameConfig.Player);
@@ -118,6 +142,12 @@ namespace GameEnginePlayground.Factories
             return playerEntity;
         }
 
+        /// <summary>
+        /// Adds an animation clip to the player's animation component for the specified animation type and texture.
+        /// </summary>
+        /// <param name="playerAnimationComponent">The animation component to add the clip to.</param>
+        /// <param name="type">The animation type.</param>
+        /// <param name="texture">The texture containing animation frames.</param>
         private void AddAnimation(ref AnimationComponent playerAnimationComponent, AnimationType type, Texture2D texture)
         {
             playerAnimationComponent.Clips[type] = new AnimationClip
@@ -136,6 +166,13 @@ namespace GameEnginePlayground.Factories
             };
         }
 
+        /// <summary>
+        /// Calculates the average bounds of non-transparent pixels in the texture frames to determine the collider size and origin.
+        /// </summary>
+        /// <param name="texture">The texture containing animation frames.</param>
+        /// <param name="frameWidth">The width of each frame.</param>
+        /// <param name="frameHeight">The height of each frame.</param>
+        /// <returns>A Rectangle representing the average bounds of the frames.</returns>
         private Rectangle CalculateAverageBounds(Texture2D texture, int frameWidth, int frameHeight)
         {
             int columns = texture.Width / frameWidth;

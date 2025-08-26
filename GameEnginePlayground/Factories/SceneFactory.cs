@@ -13,12 +13,13 @@ using GameEngine.Graphics.Animations;
 using GameEngine.Graphics.Camera;
 using GameEngine.Graphics.Components;
 using GameEngine.Graphics.Render;
-using GameEngine.IO.Audio;
 using GameEngine.IO.Audio.Systems;
+using GameEngine.IO.Controller;
 using GameEngine.Physics;
 using GameEngine.Physics.CollisionDetection;
 using GameEngine.Physics.CollisionDetection.Models;
 using GameEngine.Physics.Motion;
+using GameEnginePlayground.Factories.DataObjects;
 using GameEnginePlayground.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
@@ -27,17 +28,31 @@ using System.Linq;
 
 namespace GameEnginePlayground.Factories
 {
-    public class SceneFactory : IFactory<IScene>
+    /// <summary>
+    /// Factory for creating game scenes with all required systems, entities, and components.
+    /// Uses asset manager, audio manager, input manager, and other dependencies to fully configure the scene.
+    /// </summary>
+    public class SceneFactory : IFactory<IScene, SceneData>
     {
         private readonly IAssetManager _assetManager;
         private readonly IAudioManager _audioManager;
         private readonly IInputManager _inputManager;
         private readonly GraphicsDevice _graphicsDevice;
         private readonly ITimeManager _timeManager;
-        private readonly IFactory<ITileMap> _mapFactory;
+        private readonly IFactory<ITileMap, MapData> _mapFactory;
         private readonly SpriteBatch _spriteBatch;
         private readonly IEventManager _eventManager;
 
+        /// <summary>
+        /// Initializes a new instance of the SceneFactory with required dependencies.
+        /// </summary>
+        /// <param name="assetManager">The asset manager for loading assets.</param>
+        /// <param name="audioManager">The audio manager for sound effects and music.</param>
+        /// <param name="inputManager">The input manager for handling input.</param>
+        /// <param name="graphicsDevice">The graphics device for rendering.</param>
+        /// <param name="timeManager">The time manager for game timing.</param>
+        /// <param name="spriteBatch">The sprite batch for rendering sprites.</param>
+        /// <param name="eventManager">The event manager for event handling.</param>
         public SceneFactory(IAssetManager assetManager, IAudioManager audioManager, IInputManager inputManager, GraphicsDevice graphicsDevice, ITimeManager timeManager, SpriteBatch spriteBatch, IEventManager eventManager) {
             _assetManager = assetManager;
             _audioManager = audioManager;
@@ -49,22 +64,31 @@ namespace GameEnginePlayground.Factories
             _eventManager = eventManager;
         }
         
-        public IScene Create()
+        /// <summary>
+        /// Creates a game scene with all required systems, entities, and components using the provided scene data.
+        /// </summary>
+        /// <param name="data">The scene data used for configuration (extend SceneData for more options).</param>
+        /// <returns>The fully configured scene instance.</returns>
+        public IScene Create(SceneData data)
         {
             IScene scene = new Scene();
             AddSystems(scene);
             return scene;
         }
 
+        /// <summary>
+        /// Adds all required systems, entities, and components to the scene, including player, camera, map, and update/draw systems.
+        /// </summary>
+        /// <param name="scene">The scene to configure.</param>
         private void AddSystems(IScene scene)
         {
             IWorld sceneWorld = scene.GetWorld();
-            var gameMap = _mapFactory.Create();
-            var quadtree = new Quadtree(new Rectangle(0, 0, gameMap.Width, gameMap.Height), 4);
-            PlayerFactory playerFactory = new PlayerFactory(_graphicsDevice, _assetManager, sceneWorld, gameMap.PlayerLayer, quadtree);
-            IEntity playerEntity = playerFactory.Create();
-            IEntity cameraEntity = CreateCamera(sceneWorld, gameMap.PlayerLayer);
 
+            var gameMap = _mapFactory.Create(new MapData());
+            var quadtree = new Quadtree(new Rectangle(0, 0, gameMap.Width, gameMap.Height), 4);
+            PlayerFactory playerFactory = new PlayerFactory(_graphicsDevice, _assetManager, _eventManager, sceneWorld, gameMap.PlayerLayer, quadtree);
+            IEntity playerEntity = playerFactory.Create(new PlayerData());
+            IEntity cameraEntity = CreateCamera(sceneWorld, gameMap.PlayerLayer);
             SoundEffect fireballSfx = _assetManager.Load<SoundEffect>("fireball-sound");
             SoundEffect shovelSfx = _assetManager.Load<SoundEffect>("shovel-sound");
             _audioManager.RegisterSfx("fireball.shoot", fireballSfx);
@@ -81,20 +105,23 @@ namespace GameEnginePlayground.Factories
             _pixel.SetData(new[] { Color.White });
             ICollisionMap collisionMap = new CollisionMap(gameMap, gameMap.Layers[0]);
             AddEnemy(sceneWorld, _pixel);
-            // 3. Register EngineSystems with the GameLoop
-            // Order matters for systems that depend on each other's output!
+            // Register EngineSystems with the GameLoop
             scene.RegisterUpdateSystem(new PlayerMovementInputSystem(_inputManager));
             scene.RegisterUpdateSystem(new MovementSystem(_timeManager));
             scene.RegisterUpdateSystem(new CollisionSystem(collisionMap, quadtree));
-            scene.RegisterUpdateSystem(new AnimationStateSystem(_inputManager));
+            scene.RegisterUpdateSystem(new AnimationStateSystem());
             scene.RegisterUpdateSystem(new AnimationSystem(_timeManager));
             scene.RegisterUpdateSystem(new CameraUpdateSystem(playerEntity.Id, _inputManager));
             scene.RegisterUpdateSystem(new CullingSystem(cameraEntity, gameMap));
-            scene.RegisterUpdateSystem(new MouseEventHandlerSystem(sceneWorld, cameraEntity, gameMap, _eventManager, playerEntity, _assetManager, _inputManager, quadtree));
             scene.RegisterUpdateSystem(new ProjectileLiftetimeSystem(_timeManager, quadtree));
             scene.RegisterUpdateSystem(new TargetingSystem());
             scene.RegisterUpdateSystem(new BehaviorTreeSystem());
+            scene.RegisterUpdateSystem(new InputSystem(_inputManager));
             scene.RegisterUpdateSystem(new SoundFxSystem(_audioManager, _eventManager));
+
+            IFactory<IEntity, ProjectileData> projectileFactory = new ProjectileFactory(sceneWorld, quadtree);
+            scene.RegisterEventSystem(new ProjectileSystem(_eventManager, _inputManager, _assetManager, projectileFactory));
+            scene.RegisterEventSystem(new MouseEventHandlerSystem(sceneWorld, cameraEntity, playerEntity, gameMap, _eventManager));
 
             var pp = _graphicsDevice.PresentationParameters;
             var mainTarget = new RenderTarget2D(_graphicsDevice, pp.BackBufferWidth, pp.BackBufferHeight);
@@ -108,6 +135,11 @@ namespace GameEnginePlayground.Factories
             //scene.RegisterDrawSystem(new DebugRendererSystem(_pixel, cameraEntity, collisionMap));
         }
 
+        /// <summary>
+        /// Adds an enemy entity to the world with preconfigured components and behavior tree.
+        /// </summary>
+        /// <param name="world">The world to add the enemy to.</param>
+        /// <param name="pixel">The texture used for the enemy sprite.</param>
         private void AddEnemy(IWorld world, Texture2D pixel)
         {
             var position = new Vector2(800, 800);
@@ -139,13 +171,19 @@ namespace GameEnginePlayground.Factories
                 Effects = SpriteEffects.None,
                 LayerDepth = 0f
             });
-
-
         }
 
+        /// <summary>
+        /// Adds objects from a tile layer to the world, creating entities with transform, collider, and sprite components.
+        /// Inserts entities into the quadtree for spatial partitioning.
+        /// </summary>
+        /// <param name="map">The tile map containing the layer.</param>
+        /// <param name="world">The world to add objects to.</param>
+        /// <param name="layer">The tile layer containing objects.</param>
+        /// <param name="grassTexture">The texture to use for object sprites.</param>
+        /// <param name="quadTree">The quadtree for spatial partitioning.</param>
         private void AddObjects(ITileMap map, IWorld world, ITileLayer layer, Texture2D grassTexture, IQuadTree quadTree)
         {
-            
             foreach (var item in layer.Objects)
             {
                 var grass = world.CreateEntity();
@@ -194,6 +232,13 @@ namespace GameEnginePlayground.Factories
             }
         }
 
+        /// <summary>
+        /// Creates a camera entity positioned at the player spawn location or a default position.
+        /// Adds transform and camera components to the entity.
+        /// </summary>
+        /// <param name="world">The world to create the camera entity in.</param>
+        /// <param name="playerLayer">The tile layer containing player spawn information.</param>
+        /// <returns>The configured camera entity.</returns>
         private IEntity CreateCamera(IWorld world, ITileLayer playerLayer)
         {
             var positionObject = playerLayer.Objects.FirstOrDefault(o => o.Name == "PlayerSpawn");

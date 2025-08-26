@@ -5,6 +5,7 @@ using GameEngine.IO.Asset;
 using GameEngine.IO.Audio;
 using GameEngine.IO.Controller;
 using GameEnginePlayground.Factories;
+using GameEnginePlayground.Systems;
 using Microsoft.Extensions.DependencyInjection;
 
 
@@ -15,7 +16,6 @@ services.AddSingleton<IEventManager, EventManager>();
 services.AddSingleton<IAssetManager, AssetManager>();
 services.AddSingleton<IAudioManager, AudioManager>();
 services.AddSingleton<IInputManager, InputManager>();
-services.AddSingleton<IKeybindFactory, KeybindFactory>();
 
 // Register the game
 services.AddSingleton<Game1>();
