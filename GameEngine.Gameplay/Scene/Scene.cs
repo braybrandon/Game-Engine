@@ -1,11 +1,10 @@
 ﻿using GameEngine.Common.Interfaces;
 using Microsoft.Xna.Framework.Graphics;
-using System.Collections.Generic;
 
 namespace GameEngine.Gameplay.Scene
 {
     /// <summary>
-    /// Represents a game scene, managing its world, update systems, and draw systems.
+    /// Represents a game scene, managing its world, update systems, draw systems, and event systems.
     /// Provides methods for system registration, update, draw, and content unloading.
     /// </summary>
     public class Scene : IScene
@@ -13,6 +12,7 @@ namespace GameEngine.Gameplay.Scene
         private IWorld _world;
         private List<IUpdateSystem> _updateSystems = new List<IUpdateSystem>();
         private List<IDrawSystem> _drawSystems = new List<IDrawSystem>();
+        private List<IEventSystem> _eventSystems = new List<IEventSystem>();
 
         /// <summary>
         /// Initializes a new instance of the Scene class and creates its world.
@@ -29,6 +29,27 @@ namespace GameEngine.Gameplay.Scene
         public IWorld GetWorld()
         {
             return _world;
+        }
+
+        /// <summary>
+        /// Registers an event system to handle events within the scene.
+        /// </summary>
+        /// <param name="system">The event system to register.</param>
+        public void RegisterEventSystem(IEventSystem system)
+        {
+            if (!_eventSystems.Contains(system))
+            {
+                _eventSystems.Add(system);
+            }
+        }
+
+        /// <summary>
+        /// Unregisters an event system so it is no longer called within the scene.
+        /// </summary>
+        /// <param name="system">The event system to unregister.</param>
+        public void UnregisterEventSystem(IEventSystem system)
+        {
+            _eventSystems.Remove(system);
         }
 
         /// <summary>
