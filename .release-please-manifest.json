@@ -2,6 +2,6 @@
   "GameEngine.IO": "0.1.0",
   "GameEngine.Physics": "0.0.2",
   "GameEngine.Gameplay": "0.1.0",
-  "GameEngine.Common": "0.1.0",
+  "GameEngine.Common": "0.1.1",
   "GameEngine.Graphics": "0.0.2"
 }
