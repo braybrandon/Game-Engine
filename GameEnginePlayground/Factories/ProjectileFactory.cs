@@ -43,7 +43,7 @@ namespace GameEnginePlayground.Factories
             fireball.AddComponent(new ProposedPositionComponent());
             fireball.AddComponent(new LifetimeComponent(data.Lifetime));
 
-            fireball.AddComponent(new ColliderComponent { Bounds = data.ColliderBounds, IsTrigger = data.IsTrigger, IsStatic = data.IsStatic });
+            fireball.AddComponent(new ColliderComponent { Bounds = data.ColliderBounds, IsTrigger = data.IsTrigger, IsStatic = data.IsStatic, Filter = data.Tag });
 
             _quadTree.Insert(fireball, new Rectangle((int)data.InitialPosition.X - data.ColliderBounds.X, (int)data.InitialPosition.Y - data.ColliderBounds.Y, data.ColliderBounds.Width, data.ColliderBounds.Height));
 

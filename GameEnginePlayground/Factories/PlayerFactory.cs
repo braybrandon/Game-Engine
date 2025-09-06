@@ -1,10 +1,11 @@
-﻿using GameEngine.Common.Config;
+﻿using GameEngine.Common.Components;
+using GameEngine.Common.Config;
 using GameEngine.Common.Interfaces;
 using GameEngine.Common.IO.Components;
 using GameEngine.Common.IO.Interface;
+using GameEngine.Common.Physics;
 using GameEngine.Common.Physics.Components;
 using GameEngine.Common.Physics.Interfaces;
-using GameEngine.Gameplay.Combat.Components;
 using GameEngine.Graphics.Components;
 using GameEngine.Graphics.Enums;
 using GameEngine.Graphics.Models;
@@ -119,7 +120,7 @@ namespace GameEnginePlayground.Factories
 
             AddAnimation(ref playerAnimationComponent, AnimationType.WalkUp, _playerWalkUpTexture);
 
-            playerEntity.AddComponent(new ColliderComponent { Bounds = bounds, IsTrigger = false, IsStatic = false });
+            playerEntity.AddComponent(new ColliderComponent { Bounds = bounds, IsTrigger = false, IsStatic = false, Filter = Filters.Player });
             var transformBounds = new Rectangle(
                     (int)position.X - bounds.X,
                     (int)position.Y - bounds.Y,

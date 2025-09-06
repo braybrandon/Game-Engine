@@ -2,6 +2,7 @@
 using GameEngine.Common.Config;
 using GameEngine.Common.Interfaces;
 using GameEngine.Common.IO.Interface;
+using GameEngine.Common.Physics;
 using GameEngine.Common.Physics.Components;
 using GameEngine.Common.Physics.Interfaces;
 using GameEngine.Gameplay.AI.BehaviorTree;
@@ -20,10 +21,12 @@ using GameEngine.Physics.CollisionDetection;
 using GameEngine.Physics.CollisionDetection.Models;
 using GameEngine.Physics.Motion;
 using GameEnginePlayground.Factories.DataObjects;
+using GameEnginePlayground.Services;
 using GameEnginePlayground.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Linq;
 
 namespace GameEnginePlayground.Factories
@@ -104,7 +107,7 @@ namespace GameEnginePlayground.Factories
             Texture2D _pixel = new Texture2D(_graphicsDevice, 1, 1);
             _pixel.SetData(new[] { Color.White });
             ICollisionMap collisionMap = new CollisionMap(gameMap, gameMap.Layers[0]);
-            AddEnemy(sceneWorld, _pixel);
+
             // Register EngineSystems with the GameLoop
             scene.RegisterUpdateSystem(new PlayerMovementInputSystem(_inputManager));
             scene.RegisterUpdateSystem(new MovementSystem(_timeManager));
@@ -120,7 +123,8 @@ namespace GameEnginePlayground.Factories
             scene.RegisterUpdateSystem(new SoundFxSystem(_audioManager, _eventManager));
 
             IFactory<IEntity, ProjectileData> projectileFactory = new ProjectileFactory(sceneWorld, quadtree);
-            scene.RegisterEventSystem(new ProjectileSystem(_eventManager, _inputManager, _assetManager, projectileFactory));
+            AddEnemy(sceneWorld, _pixel, quadtree, projectileFactory);
+            scene.RegisterEventSystem(new ProjectileSystem(_eventManager, _inputManager, _assetManager, projectileFactory, _graphicsDevice));
             scene.RegisterEventSystem(new MouseEventHandlerSystem(sceneWorld, cameraEntity, playerEntity, gameMap, _eventManager));
 
             var pp = _graphicsDevice.PresentationParameters;
@@ -132,7 +136,7 @@ namespace GameEnginePlayground.Factories
             scene.RegisterDrawSystem(new TileMapRenderSystem(gameMap, cameraEntity, mainTarget, _graphicsDevice));
             scene.RegisterDrawSystem(new SpriteRenderSystem(_pixel));
             //scene.RegisterDrawSystem(new LightFxRenderSystem(_graphicsDevice, playerEntity, cameraEntity, lightTarget, mainTarget, lightTexture, lightEffect));
-            //scene.RegisterDrawSystem(new DebugRendererSystem(_pixel, cameraEntity, collisionMap));
+            scene.RegisterDrawSystem(new DebugRendererSystem(_pixel, cameraEntity, collisionMap));
         }
 
         /// <summary>
@@ -140,37 +144,58 @@ namespace GameEnginePlayground.Factories
         /// </summary>
         /// <param name="world">The world to add the enemy to.</param>
         /// <param name="pixel">The texture used for the enemy sprite.</param>
-        private void AddEnemy(IWorld world, Texture2D pixel)
+        private void AddEnemy(IWorld world, Texture2D pixel, Quadtree quadtree, IFactory<IEntity, ProjectileData> projectileFactory)
         {
-            var position = new Vector2(800, 800);
-            var enemy = world.CreateEntity();
-            enemy.AddComponent(new TransformComponent { Position = position, Scale = Vector2.One });
-            enemy.AddComponent(new DirectionComponent { Value = Vector2.Zero });
-            enemy.AddComponent(new PerceptionComponent { Radius = 200 });
-            enemy.AddComponent(new AIComponent());
-            enemy.AddComponent(new TargetComponent());
-            enemy.AddComponent(new ProposedPositionComponent { Value = position });
-            enemy.AddComponent(new SpeedComponent() { Value = 60f });
-            enemy.AddComponent(new ColliderComponent { Bounds = new Rectangle(0,0,1,1), IsTrigger = false, IsStatic = false });
-            var hasTarget = new HasTargetNode(enemy);
-            var chasePlayer = new MoveToTargetNode(enemy);
-            var chaseSequence = new SequenceNode(enemy, hasTarget, chasePlayer);
-            var rootSelector = new SelectorNode(enemy, chaseSequence);
-            Texture2D _playerTexture = _assetManager.LoadTexture(FileNameConfig.Player);
-            var origin = new Vector2(_playerTexture.Width / 2, _playerTexture.Height / 2);
 
-            enemy.AddComponent(new BehaviorTreeComponent(rootSelector ));
-            enemy.AddComponent(new SpriteComponent
+            Texture2D enemyTexture = _assetManager.LoadTexture("sasuke");
+            for(int i = 0; i < 10; i++)
             {
-                Texture = _playerTexture,
-                SourceRectangle = _playerTexture.Bounds,
-                Color = Color.White,
-                Scale = 1f,
-                Rotation = 0f,
-                Origin = new Vector2(0,0),
-                Effects = SpriteEffects.None,
-                LayerDepth = 0f
-            });
+                var randomx = new Random().Next(20, 1500);
+                var randomy = new Random().Next(20, 1500);
+                var position = new Vector2(randomx, randomy);
+                var enemy = world.CreateEntity();
+                var origin = new Vector2(enemyTexture.Width / 2, enemyTexture.Height / 2);
+                var bounds = new Rectangle(enemyTexture.Width / 2, enemyTexture.Height / 2, enemyTexture.Width, enemyTexture.Height);
+                enemy.AddComponent(new TransformComponent { Position = position, Scale = Vector2.One });
+                enemy.AddComponent(new DirectionComponent { Value = Vector2.Zero });
+                enemy.AddComponent(new PerceptionComponent { Radius = 200 });
+                enemy.AddComponent(new AIComponent());
+                enemy.AddComponent(new HealthComponent { CurrentHealth = 100, MaxHealth = 100 });
+                enemy.AddComponent(new TargetComponent());
+                enemy.AddComponent(new ProposedPositionComponent { Value = position });
+                enemy.AddComponent(new SpeedComponent() { Value = 60f });
+                enemy.AddComponent(new ColliderComponent { Bounds = bounds, IsTrigger = false, IsStatic = false, Filter = Filters.Enemy });
+                var hasTarget = new HasTargetNode(enemy);
+                var chasePlayer = new MoveToTargetNode(enemy);
+                var chaseSequence = new SequenceNode(enemy, hasTarget, chasePlayer);
+                var fireballNode = new FireballNode(enemy, projectileFactory, _eventManager, world);
+                var inRange = new InRangeNode(enemy);
+                var gcd = new GlobalCooldownNode(1f);
+                var stopMovement = new StopMovementNode(enemy);
+                var attackSequence = new SequenceNode(enemy, hasTarget, inRange, stopMovement, gcd, fireballNode);
+                var rootSelector = new SelectorNode(enemy, attackSequence, chaseSequence);
+                var transformBounds = new Rectangle(
+                    (int)position.X - bounds.X,
+                    (int)position.Y - bounds.Y,
+                    bounds.Width,
+                    bounds.Height
+                );
+                quadtree.Insert(enemy, transformBounds);
+
+                enemy.AddComponent(new BehaviorTreeComponent(rootSelector));
+                enemy.AddComponent(new SpriteComponent
+                {
+                    Texture = enemyTexture,
+                    SourceRectangle = enemyTexture.Bounds,
+                    Color = Color.White,
+                    Scale = 1f,
+                    Rotation = 0f,
+                    Origin = origin,
+                    Effects = SpriteEffects.None,
+                    LayerDepth = 0f
+                });
+            }
+
         }
 
         /// <summary>

@@ -1,4 +1,6 @@
-﻿using GameEngine.Common.Interfaces;
+﻿using GameEngine.Common.Components;
+using GameEngine.Common.Interfaces;
+using GameEngine.Common.Physics;
 using GameEngine.Common.Physics.Components;
 using GameEngine.Common.Physics.Interfaces;
 using Microsoft.Xna.Framework;
@@ -49,31 +51,86 @@ namespace GameEngine.Physics.CollisionDetection
 
                     if (movingEntity.Id == entity.Id) continue;
                     ref ColliderComponent entityCollider = ref entity.GetComponent<ColliderComponent>();
-                    if (!entityCollider.IsStatic) continue;
                     ref TransformComponent entTransform = ref entity.GetComponent<TransformComponent>();
-                    var bottomBounds = new Rectangle(
-                        proposedBounds.X,
-                        proposedBounds.Y + proposedBounds.Height - 1,
-                        colliderBounds.Width,
-                        1
-                    );
-                    var entBounds = new Rectangle(
-                        (int)entTransform.Position.X - entityCollider.Bounds.X,
-                        (int)entTransform.Position.Y - entityCollider.Bounds.Y,
-                        entityCollider.Bounds.Width,
-                        entityCollider.Bounds.Height
-                    );
-                    collides = entBounds.Intersects(bottomBounds);
-                    if (collides) break;
+                    if (!entityCollider.IsStatic)
+                    {
+                      
+                        var entBounds = new Rectangle(
+                            (int)entTransform.Position.X - entityCollider.Bounds.X,
+                            (int)entTransform.Position.Y - entityCollider.Bounds.Y,
+                            entityCollider.Bounds.Width,
+                            entityCollider.Bounds.Height
+                        );
+                        if (proposedBounds.Intersects(entBounds))
+                        {
+                            if (!CollisionFilters.ShouldCollide(collider.Filter, entityCollider.Filter))
+                                continue;
+
+                            // projectiles vs anything they’re allowed to hit
+                            bool aProj = CollisionFilters.InCat(collider.Filter, CollisionCategory.Projectile);
+                            bool bProj = CollisionFilters.InCat(entityCollider.Filter, CollisionCategory.Projectile);
+                            if (aProj || bProj)
+                            {
+                                var proj = aProj ? movingEntity : entity;
+                                var target = aProj ? entity : movingEntity;
+                                var projBounds = aProj ? transformBounds : entBounds;
+                                // NEW: skip pairs that aren't allowed to collide
+
+                                CalculateDamage(target, world, entBounds);
+                                _quadTree.Remove(proj, projBounds);
+                                // Mark the entity for removal
+                                world.DestroyEntity(proj); // or whatever method you use to remove entities
+                                collides = true;
+                            }
+
+                        }
+                        continue;
+                    }
+                    else
+                    {
+
+                        var bottomBounds = new Rectangle(
+                            proposedBounds.X,
+                            proposedBounds.Y,
+                            colliderBounds.Width,
+                            colliderBounds.Height
+                        );
+                        var entBounds = new Rectangle(
+                            (int)entTransform.Position.X - entityCollider.Bounds.X,
+                            (int)entTransform.Position.Y - entityCollider.Bounds.Y,
+                            entityCollider.Bounds.Width,
+                            entityCollider.Bounds.Height
+                        );
+                        collides = entBounds.Intersects(bottomBounds);
+                        if (collides) break;
+                    }
                 }
 
                 if (!_collisionMap.IsSolid(proposedBounds) && !collides)
                 {
-                    transform.Position = proposedPosition.Value; 
+                    transform.Position = proposedPosition.Value;
                     _quadTree.Remove(movingEntity, transformBounds);
                     _quadTree.Insert(movingEntity, proposedBounds);
                 }
             }
+        }
+
+        private bool CalculateDamage(IEntity entity, IWorld world, Rectangle bounds)
+        {
+            if (entity.HasComponent<HealthComponent>())
+            {
+                ref var health = ref entity.GetComponent<HealthComponent>();
+                health.CurrentHealth -= 10; // or whatever damage value you want
+                if(health.CurrentHealth <= 0)
+                {
+                    _quadTree.Remove(entity, bounds);
+                    // Mark the entity for removal
+                    world.DestroyEntity(entity);
+                    return true;
+                }
+
+            }
+            return false;
         }
     }
 }
