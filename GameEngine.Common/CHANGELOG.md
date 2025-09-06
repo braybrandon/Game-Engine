@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.1](https://github.com/braybrandon/Game-Engine/compare/common-v0.1.0...common-v0.1.1) (2025-08-26)
+
+
+### Bug Fixes
+
+* **common:** Add documentation to ICollisionMap ([#210](https://github.com/braybrandon/Game-Engine/issues/210)) ([d1245c9](https://github.com/braybrandon/Game-Engine/commit/d1245c94ffa850df8f00d4d476fc88f0e0345a5c))
+
 ## [0.1.0](https://github.com/braybrandon/Game-Engine/compare/common-v0.0.4...common-v0.1.0) (2025-08-25)
 
 
