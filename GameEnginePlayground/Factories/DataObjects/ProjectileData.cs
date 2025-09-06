@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GameEngine.Common.Physics;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Text.Json.Serialization;
 
@@ -10,6 +11,7 @@ namespace GameEnginePlayground.Factories.DataObjects
     /// </summary>
     public class ProjectileData
     {
+        public CollisionFilter Tag { get; set; } 
         /// <summary>Speed of the projectile.</summary>
         public float ProjectileSpeed { get; set; }
         /// <summary>Sound file to play when the projectile is created or fired.</summary>

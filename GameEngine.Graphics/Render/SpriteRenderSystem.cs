@@ -1,4 +1,5 @@
-﻿using GameEngine.Common.Interfaces;
+﻿using GameEngine.Common.Components;
+using GameEngine.Common.Interfaces;
 using GameEngine.Common.Physics.Components;
 using GameEngine.Graphics.Camera;
 using GameEngine.Graphics.Components;
@@ -46,7 +47,17 @@ namespace GameEngine.Graphics.Render
                     sprite.Effects,
                    sprite.LayerDepth
                 );
+                if (entity.HasComponent<HealthComponent>())
+                {
+                    ref var health = ref entity.GetComponent<HealthComponent>();
+                    var percent = (float)health.CurrentHealth / health.MaxHealth;
+                    spriteBatch.Draw(_pixel, new Rectangle((int)transform.Position.X - 16, (int)transform.Position.Y - 16, 32, 8), Color.Black);
+                    spriteBatch.Draw(_pixel, new Rectangle((int)transform.Position.X - 16, (int)transform.Position.Y - 16, (int)(32 * percent), 8), Color.Green);
+                }
+
             }
+
+
 
             spriteBatch.End();
         }

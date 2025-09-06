@@ -21,6 +21,8 @@ namespace GameEngine.Common.Physics.Components
         /// </summary>
         public Vector2 Offset;
 
+        public CollisionFilter Filter;
+
         /// <summary>
         /// Indicates if this collider is a trigger. Triggers detect collisions but do not cause a physical response.
         /// </summary>

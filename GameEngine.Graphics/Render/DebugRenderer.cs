@@ -1,5 +1,6 @@
 ﻿using GameEngine.Common.Components;
 using GameEngine.Common.Interfaces;
+using GameEngine.Common.Physics.Components;
 using GameEngine.Graphics.Camera;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -48,6 +49,20 @@ namespace GameEngine.Graphics.Render
                         DrawRectangleOutline(spriteBatch, outline, Color.Red, 1);
                     }
                 }
+            }
+
+            foreach (var entity in world.GetEntitiesWith<TransformComponent, ColliderComponent>())
+            {
+                ref var transform = ref entity.GetComponent<TransformComponent>();
+                ref var collider = ref entity.GetComponent<ColliderComponent>();
+                Rectangle colliderBounds = collider.Bounds;
+                Rectangle entityRect = new Rectangle(
+                    (int)transform.Position.X - colliderBounds.X,
+                    (int)transform.Position.Y - colliderBounds.Y,
+                    colliderBounds.Width,
+                    colliderBounds.Height
+                );
+                DrawRectangleOutline(spriteBatch, entityRect, Color.Blue, 1);
             }
             spriteBatch.End();
         }

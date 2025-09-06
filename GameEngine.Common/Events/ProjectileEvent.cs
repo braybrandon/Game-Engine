@@ -1,4 +1,7 @@
 ﻿using GameEngine.Common.Interfaces;
+using Microsoft.Xna.Framework;
+
+
 
 namespace GameEngine.Common.Events
 {
@@ -12,6 +15,8 @@ namespace GameEngine.Common.Events
         /// Gets the type or name of the projectile event.
         /// </summary>
         public string Type { get; }
+
+        public Vector2 Direction { get; set; } = Vector2.Zero;
 
         /// <summary>
         /// Gets the ID of the entity associated with the projectile event.
@@ -34,6 +39,13 @@ namespace GameEngine.Common.Events
             EntityId = entityId;
             Type = name;
             World = world;
+        }
+        public ProjectileEvent(int entityId, string name, IWorld world, Vector2 direction)
+        {
+            EntityId = entityId;
+            Type = name;
+            World = world;
+            Direction = direction;
         }
 
         /// <summary>
