@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/braybrandon/Game-Engine/compare/common-v0.1.1...common-v0.2.0) (2025-10-05)
+
+
+### Features
+
+* **Common:** small change ([f3cff50](https://github.com/braybrandon/Game-Engine/commit/f3cff5059581f801ea284cfd29306e2764010e6f))
+
 ## [0.1.1](https://github.com/braybrandon/Game-Engine/compare/common-v0.1.0...common-v0.1.1) (2025-08-26)
 
 
