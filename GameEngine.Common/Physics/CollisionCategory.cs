@@ -8,7 +8,8 @@ namespace GameEngine.Common.Physics
         None = 0,
         Player = 1 << 0,
         Enemy = 1 << 1,
-        Projectile = 1 << 2
+        Projectile = 1 << 2,
+        Environment = 1 << 3
     }
 
     public struct CollisionFilter
@@ -23,25 +24,31 @@ namespace GameEngine.Common.Physics
         public static CollisionFilter Player => new()
         {
             Category = CollisionCategory.Player,
-            Mask = (uint)(CollisionCategory.Enemy | CollisionCategory.Projectile),
+            Mask = (uint)(CollisionCategory.Environment | CollisionCategory.Projectile),
         };
 
         public static CollisionFilter Enemy => new()
         {
             Category = CollisionCategory.Enemy,
-            Mask = (uint)(CollisionCategory.Player | CollisionCategory.Projectile),
+            Mask = (uint)(CollisionCategory.Environment | CollisionCategory.Projectile),
         };
 
         public static CollisionFilter PlayerProjectile => new()
         {
             Category = CollisionCategory.Projectile,
-            Mask = (uint)(CollisionCategory.Enemy),
+            Mask = (uint)(CollisionCategory.Enemy | CollisionCategory.Environment),
         };
 
         public static CollisionFilter EnemyProjectile => new()
         {
             Category = CollisionCategory.Projectile,
-            Mask = (uint)(CollisionCategory.Player),
+            Mask = (uint)(CollisionCategory.Player | CollisionCategory.Environment),
+        };
+
+        public static CollisionFilter Environment => new()
+        {
+            Category = CollisionCategory.Environment,
+            Mask = (uint)(CollisionCategory.Player | CollisionCategory.Enemy | CollisionCategory.Projectile),
         };
     }
 

@@ -28,6 +28,7 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Linq;
+using static Assimp.Metadata;
 
 namespace GameEnginePlayground.Factories
 {
@@ -170,7 +171,7 @@ namespace GameEnginePlayground.Factories
                 var chaseSequence = new SequenceNode(enemy, hasTarget, chasePlayer);
                 var fireballNode = new FireballNode(enemy, projectileFactory, _eventManager, world);
                 var inRange = new InRangeNode(enemy);
-                var gcd = new GlobalCooldownNode(1f);
+                var gcd = new GlobalCooldownNode(0.5f);
                 var stopMovement = new StopMovementNode(enemy);
                 var attackSequence = new SequenceNode(enemy, hasTarget, inRange, stopMovement, gcd, fireballNode);
                 var rootSelector = new SelectorNode(enemy, attackSequence, chaseSequence);
@@ -225,7 +226,8 @@ namespace GameEnginePlayground.Factories
                     var colliderX = tileset.Tiles[0].Objects[0].X;
                     var colliderY = tileset.Tiles[0].Objects[0].Y;
                     var cbounds = new Rectangle((int)(-(colliderX - width / 2)), (int)(-(colliderY - height / 2)), (int)colliderWidth, (int)colliderHeight);
-                    grass.AddComponent(new ColliderComponent { Bounds = cbounds, IsStatic = true});
+                    grass.AddComponent(new ColliderComponent { Bounds = cbounds, IsStatic = true, Filter= Filters.Environment });
+                    grass.AddComponent(new HealthComponent { CurrentHealth = 30, MaxHealth = 30 });
                     var transformBounds = new Rectangle(
                         (int)item.X - cbounds.X,
                         (int)item.Y - cbounds.Y,
