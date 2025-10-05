@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace GameEngine.Common.IO.Components
 {
-    /// <summary>
+    /// <summary> 
     /// Component that flags an entity as player-controlled and stores key bindings for input actions.
     /// Used to associate keyboard input mappings and actions with player entities for input handling and game logic.
     /// </summary>
